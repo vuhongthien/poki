@@ -18,5 +18,7 @@ public class GroupPet {
 
     private String name;
 
+    private int step;
+
     private Long requestAttackIdGroup;
 }

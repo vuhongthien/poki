@@ -22,7 +22,7 @@ public class EnemyPet {
 
     private int lever;
 
-    private boolean checkNew;
+    private int leverDisplay;
 
     private int requestPass;
 

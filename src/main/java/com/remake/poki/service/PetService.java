@@ -1,9 +1,13 @@
 package com.remake.poki.service;
 
+import com.remake.poki.dto.GroupDTO;
 import com.remake.poki.dto.PetDTO;
+import com.remake.poki.dto.PetEnemyDTO;
 import com.remake.poki.enums.ElementType;
 import com.remake.poki.model.Pet;
+import com.remake.poki.repo.GroupPetRepository;
 import com.remake.poki.repo.PetRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.io.File;
@@ -19,8 +23,12 @@ import java.util.stream.Collectors;
 public class PetService {
     private final PetRepository petRepository;
 
-    public PetService(PetRepository petRepository) {
+    final
+    GroupPetRepository groupPetRepository;
+
+    public PetService(PetRepository petRepository, GroupPetRepository groupPetRepository) {
         this.petRepository = petRepository;
+        this.groupPetRepository = groupPetRepository;
     }
 
     @Transactional
@@ -92,6 +100,16 @@ public class PetService {
 
     public List<PetDTO> getPets() {
         return petRepository.findAllPet();
+    }
+
+    public List<GroupDTO> getEnemyPets(Long userId) {
+        List<GroupDTO> groupDTOS = groupPetRepository.getGroupPet(userId);
+        for (GroupDTO groupDTO : groupDTOS) {
+            List<PetEnemyDTO> petEnemyDTOS = petRepository.getEnemyPets(userId, groupDTO.getId());
+            groupDTO.setListPetEnemy(petEnemyDTOS);
+        }
+
+        return groupDTOS;
     }
 }
 

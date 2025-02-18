@@ -33,5 +33,11 @@ public class PetController {
 
         return new ResponseEntity<>(petService.getPets(), HttpStatus.OK);
     }
+
+    @GetMapping("/{userId}")
+    public ResponseEntity<?> GetEnemyPets(@PathVariable() Long userId) {
+
+        return new ResponseEntity<>(petService.getEnemyPets(userId), HttpStatus.OK);
+    }
 }
 

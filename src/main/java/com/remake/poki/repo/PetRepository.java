@@ -1,6 +1,7 @@
 package com.remake.poki.repo;
 
 import com.remake.poki.dto.PetDTO;
+import com.remake.poki.dto.PetEnemyDTO;
 import com.remake.poki.model.Pet;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -16,4 +17,11 @@ public interface PetRepository extends JpaRepository<Pet, Long> {
             "JOIN ElementWeakness ew ON p.elementType = ew.weakAgainst " +
             "WHERE p.maxLevel = ps.level OR p.maxLevel IS NULL")
     List<PetDTO> findAllPet();
+
+    @Query(value = "SELECT new com.remake.poki.dto.PetEnemyDTO(p.id, p.name, ep.lever, ep.leverDisplay, COALESCE(cp.count, 0), ep.requestPass, ep.requestAttack) " +
+            "FROM Pet p " +
+            "LEFT JOIN CountPass cp ON p.id = cp.idPet AND cp.idUser = :userId " +
+            "JOIN EnemyPet ep ON ep.idPet = p.id AND ep.idGroupPet = :groupId")
+    List<PetEnemyDTO> getEnemyPets(Long userId, Long groupId);
+
 }
