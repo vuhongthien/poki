@@ -31,5 +31,61 @@ public class PetStats {
 
     @Column(precision = 5, scale = 2)
     private BigDecimal weaknessValue;
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Long getPetId() {
+        return petId;
+    }
+
+    public void setPetId(Long petId) {
+        this.petId = petId;
+    }
+
+    public int getLevel() {
+        return level;
+    }
+
+    public void setLevel(int level) {
+        this.level = level;
+    }
+
+    public int getHp() {
+        return hp;
+    }
+
+    public void setHp(int hp) {
+        this.hp = hp;
+    }
+
+    public int getAttack() {
+        return attack;
+    }
+
+    public void setAttack(int attack) {
+        this.attack = attack;
+    }
+
+    public int getMana() {
+        return mana;
+    }
+
+    public void setMana(int mana) {
+        this.mana = mana;
+    }
+
+    public BigDecimal getWeaknessValue() {
+        return weaknessValue;
+    }
+
+    public void setWeaknessValue(BigDecimal weaknessValue) {
+        this.weaknessValue = weaknessValue;
+    }
 }
 

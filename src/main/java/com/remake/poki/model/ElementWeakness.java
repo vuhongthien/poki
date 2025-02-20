@@ -25,4 +25,28 @@ public class ElementWeakness {
 
     @Enumerated(EnumType.STRING)
     private ElementType weakAgainst;
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public ElementType getElement() {
+        return element;
+    }
+
+    public void setElement(ElementType element) {
+        this.element = element;
+    }
+
+    public ElementType getWeakAgainst() {
+        return weakAgainst;
+    }
+
+    public void setWeakAgainst(ElementType weakAgainst) {
+        this.weakAgainst = weakAgainst;
+    }
 }
