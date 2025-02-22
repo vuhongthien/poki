@@ -16,6 +16,14 @@ public class UserDTO implements Serializable {
 
     private int requestAttack;
 
+    private String name;
+
+    private int lever;
+
+    private int exp;
+
+    private int expCurrent;
+
     public UserDTO() {
     }
 
@@ -57,5 +65,37 @@ public class UserDTO implements Serializable {
 
     public void setRequestAttack(int requestAttack) {
         this.requestAttack = requestAttack;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public int getLever() {
+        return lever;
+    }
+
+    public void setLever(int lever) {
+        this.lever = lever;
+    }
+
+    public int getExp() {
+        return exp;
+    }
+
+    public void setExp(int exp) {
+        this.exp = exp;
+    }
+
+    public int getExpCurrent() {
+        return expCurrent;
+    }
+
+    public void setExpCurrent(int expCurrent) {
+        this.expCurrent = expCurrent;
     }
 }

@@ -37,21 +37,22 @@ public class UserPetDTO {
     private int manaSkillCard;
 
     public UserPetDTO(Pet p, UserPet up, PetStats ps, ElementWeakness ew, User u, SkillCard sc) {
-        this.id = up.getId();
-        this.userId = u.getId();
-        this.petId = p.getId();
-        this.skillCardId = sc.getId();
-        this.name = p.getName();
-        this.des = sc.getDescription();
-        this.elementType = p.getElementType();
-        this.elementOther = ew.getElement();
-        this.level = up.getLevel();
-        this.hp = ps.getHp();
-        this.attack = ps.getAttack();
-        this.mana = ps.getMana();
-        this.weaknessValue = ps.getWeaknessValue();
-        this.manaSkillCard = sc.getMana();
+        this.id = (up != null) ? up.getId() : null;
+        this.userId = (u != null) ? u.getId() : null;
+        this.petId = (p != null) ? p.getId() : null;
+        this.skillCardId = (sc != null) ? sc.getId() : null;
+        this.name = (p != null) ? p.getName() : null;
+        this.des = (sc != null) ? sc.getDescription() : null;
+        this.elementType = (p != null) ? p.getElementType() : null;
+        this.elementOther = (ew != null) ? ew.getElement() : null;
+        this.level = (up != null) ? up.getLevel() : 0;
+        this.hp = (ps != null) ? ps.getHp() : 0;
+        this.attack = (ps != null) ? ps.getAttack() : 0;
+        this.mana = (ps != null) ? ps.getMana() : 0;
+        this.weaknessValue = (ps != null) ? ps.getWeaknessValue() : BigDecimal.ZERO;
+        this.manaSkillCard = (sc != null) ? sc.getMana() : 0;
     }
+
 
     public Long getId() {
         return id;

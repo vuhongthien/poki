@@ -10,13 +10,16 @@ import java.util.List;
 
 @Repository
 public interface UserPetRepository extends JpaRepository<UserPet, Long> {
-    @Query(value = "SELECT new com.remake.poki.dto.UserPetDTO(p,up, ps, ew, u, sc) " +
-            "FROM Pet p, UserPet up,PetStats ps, ElementWeakness ew, User u, SkillCard sc " +
-            "WHERE p.id = up.petId " +
-            "AND up.userId = u.id " +
-            "AND up.petId = ps.petId " +
-            "AND p.elementType = ew.weakAgainst " +
-            "AND p.skillCardId = sc.id " +
+    @Query(value = "SELECT new com.remake.poki.dto.UserPetDTO(p, up, ps, ew, u, sc) " +
+            "FROM Pet p " +
+            "JOIN UserPet up ON p.id = up.petId " +
+            "JOIN PetStats ps ON up.petId = ps.petId AND up.level = ps.level " +
+            "JOIN User u ON up.userId = u.id " +
+            "LEFT JOIN ElementWeakness ew ON p.elementType = ew.weakAgainst " +
+            "LEFT JOIN SkillCard sc ON p.skillCardId = sc.id " +
             "AND u.id = :userId")
+
+
+
     List<UserPetDTO> getListUserPets(Long userId);
 }

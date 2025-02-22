@@ -30,6 +30,10 @@ public class User {
 
     private int lever;
 
+    private int exp = 500;
+
+    private int expCurrent=10;
+
     private Long idPetUser;
 
     private int gold = 10000;
@@ -114,5 +118,21 @@ public class User {
 
     public void setRequestAttack(int requestAttack) {
         this.requestAttack = requestAttack;
+    }
+
+    public int getExp() {
+        return exp;
+    }
+
+    public void setExp(int exp) {
+        this.exp = exp;
+    }
+
+    public int getExpCurrent() {
+        return expCurrent;
+    }
+
+    public void setExpCurrent(int expCurrent) {
+        this.expCurrent = expCurrent;
     }
 }
