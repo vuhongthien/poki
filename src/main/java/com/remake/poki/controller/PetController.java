@@ -1,11 +1,14 @@
 package com.remake.poki.controller;
 
+import com.remake.poki.model.PetStats;
 import com.remake.poki.service.PetService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.util.List;
 
 @RestController
 @RequestMapping("/pets")
@@ -26,6 +29,17 @@ public class PetController {
     public String importPetsName() throws IOException {
         petService.updatePetNamesFromFile();
         return "Import Pets thành công!";
+    }
+
+    @PostMapping("/generate-levels")
+    public ResponseEntity<List<PetStats>> generatePetLevels(
+            @RequestParam Long petId,
+            @RequestParam int baseHp,
+            @RequestParam int baseAttack,
+            @RequestParam int baseMana,
+            @RequestParam BigDecimal baseWeaknessValue) {
+
+        return ResponseEntity.ok(petService.generatePetLevels(petId, baseHp,baseAttack,baseMana,baseWeaknessValue));
     }
 
     @GetMapping()

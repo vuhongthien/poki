@@ -15,7 +15,7 @@ public interface PetRepository extends JpaRepository<Pet, Long> {
             "FROM Pet p " +
             "JOIN PetStats ps ON p.id = ps.petId " +
             "JOIN ElementWeakness ew ON p.elementType = ew.weakAgainst " +
-            "WHERE p.maxLevel = ps.level OR p.maxLevel IS NULL")
+            "WHERE p.maxLevel = ps.level OR p.maxLevel IS NULL ORDER BY p.id ASC")
     List<PetDTO> findAllPet();
 
     @Query(value = "SELECT new com.remake.poki.dto.PetEnemyDTO(p.id, p.name, ep.lever, ep.leverDisplay, COALESCE(cp.count, 0), ep.requestPass, ep.requestAttack) " +

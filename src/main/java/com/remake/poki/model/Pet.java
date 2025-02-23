@@ -23,6 +23,16 @@ public class Pet {
 
     private int maxLevel;
 
+    private int parentId;
+
+    public int getParentId() {
+        return parentId;
+    }
+
+    public void setParentId(int parentId) {
+        this.parentId = parentId;
+    }
+
     public Long getId() {
         return id;
     }

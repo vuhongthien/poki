@@ -34,11 +34,20 @@ public class User {
 
     private int expCurrent=10;
 
-    private Long idPetUser;
 
     private int gold = 10000;
 
     private int requestAttack = 500;
+
+    private Long petId;
+
+    public Long getPetId() {
+        return petId;
+    }
+
+    public void setPetId(Long petId) {
+        this.petId = petId;
+    }
 
     public Long getId() {
         return id;
@@ -96,13 +105,6 @@ public class User {
         this.lever = lever;
     }
 
-    public Long getIdPetUser() {
-        return idPetUser;
-    }
-
-    public void setIdPetUser(Long idPetUser) {
-        this.idPetUser = idPetUser;
-    }
 
     public int getGold() {
         return gold;

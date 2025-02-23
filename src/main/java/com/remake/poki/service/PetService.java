@@ -5,15 +5,19 @@ import com.remake.poki.dto.PetDTO;
 import com.remake.poki.dto.PetEnemyDTO;
 import com.remake.poki.enums.ElementType;
 import com.remake.poki.model.Pet;
+import com.remake.poki.model.PetStats;
 import com.remake.poki.repo.GroupPetRepository;
 import com.remake.poki.repo.PetRepository;
+import com.remake.poki.repo.PetStatsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.io.File;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -25,6 +29,9 @@ public class PetService {
 
     final
     GroupPetRepository groupPetRepository;
+
+    @Autowired
+    PetStatsRepository petStatsRepository;
 
     public PetService(PetRepository petRepository, GroupPetRepository groupPetRepository) {
         this.petRepository = petRepository;
@@ -96,6 +103,28 @@ public class PetService {
 
         // Save all updated pets in batch
         petRepository.saveAll(pets);
+    }
+
+    @Transactional
+    public List<PetStats> generatePetLevels(Long petId, int baseHp, int baseAttack, int baseMana, BigDecimal baseWeaknessValue) {
+        List<PetStats> petStatsList = new ArrayList<>();
+
+        for (int level = 1; level <= 14; level++) {
+            PetStats stats = new PetStats();
+//            stats.setId((petId - 1) * 14 + level);
+            stats.setPetId(petId);
+            stats.setLevel(level);
+
+            // Công thức tăng trưởng theo cấp độ
+            stats.setHp((int) (baseHp * Math.pow(1.1, level - 1))); // HP tăng 10% mỗi cấp
+            stats.setAttack((int) (baseAttack * Math.pow(1.08, level - 1))); // Attack tăng 8% mỗi cấp
+            stats.setMana((int) (baseMana * Math.pow(1.05, level - 1))); // Mana tăng 5% mỗi cấp
+            stats.setWeaknessValue(baseWeaknessValue.add(new BigDecimal(level - 1).multiply(new BigDecimal("0.02")))); // Weakness tăng 0.02 mỗi cấp
+
+            petStatsList.add(stats);
+        }
+        petStatsRepository.saveAll(petStatsList);
+        return petStatsList;
     }
 
     public List<PetDTO> getPets() {

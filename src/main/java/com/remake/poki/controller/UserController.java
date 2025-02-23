@@ -23,4 +23,9 @@ public class UserController {
         return new ResponseEntity<>(userService.getMoney(userId), HttpStatus.OK);
     }
 
+    @GetMapping("/room/{userId}/{enemyPetId}")
+    public ResponseEntity<?> getInfoRoom(@PathVariable() Long userId, @PathVariable() Long enemyPetId) {
+        return new ResponseEntity<>(userService.getInfoRoom(userId, enemyPetId), HttpStatus.OK);
+    }
+
 }
