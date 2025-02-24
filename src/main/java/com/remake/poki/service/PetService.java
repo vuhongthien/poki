@@ -3,6 +3,7 @@ package com.remake.poki.service;
 import com.remake.poki.dto.GroupDTO;
 import com.remake.poki.dto.PetDTO;
 import com.remake.poki.dto.PetEnemyDTO;
+import com.remake.poki.dto.UserPetDTO;
 import com.remake.poki.enums.ElementType;
 import com.remake.poki.model.Pet;
 import com.remake.poki.model.PetStats;
@@ -127,6 +128,18 @@ public class PetService {
         return petStatsList;
     }
 
+    @Transactional
+    public List<PetStats> ups(Long petId, BigDecimal baseWeaknessValue) {
+        List<PetStats> stats = petStatsRepository.findAllByPetId(petId);
+        for (PetStats s : stats) {
+            s.setWeaknessValue(baseWeaknessValue.add(new BigDecimal(s.getLevel()).multiply(new BigDecimal("0.02")))); // Weakness tăng 0.02 mỗi cấp
+
+
+        }
+        petStatsRepository.saveAll(stats);
+        return stats;
+    }
+
     public List<PetDTO> getPets() {
         return petRepository.findAllPet();
     }
@@ -139,6 +152,15 @@ public class PetService {
         }
 
         return groupDTOS;
+    }
+
+    public UserPetDTO getInfoEPet(Long petEId, Long petId) {
+        Pet pet = petRepository.findById(petId).get();
+        UserPetDTO ePet = petRepository.getInfoEPet( petEId);
+        if(!pet.getElementType().equals(ePet.getElementOther())){
+            ePet.setWeaknessValue(BigDecimal.valueOf(1));
+        }
+        return ePet;
     }
 }
 

@@ -53,6 +53,19 @@ public class UserPetDTO {
         this.manaSkillCard = (sc != null) ? sc.getMana() : 0;
     }
 
+    public UserPetDTO(Pet p, EnemyPet up, PetStats ps, ElementWeakness ew) {
+        this.id = (up != null) ? up.getId() : null;
+        this.petId = (p != null) ? p.getId() : null;
+        this.name = (p != null) ? p.getName() : null;
+        this.elementType = (p != null) ? p.getElementType() : null;
+        this.elementOther = (ew != null) ? ew.getElement() : null;
+        this.level = (up != null) ? up.getLever() : 0;
+        this.hp = (ps != null) ? ps.getHp() : 0;
+        this.attack = (ps != null) ? ps.getAttack() : 0;
+        this.mana = (ps != null) ? ps.getMana() : 0;
+        this.weaknessValue = (ps != null) ? ps.getWeaknessValue() : BigDecimal.ZERO;
+    }
+
 
     public Long getId() {
         return id;

@@ -1,6 +1,7 @@
 package com.remake.poki.service;
 
 import com.remake.poki.dto.UserDTO;
+import com.remake.poki.dto.UserPetDTO;
 import com.remake.poki.dto.UserRoomDTO;
 import com.remake.poki.model.Pet;
 import com.remake.poki.repo.PetRepository;
@@ -37,4 +38,5 @@ public class UserService {
         userRoomDTO.setNameEnemyPetId(pet.getName());
         return userRoomDTO;
     }
+
 }

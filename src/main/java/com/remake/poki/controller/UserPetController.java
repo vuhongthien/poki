@@ -24,4 +24,10 @@ public class UserPetController {
     public ResponseEntity<?> getUserPets(@PathVariable() Long userId) {
         return new ResponseEntity<>(userPetService.getUserPets(userId), HttpStatus.OK);
     }
+
+    @GetMapping("/match/{userId}/{petId}/{ePetId}")
+    public ResponseEntity<?> getInfoMatch(@PathVariable() Long userId, @PathVariable() Long petId, @PathVariable() Long ePetId) {
+        return new ResponseEntity<>(userPetService.getInfoMatch(userId, petId, ePetId), HttpStatus.OK);
+    }
+
 }

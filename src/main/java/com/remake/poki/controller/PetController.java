@@ -42,6 +42,14 @@ public class PetController {
         return ResponseEntity.ok(petService.generatePetLevels(petId, baseHp,baseAttack,baseMana,baseWeaknessValue));
     }
 
+    @PostMapping("/ups")
+    public ResponseEntity<List<PetStats>> ups(
+            @RequestParam Long petId,
+            @RequestParam BigDecimal baseWeaknessValue) {
+
+        return ResponseEntity.ok(petService.ups(petId,baseWeaknessValue));
+    }
+
     @GetMapping()
     public ResponseEntity<?> getPets() {
 
@@ -51,6 +59,11 @@ public class PetController {
     @GetMapping("/{userId}")
     public ResponseEntity<?> getEnemyPets(@PathVariable() Long userId) {
         return new ResponseEntity<>(petService.getEnemyPets(userId), HttpStatus.OK);
+    }
+
+    @GetMapping("/infoEnemyPet/{petEId}/{petId}")
+    public ResponseEntity<?> getInfoEPet(@PathVariable() Long petEId, @PathVariable() Long petId) {
+        return new ResponseEntity<>(petService.getInfoEPet(petEId, petId), HttpStatus.OK);
     }
 }
 
