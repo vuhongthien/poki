@@ -31,12 +31,13 @@ public class PetService {
     final
     GroupPetRepository groupPetRepository;
 
-    @Autowired
+    final
     PetStatsRepository petStatsRepository;
 
-    public PetService(PetRepository petRepository, GroupPetRepository groupPetRepository) {
+    public PetService(PetRepository petRepository, GroupPetRepository groupPetRepository, PetStatsRepository petStatsRepository) {
         this.petRepository = petRepository;
         this.groupPetRepository = groupPetRepository;
+        this.petStatsRepository = petStatsRepository;
     }
 
     @Transactional
