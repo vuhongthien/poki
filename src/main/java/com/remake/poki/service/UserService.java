@@ -1,9 +1,11 @@
 package com.remake.poki.service;
 
+import com.remake.poki.dto.LoginDTO;
 import com.remake.poki.dto.UserDTO;
 import com.remake.poki.dto.UserPetDTO;
 import com.remake.poki.dto.UserRoomDTO;
 import com.remake.poki.model.Pet;
+import com.remake.poki.model.User;
 import com.remake.poki.repo.PetRepository;
 import com.remake.poki.repo.UserRepository;
 import org.modelmapper.ModelMapper;
@@ -21,6 +23,7 @@ public class UserService {
 
     private final
     ModelMapper modelMapper;
+
     public UserService(UserRepository userRepository, ModelMapper modelMapper) {
         this.userRepository = userRepository;
         this.modelMapper = modelMapper;
@@ -33,10 +36,15 @@ public class UserService {
     }
 
     public UserRoomDTO getInfoRoom(Long userId, Long enemyPetId) {
-        UserRoomDTO userRoomDTO = userRepository.findInfoRoom(userId,enemyPetId);
+        UserRoomDTO userRoomDTO = userRepository.findInfoRoom(userId, enemyPetId);
         Pet pet = petRepository.findById(enemyPetId).orElseThrow();
         userRoomDTO.setNameEnemyPetId(pet.getName());
         return userRoomDTO;
     }
 
+    public UserDTO login(LoginDTO request) {
+        User user = userRepository.findByUserAndPassword(request.getUser(), request.getPassword())
+                .orElseThrow(() -> new NoSuchElementException("fail info login: " + request.getUser()));;
+        return getMoney(user.getId());
+    }
 }
