@@ -17,7 +17,7 @@ public interface UserPetRepository extends JpaRepository<UserPet, Long> {
             "JOIN User u ON up.userId = u.id " +
             "LEFT JOIN ElementWeakness ew ON p.elementType = ew.weakAgainst " +
             "LEFT JOIN SkillCard sc ON p.skillCardId = sc.id " +
-            "AND u.id = :userId")
+            "WHERE up.userId = :userId")
     List<UserPetDTO> getListUserPets(Long userId);
 
     @Query(value = "SELECT new com.remake.poki.dto.UserPetDTO(p, up, ps, ew, u, sc) " +
