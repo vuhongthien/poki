@@ -24,9 +24,10 @@ public interface UserPetRepository extends JpaRepository<UserPet, Long> {
             "FROM Pet p " +
             "JOIN UserPet up ON p.id = up.petId AND p.id = :petId " +
             "JOIN PetStats ps ON up.petId = ps.petId AND up.level = ps.level " +
-            "JOIN User u ON up.userId = u.id " +
-            "LEFT JOIN ElementWeakness ew ON p.elementType = ew.weakAgainst " +
-            "LEFT JOIN SkillCard sc ON p.skillCardId = sc.id " +
-            "AND u.id = :userId")
+            "JOIN User u ON up.userId = u.id AND u.id = :userId " +
+            "JOIN ElementWeakness ew ON p.elementType = ew.weakAgainst " +
+            "LEFT JOIN SkillCard sc ON p.skillCardId = sc.id ")
     UserPetDTO getInfoMatch(Long userId, Long petId);
+
+    boolean existsByUserIdAndPetId(Long userId, Long petId);
 }

@@ -1,5 +1,6 @@
 package com.remake.poki.controller;
 
+import com.remake.poki.ApiResponse;
 import com.remake.poki.dto.LoginDTO;
 import com.remake.poki.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +30,12 @@ public class UserController {
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody() LoginDTO request) {
         return new ResponseEntity<>(userService.login(request), HttpStatus.OK);
+    }
+
+    @GetMapping("/energy/{userId}")
+    public ResponseEntity<?> downEnergy(@PathVariable() Long userId) {
+
+        return ResponseEntity.ok().body(new ApiResponse(true, userService.downEnergy(userId), null));
     }
 
 }

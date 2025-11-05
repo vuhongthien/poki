@@ -8,6 +8,10 @@ public class UserDTO implements Serializable {
 
     private Long id;
 
+    private Long petId;
+
+     private Long avtId;
+
     private int energy;
 
     private int energyFull;
@@ -25,6 +29,14 @@ public class UserDTO implements Serializable {
     private int expCurrent;
 
     public UserDTO() {
+    }
+
+    public Long getAvtId() {
+        return avtId;
+    }
+
+    public void setAvtId(Long avtId) {
+        this.avtId = avtId;
     }
 
     public Long getId() {
@@ -97,5 +109,13 @@ public class UserDTO implements Serializable {
 
     public void setExpCurrent(int expCurrent) {
         this.expCurrent = expCurrent;
+    }
+
+    public Long getPetId() {
+        return petId;
+    }
+
+    public void setPetId(Long petId) {
+        this.petId = petId;
     }
 }

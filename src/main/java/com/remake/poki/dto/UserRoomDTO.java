@@ -28,6 +28,8 @@ public class UserRoomDTO {
 
     private String nameEnemyPetId;
 
+    private String elementType;
+
     public UserRoomDTO(User u, CountPass cp, Pet p, EnemyPet ep) {
         this.id = u.getId();
         this.energy = u.getEnergy();
@@ -39,6 +41,7 @@ public class UserRoomDTO {
         this.lever = u.getLever();
         this.petId = p.getId();
         this.enemyPetId = ep.getIdPet();
+        this.elementType = p.getElementType().name();
     }
 
     public Long getId() {
@@ -127,5 +130,13 @@ public class UserRoomDTO {
 
     public void setNameEnemyPetId(String nameEnemyPetId) {
         this.nameEnemyPetId = nameEnemyPetId;
+    }
+
+    public String getElementType() {
+        return elementType;
+    }
+
+    public void setElementType(String elementType) {
+        this.elementType = elementType;
     }
 }

@@ -41,6 +41,16 @@ public class User {
 
     private Long petId;
 
+    private Long avtId;
+
+    public Long getAvtId() {
+        return avtId;
+    }
+
+    public void setAvtId(Long avtId) {
+        this.avtId = avtId;
+    }
+
     public Long getPetId() {
         return petId;
     }

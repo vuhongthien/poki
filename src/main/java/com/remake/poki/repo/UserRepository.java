@@ -1,5 +1,6 @@
 package com.remake.poki.repo;
 
+import aj.org.objectweb.asm.commons.Remapper;
 import com.remake.poki.dto.UserDTO;
 import com.remake.poki.dto.UserRoomDTO;
 import com.remake.poki.model.User;
@@ -20,4 +21,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
     UserRoomDTO findInfoRoom(Long userId, Long enemyPetId);
 
     Optional<User> findByUserAndPassword(String user, String password);
+
+    Optional<User> findByUser(String user);
 }
