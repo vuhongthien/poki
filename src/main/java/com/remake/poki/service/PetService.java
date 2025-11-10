@@ -10,6 +10,7 @@ import com.remake.poki.model.PetStats;
 import com.remake.poki.repo.GroupPetRepository;
 import com.remake.poki.repo.PetRepository;
 import com.remake.poki.repo.PetStatsRepository;
+import com.remake.poki.util.Calculator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -142,8 +143,19 @@ public class PetService {
     }
 
     public List<PetDTO> getPets() {
-        return petRepository.findAllPet();
+        List<PetDTO> pets = petRepository.findAllPet();
+        for (PetDTO pet : pets) {
+            int level = pet.getMaxLevel();
+            UserPetDTO tmp = Calculator.calculateFromPet(pet, level);
+            pet.setAttack(tmp.getAttack());
+            pet.setHp(tmp.getHp());
+            pet.setMana(tmp.getMana());
+            pet.setWeaknessValue(tmp.getWeaknessValue());
+        }
+
+        return pets;
     }
+
 
     public List<GroupDTO> getEnemyPets(Long userId) {
         List<GroupDTO> groupDTOS = groupPetRepository.getGroupPet(userId);
@@ -157,7 +169,7 @@ public class PetService {
 
     public UserPetDTO getInfoEPet(Long petEId, Long petId) {
         Pet pet = petRepository.findById(petId).get();
-        UserPetDTO ePet = petRepository.getInfoEPet( petEId);
+        UserPetDTO ePet = Calculator.calculateStats(petRepository.getInfoEPet( petEId)) ;
         if(!pet.getElementType().equals(ePet.getElementOther())){
             ePet.setWeaknessValue(BigDecimal.valueOf(1));
         }

@@ -25,6 +25,7 @@ public class UserPetDTO {
     private ElementType elementOther;
 
     private int level;
+    private int maxLevel;
 
     private int hp;
 
@@ -46,6 +47,7 @@ public class UserPetDTO {
         this.elementType = (p != null) ? p.getElementType() : null;
         this.elementOther = (ew != null) ? ew.getElement() : null;
         this.level = (up != null) ? up.getLevel() : 0;
+        this.maxLevel = (p != null) ? p.getMaxLevel() : 0;
         this.hp = (ps != null) ? ps.getHp() : 0;
         this.attack = (ps != null) ? ps.getAttack() : 0;
         this.mana = (ps != null) ? ps.getMana() : 0;
@@ -177,5 +179,13 @@ public class UserPetDTO {
 
     public void setManaSkillCard(int manaSkillCard) {
         this.manaSkillCard = manaSkillCard;
+    }
+
+    public int getMaxLevel() {
+        return maxLevel;
+    }
+
+    public void setMaxLevel(int maxLevel) {
+        this.maxLevel = maxLevel;
     }
 }

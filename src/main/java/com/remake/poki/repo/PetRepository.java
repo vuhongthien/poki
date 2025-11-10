@@ -16,7 +16,7 @@ public interface PetRepository extends JpaRepository<Pet, Long> {
             "FROM Pet p " +
             "JOIN PetStats ps ON p.id = ps.petId " +
             "JOIN ElementWeakness ew ON p.elementType = ew.weakAgainst " +
-            "WHERE p.maxLevel = ps.level OR p.maxLevel IS NULL ORDER BY ps.attack ASC")
+            "WHERE ps.level = 1 ORDER BY p.id ASC")
     List<PetDTO> findAllPet();
 
     @Query(value = "SELECT new com.remake.poki.dto.PetEnemyDTO(p.id, p.name, ep.lever, ep.leverDisplay, COALESCE(cp.count, 0), ep.requestPass, ep.requestAttack) " +
@@ -28,7 +28,7 @@ public interface PetRepository extends JpaRepository<Pet, Long> {
     @Query(value = "SELECT new com.remake.poki.dto.UserPetDTO(p, ep, ps, ew) " +
             "FROM Pet p " +
             "JOIN EnemyPet ep ON p.id = ep.idPet AND p.id = :petEId " +
-            "JOIN PetStats ps ON ep.idPet = ps.petId AND ep.lever = ps.level " +
+            "JOIN PetStats ps ON ep.idPet = ps.petId " +
             "LEFT JOIN ElementWeakness ew ON p.elementType = ew.weakAgainst")
     UserPetDTO getInfoEPet( Long petEId);
 }

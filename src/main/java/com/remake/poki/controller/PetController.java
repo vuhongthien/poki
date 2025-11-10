@@ -2,6 +2,8 @@ package com.remake.poki.controller;
 
 import com.remake.poki.model.PetStats;
 import com.remake.poki.service.PetService;
+import com.remake.poki.service.UserPetService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -39,7 +41,7 @@ public class PetController {
             @RequestParam int baseMana,
             @RequestParam BigDecimal baseWeaknessValue) {
 
-        return ResponseEntity.ok(petService.generatePetLevels(petId, baseHp,baseAttack,baseMana,baseWeaknessValue));
+        return ResponseEntity.ok(petService.generatePetLevels(petId, baseHp, baseAttack, baseMana, baseWeaknessValue));
     }
 
     @PostMapping("/ups")
@@ -47,7 +49,7 @@ public class PetController {
             @RequestParam Long petId,
             @RequestParam BigDecimal baseWeaknessValue) {
 
-        return ResponseEntity.ok(petService.ups(petId,baseWeaknessValue));
+        return ResponseEntity.ok(petService.ups(petId, baseWeaknessValue));
     }
 
     @GetMapping()

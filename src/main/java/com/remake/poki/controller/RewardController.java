@@ -31,7 +31,7 @@ public class RewardController {
     public ResponseEntity<?> addPetToUser(@PathVariable Long userId, @RequestBody PetRequest request) {
 
         try {
-            rewardService.addPetToUser(userId, request.getPetId());
+            rewardService.addPetToUser(userId, request.getPetId(), request.getRequestAttack());
 
             return ResponseEntity.ok().body(new ApiResponse(true, "Pet added successfully", null));
 
@@ -40,8 +40,8 @@ public class RewardController {
         }
     }
 
-    @PostMapping("/{userId}/{petId}/stones")
-    public ResponseEntity<?> addStoneToUser(@PathVariable Long userId,@PathVariable Long petId, @RequestBody StoneRequest request) {
+    @PostMapping("/{userId}/stones")
+    public ResponseEntity<?> addStoneToUser(@PathVariable Long userId, @RequestBody StoneRequest request) {
 
         try {
             if (!isValidElement(request.getElement())) {
@@ -56,7 +56,7 @@ public class RewardController {
                 return ResponseEntity.badRequest().body(new ApiResponse(false, "Quantity must be positive", null));
             }
 
-            rewardService.addStoneToUser(userId, request.getElement(), request.getLevel(), request.getQuantity(), petId);
+            rewardService.addStoneToUser(userId, request.getElement(), request.getLevel(), request.getQuantity());
 
             return ResponseEntity.ok().body(new ApiResponse(true, "Stone added successfully", null));
 

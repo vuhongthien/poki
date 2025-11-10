@@ -28,6 +28,13 @@ public class UserDTO implements Serializable {
 
     private int expCurrent;
 
+    private int wheel;
+
+    private int starWhite ;
+    private int starBlue ;
+    private int starRed ;
+
+
     public UserDTO() {
     }
 
@@ -117,5 +124,37 @@ public class UserDTO implements Serializable {
 
     public void setPetId(Long petId) {
         this.petId = petId;
+    }
+
+    public int getWheel() {
+        return wheel;
+    }
+
+    public void setWheel(int wheel) {
+        this.wheel = wheel;
+    }
+
+    public int getStarWhite() {
+        return starWhite;
+    }
+
+    public void setStarWhite(int starWhite) {
+        this.starWhite = starWhite;
+    }
+
+    public int getStarBlue() {
+        return starBlue;
+    }
+
+    public void setStarBlue(int starBlue) {
+        this.starBlue = starBlue;
+    }
+
+    public int getStarRed() {
+        return starRed;
+    }
+
+    public void setStarRed(int starRed) {
+        this.starRed = starRed;
     }
 }

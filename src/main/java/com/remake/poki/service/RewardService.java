@@ -1,10 +1,7 @@
 package com.remake.poki.service;
 
 import com.remake.poki.enums.ElementType;
-import com.remake.poki.model.CountPass;
-import com.remake.poki.model.Stone;
-import com.remake.poki.model.StoneUser;
-import com.remake.poki.model.UserPet;
+import com.remake.poki.model.*;
 import com.remake.poki.repo.*;
 import com.remake.poki.request.PetRequest;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,10 +32,13 @@ public class RewardService {
      * Thêm Pet cho User
      */
     @Transactional
-    public void addPetToUser(Long userId, Long petId) {
-        if (!userRepository.existsById(userId)) {
+    public void addPetToUser(Long userId, Long petId, int requestAttack) {
+        User user = userRepository.findById(userId).orElse(null);
+        if (user == null) {
             throw new RuntimeException("User not found");
         }
+        user.setRequestAttack(user.getRequestAttack()+requestAttack);
+        userRepository.save(user);
 
         // Kiểm tra user đã có pet này chưa
         if (userPetRepository.existsByUserIdAndPetId(userId, petId)) {
@@ -54,8 +54,10 @@ public class RewardService {
      * Thêm Stone cho User
      */
     @Transactional
-    public void addStoneToUser(Long userId, String element, Integer level, Integer quantity, Long petId) {
-        if (!userRepository.existsById(userId)) {
+    public void addStoneToUser(Long userId, String element, Integer level, Integer quantity) {
+
+        User user = userRepository.findById(userId).orElse(null);
+        if (user == null) {
             throw new RuntimeException("User not found");
         }
         ElementType elementType;

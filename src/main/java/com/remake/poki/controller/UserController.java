@@ -1,7 +1,11 @@
 package com.remake.poki.controller;
 
 import com.remake.poki.ApiResponse;
+import com.remake.poki.dto.DeductGoldRequestDTO;
+import com.remake.poki.dto.DeductGoldResponseDTO;
 import com.remake.poki.dto.LoginDTO;
+import com.remake.poki.request.UpdateStarRequest;
+import com.remake.poki.response.UpdateStarResponse;
 import com.remake.poki.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -38,4 +42,57 @@ public class UserController {
         return ResponseEntity.ok().body(new ApiResponse(true, userService.downEnergy(userId), null));
     }
 
+    @GetMapping("/ct/{userId}/{requestAttack}")
+    public ResponseEntity<?> upCT(@PathVariable() Long userId, @PathVariable() int requestAttack) {
+
+        return ResponseEntity.ok().body(new ApiResponse(true, userService.upCT(userId, requestAttack), null));
+    }
+
+    @PostMapping("/deduct-gold")
+    public ResponseEntity<DeductGoldResponseDTO> deductGold(@RequestBody DeductGoldRequestDTO request) {
+        DeductGoldResponseDTO response = userService.deductGold(request);
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/update-star")
+    public ResponseEntity<UpdateStarResponse> updateStar(@RequestBody UpdateStarRequest request) {
+        try {
+            // Validate request
+            if (request.getUserId() == null) {
+                UpdateStarResponse errorResponse = new UpdateStarResponse();
+                errorResponse.setSuccess(false);
+                errorResponse.setMessage("User ID is required");
+                return ResponseEntity.badRequest().body(errorResponse);
+            }
+
+            if (request.getStarType() == null || request.getStarType().trim().isEmpty()) {
+                UpdateStarResponse errorResponse = new UpdateStarResponse();
+                errorResponse.setSuccess(false);
+                errorResponse.setMessage("Star type is required");
+                return ResponseEntity.badRequest().body(errorResponse);
+            }
+
+            if (request.getAmount() <= 0) {
+                UpdateStarResponse errorResponse = new UpdateStarResponse();
+                errorResponse.setSuccess(false);
+                errorResponse.setMessage("Amount must be greater than 0");
+                return ResponseEntity.badRequest().body(errorResponse);
+            }
+
+            // Gọi service để cập nhật
+            UpdateStarResponse response = userService.updateStar(request);
+
+            if (response.isSuccess()) {
+                return ResponseEntity.ok(response);
+            } else {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+            }
+
+        } catch (Exception e) {
+            UpdateStarResponse errorResponse = new UpdateStarResponse();
+            errorResponse.setSuccess(false);
+            errorResponse.setMessage("Server error: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+        }
+    }
 }

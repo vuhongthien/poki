@@ -39,6 +39,11 @@ public class User {
 
     private int requestAttack = 500;
 
+    private int wheel = 3;
+    private int starWhite = 0;
+    private int starBlue = 0;
+    private int starRed = 0;
+
     private Long petId;
 
     private Long avtId;
@@ -146,5 +151,37 @@ public class User {
 
     public void setExpCurrent(int expCurrent) {
         this.expCurrent = expCurrent;
+    }
+
+    public int getWheel() {
+        return wheel;
+    }
+
+    public void setWheel(int wheel) {
+        this.wheel = wheel;
+    }
+
+    public int getStarWhite() {
+        return starWhite;
+    }
+
+    public void setStarWhite(int starWhite) {
+        this.starWhite = starWhite;
+    }
+
+    public int getStarBlue() {
+        return starBlue;
+    }
+
+    public void setStarBlue(int starBlue) {
+        this.starBlue = starBlue;
+    }
+
+    public int getStarRed() {
+        return starRed;
+    }
+
+    public void setStarRed(int starRed) {
+        this.starRed = starRed;
     }
 }

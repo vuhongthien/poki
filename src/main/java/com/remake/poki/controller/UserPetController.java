@@ -30,4 +30,10 @@ public class UserPetController {
         return new ResponseEntity<>(userPetService.getInfoMatch(userId, petId, ePetId), HttpStatus.OK);
     }
 
+    @GetMapping("/update/{userId}/{petId}")
+    public ResponseEntity<?> updatePets(@PathVariable() Long userId, @PathVariable() Long petId) {
+
+        return new ResponseEntity<>(userPetService.updatePets(userId, petId), HttpStatus.OK);
+    }
+
 }
