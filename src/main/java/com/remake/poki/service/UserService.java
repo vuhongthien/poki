@@ -42,6 +42,9 @@ public class UserService {
 
     public UserRoomDTO getInfoRoom(Long userId, Long enemyPetId) {
         UserRoomDTO userRoomDTO = userRepository.findInfoRoom(userId, enemyPetId);
+        if(userRoomDTO == null){
+            userRoomDTO = userRepository.findInfoRoomHT(userId, enemyPetId);
+        }
         Pet pet = petRepository.findById(enemyPetId).orElseThrow();
         userRoomDTO.setElementType(pet.getElementType().name());
         return userRoomDTO;

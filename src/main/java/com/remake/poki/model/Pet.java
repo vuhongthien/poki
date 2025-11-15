@@ -16,6 +16,7 @@ public class Pet {
 
     private String name;
 
+    @Setter
     private String des;
 
     @Enumerated(EnumType.STRING)
@@ -24,6 +25,18 @@ public class Pet {
     private int maxLevel;
 
     private int parentId;
+    private int no;
+
+    // Flag đánh dấu pet huyền thoại
+    private boolean flagLegend = false;
+
+    public boolean isFlagLegend() {
+        return flagLegend;
+    }
+
+    public void setFlagLegend(boolean flagLegend) {
+        this.flagLegend = flagLegend;
+    }
 
     public int getParentId() {
         return parentId;
@@ -77,7 +90,11 @@ public class Pet {
         return des;
     }
 
-    public void setDes(String des) {
-        this.des = des;
+    public int getNo() {
+        return no;
+    }
+
+    public void setNo(int no) {
+        this.no = no;
     }
 }

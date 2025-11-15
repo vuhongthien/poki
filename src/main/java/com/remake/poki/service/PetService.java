@@ -7,9 +7,11 @@ import com.remake.poki.dto.UserPetDTO;
 import com.remake.poki.enums.ElementType;
 import com.remake.poki.model.Pet;
 import com.remake.poki.model.PetStats;
+import com.remake.poki.model.WorldBossSchedule;
 import com.remake.poki.repo.GroupPetRepository;
 import com.remake.poki.repo.PetRepository;
 import com.remake.poki.repo.PetStatsRepository;
+import com.remake.poki.repo.WorldBossScheduleRepository;
 import com.remake.poki.util.Calculator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -34,6 +36,8 @@ public class PetService {
 
     final
     PetStatsRepository petStatsRepository;
+    @Autowired
+    WorldBossScheduleRepository worldBossScheduleRepository;
 
     public PetService(PetRepository petRepository, GroupPetRepository groupPetRepository, PetStatsRepository petStatsRepository) {
         this.petRepository = petRepository;
@@ -169,7 +173,18 @@ public class PetService {
 
     public UserPetDTO getInfoEPet(Long petEId, Long petId) {
         Pet pet = petRepository.findById(petId).get();
-        UserPetDTO ePet = Calculator.calculateStats(petRepository.getInfoEPet( petEId)) ;
+        UserPetDTO userPetDTO = petRepository.getInfoEPet( petEId);
+        UserPetDTO ePet;
+        if(userPetDTO.getLevel() != 14){
+            ePet = Calculator.calculateStats(petRepository.getInfoEPet( petEId)) ;
+        }else{
+            ePet = petRepository.getInfoEPet( petEId);
+            WorldBossSchedule worldBossSchedule = worldBossScheduleRepository.findByPetId(petEId);
+            ePet.setHp(worldBossSchedule.getBossHp());
+            ePet.setAttack(worldBossSchedule.getBossAttack());
+            ePet.setMana(worldBossSchedule.getBossMana());
+        }
+
         if(!pet.getElementType().equals(ePet.getElementOther())){
             ePet.setWeaknessValue(BigDecimal.valueOf(1));
         }

@@ -63,4 +63,8 @@ public class UserPetService {
         userPetRepository.save(userPet);
         return Calculator.calculateStats(userPetRepository.getUserPet(userId,petId));
     }
+
+    public UserPetDTO getUserPetsHT(Long userId, Long petId) {
+        return Calculator.calculateStats(userPetRepository.getUserPet(userId, petId));
+    }
 }

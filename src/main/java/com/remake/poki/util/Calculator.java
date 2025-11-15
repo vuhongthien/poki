@@ -28,7 +28,10 @@ public class Calculator {
      *  - Output: UserPetDTO sau khi scale stat theo level + buff lv7/lv10
      */
     public static UserPetDTO calculateStats(UserPetDTO userPet) {
-        return calculateStats(userPet, null);
+        return calculateStats(userPet, null, 0);
+    }
+    public static UserPetDTO calculateStats(UserPetDTO userPet, int level) {
+        return calculateStats(userPet, null, level);
     }
 
     /**
@@ -39,15 +42,20 @@ public class Calculator {
      *  - Base stat lấy từ PetDTO (ổn định, không sợ bị nhân chồng)
      *  - Output: cập nhật lại chỉ số vào UserPetDTO và trả về
      */
-    public static UserPetDTO calculateStats(UserPetDTO userPet, PetDTO petBase) {
+    public static UserPetDTO calculateStats(UserPetDTO userPet, PetDTO petBase, int level) {
         if (userPet == null) return null;
 
         // Level & MaxLevel
-        int level = userPet.getLevel();
+        level = userPet.getLevel();
+
+
         int maxLevel =
                 (userPet.getMaxLevel() > 0) ? userPet.getMaxLevel()
                         : (petBase != null && petBase.getMaxLevel() > 0) ? petBase.getMaxLevel()
                         : DEFAULT_MAX_LEVEL;
+        if(level == 14){
+            maxLevel = 14;
+        }
 
         if (level < 1) level = 1;
         if (level > maxLevel) level = maxLevel;
@@ -131,6 +139,6 @@ public class Calculator {
         dto.setLevel(level);
         dto.setWeaknessValue(petBase.getWeaknessValue());
 
-        return calculateStats(dto, petBase);
+        return calculateStats(dto, petBase,0);
     }
 }

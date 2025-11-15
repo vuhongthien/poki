@@ -31,4 +31,9 @@ public interface PetRepository extends JpaRepository<Pet, Long> {
             "JOIN PetStats ps ON ep.idPet = ps.petId " +
             "LEFT JOIN ElementWeakness ew ON p.elementType = ew.weakAgainst")
     UserPetDTO getInfoEPet( Long petEId);
+
+
+    @Query("SELECT p FROM Pet p WHERE p.flagLegend = true ORDER BY p.no ASC")
+    List<Pet> findLegendPetsOrderByNoAsc();
+
 }

@@ -18,8 +18,8 @@ public class ExtractPetData {
     public static void main(String[] args) {
 
 
-        String inputDirPath = "C:\\Users\\ASUS\\Downloads\\sprites\\DefineSprite_477";
-        String outputFilePath = "C:\\Users\\ASUS\\Desktop\\game\\New folder";
+        String inputDirPath = "C:\\Users\\ASUS\\Downloads\\sprites\\sprites\\DefineSprite_518";
+        String outputFilePath = "C:\\swf";
 
         try {
             mergeSprites(inputDirPath, outputFilePath);

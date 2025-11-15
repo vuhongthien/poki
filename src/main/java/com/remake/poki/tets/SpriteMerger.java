@@ -16,8 +16,11 @@ import java.util.regex.Pattern;
 
 public class SpriteMerger {
 
+    // Số sprite tối đa trên 1 hàng (muốn dài mới xuống hàng thì tăng số này lên)
+    private static final int FRAMES_PER_ROW = 10;
+
     public static void main(String[] args) {
-        String inputDirPath = "C:\\Users\\ASUS\\Downloads\\sprites\\DefineSprite_477";
+        String inputDirPath  = "C:\\Users\\ASUS\\Downloads\\sprites\\sprites\\DefineSprite_518";
         String outputDirPath = "C:\\Users\\ASUS\\Desktop\\game\\New folder";
 
         try {
@@ -43,24 +46,42 @@ public class SpriteMerger {
         Arrays.sort(imageFiles, Comparator.comparingInt(SpriteMerger::extractNumber));
 
         BufferedImage firstImage = ImageIO.read(imageFiles[0]);
-        int singleWidth = firstImage.getWidth();
+        int singleWidth  = firstImage.getWidth();
         int singleHeight = firstImage.getHeight();
 
-        int totalWidth = singleWidth * imageFiles.length;
-        int totalHeight = singleHeight;
+        int frameCount = imageFiles.length;
 
-        BufferedImage spriteSheet = new BufferedImage(totalWidth, totalHeight, BufferedImage.TYPE_INT_ARGB);
+        // Tính số cột / hàng
+        int columns = Math.min(FRAMES_PER_ROW, frameCount);
+        int rows    = (int) Math.ceil((double) frameCount / columns);
+
+        int totalWidth  = singleWidth * columns;
+        int totalHeight = singleHeight * rows;
+
+        // Pad cho width/height là bội số của 4 để Unity nén DXT5 được
+        int paddedWidth  = makeMultipleOf4(totalWidth);
+        int paddedHeight = makeMultipleOf4(totalHeight);
+
+        BufferedImage spriteSheet =
+                new BufferedImage(paddedWidth, paddedHeight, BufferedImage.TYPE_INT_ARGB);
         Graphics g = spriteSheet.getGraphics();
 
-        for (int i = 0; i < imageFiles.length; i++) {
+        // Vẽ từng sprite theo grid (nhiều hàng)
+        for (int i = 0; i < frameCount; i++) {
             BufferedImage img = ImageIO.read(imageFiles[i]);
-            g.drawImage(img, i * singleWidth, 0, null);
-        }
 
+            int col = i % columns;
+            int row = i / columns;
+
+            int x = col * singleWidth;
+            int y = row * singleHeight;
+
+            g.drawImage(img, x, y, null);
+        }
         g.dispose();
 
-        // Tên file là kích thước từng tấm ảnh (VD: 64x64.png)
         String outputFileName = singleWidth + "x" + singleHeight + ".png";
+
         File outputDir = new File(outputDirPath);
         if (!outputDir.exists()) {
             outputDir.mkdirs();
@@ -82,5 +103,10 @@ public class SpriteMerger {
             return Integer.MAX_VALUE; // Không có số thì đẩy về sau cùng
         }
     }
-}
 
+    // Trả về số gần nhất >= value mà chia hết cho 4
+    private static int makeMultipleOf4(int value) {
+        int r = value % 4;
+        return (r == 0) ? value : value + (4 - r);
+    }
+}

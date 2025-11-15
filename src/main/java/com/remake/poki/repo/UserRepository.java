@@ -20,6 +20,12 @@ public interface UserRepository extends JpaRepository<User, Long> {
             "LEFT JOIN CountPass cp ON cp.idUser = u.id AND ep.idPet = cp.idPet" )
     UserRoomDTO findInfoRoom(Long userId, Long enemyPetId);
 
+    @Query(value = "SELECT new com.remake.poki.dto.UserRoomDTO(u, null, p, ep) " +
+            "FROM Pet p " +
+            "JOIN User u ON u.petId = p.id AND u.id = :userId "+
+            "JOIN EnemyPet ep ON ep.idPet = :enemyPetId WHERE p.flagLegend = true")
+    UserRoomDTO findInfoRoomHT(Long userId, Long enemyPetId);
+
     Optional<User> findByUserAndPassword(String user, String password);
 
     Optional<User> findByUser(String user);
