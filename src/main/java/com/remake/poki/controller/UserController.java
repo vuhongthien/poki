@@ -4,6 +4,7 @@ import com.remake.poki.ApiResponse;
 import com.remake.poki.dto.DeductGoldRequestDTO;
 import com.remake.poki.dto.DeductGoldResponseDTO;
 import com.remake.poki.dto.LoginDTO;
+import com.remake.poki.dto.UserDTO;
 import com.remake.poki.request.UpdateStarRequest;
 import com.remake.poki.response.UpdateStarResponse;
 import com.remake.poki.service.UserService;
@@ -23,6 +24,9 @@ public class UserController {
 
     @GetMapping("/{userId}")
     public ResponseEntity<?> getMoney(@PathVariable() Long userId) {
+        UserDTO userDTO = userService.getMoney(userId);
+        long secondsUntilNext = userService.getSecondsUntilNextRegen( userId);
+        userDTO.setSecondsUntilNextRegen(secondsUntilNext);
         return new ResponseEntity<>(userService.getMoney(userId), HttpStatus.OK);
     }
 

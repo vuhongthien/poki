@@ -3,6 +3,7 @@ package com.remake.poki.repo;
 import com.remake.poki.model.WorldBossDamage;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -19,4 +20,9 @@ public interface WorldBossDamageRepository extends JpaRepository<WorldBossDamage
     long countPlayersWithHigherDamage(Long bossScheduleId, int damage);
 
     List<WorldBossDamage> findByBossScheduleId(Long bossScheduleId);
+
+    @Query("SELECT wbd FROM WorldBossDamage wbd " +
+            "WHERE wbd.bossScheduleId = :bossScheduleId " +
+            "ORDER BY wbd.totalDamage DESC")
+    List<WorldBossDamage> findTopPlayersByBossScheduleId(@Param("bossScheduleId") Long bossScheduleId);
 }

@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Table(name = "users")
 @Getter
@@ -23,6 +25,8 @@ public class User {
     private String password;
 
     private String user;
+    @Column(name = "last_energy_update")
+    private LocalDateTime lastEnergyUpdate;
 
     private int energy = 80;
 

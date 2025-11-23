@@ -30,6 +30,9 @@ public class PetDTO implements Serializable {
 
     private String des;
 
+    public PetDTO() {
+    }
+
     public PetDTO(Long id, Long skillCardId, String name, ElementType elementType, int maxLevel, ElementType elementOther, int hp, int attack, int mana, BigDecimal weaknessValue, String des) {
         this.id = id;
         this.skillCardId = skillCardId;

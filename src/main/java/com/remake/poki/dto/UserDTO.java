@@ -33,7 +33,15 @@ public class UserDTO implements Serializable {
     private int starWhite ;
     private int starBlue ;
     private int starRed ;
+    private long secondsUntilNextRegen;
 
+    public long getSecondsUntilNextRegen() {
+        return secondsUntilNextRegen;
+    }
+
+    public void setSecondsUntilNextRegen(long secondsUntilNextRegen) {
+        this.secondsUntilNextRegen = secondsUntilNextRegen;
+    }
 
     public UserDTO() {
     }

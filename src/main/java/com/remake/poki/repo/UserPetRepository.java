@@ -46,4 +46,6 @@ public interface UserPetRepository extends JpaRepository<UserPet, Long> {
     UserPetDTO getUserPet(Long userId, Long petId);
 
     Optional<UserPet> findByIdAndUserId(Long id, Long userId);
+
+    List<UserPet> findByUserId(Long userId);
 }

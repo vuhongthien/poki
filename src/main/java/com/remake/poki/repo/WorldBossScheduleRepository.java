@@ -4,6 +4,7 @@ import com.remake.poki.model.WorldBossSchedule;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import java.util.List;
+import java.util.Optional;
 
 public interface WorldBossScheduleRepository extends JpaRepository<WorldBossSchedule, Long> {
 
@@ -20,4 +21,9 @@ public interface WorldBossScheduleRepository extends JpaRepository<WorldBossSche
 
     @Query("SELECT w FROM WorldBossSchedule w WHERE w.isActive = true ORDER BY w.displayOrder ASC")
     List<WorldBossSchedule> findAllActiveBosses();
+
+    @Query("SELECT wbs FROM WorldBossSchedule wbs " +
+            "WHERE wbs.isActive = true " +
+            "ORDER BY wbs.id DESC")
+    Optional<WorldBossSchedule> findLatestFinishedBoss();
 }

@@ -12,11 +12,14 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @Service
 public class UserService {
+    private static final int ENERGY_REGEN_MINUTES = 8;
     private final UserRepository userRepository;
 
     @Autowired
@@ -42,7 +45,7 @@ public class UserService {
 
     public UserRoomDTO getInfoRoom(Long userId, Long enemyPetId) {
         UserRoomDTO userRoomDTO = userRepository.findInfoRoom(userId, enemyPetId);
-        if(userRoomDTO == null){
+        if (userRoomDTO == null) {
             userRoomDTO = userRepository.findInfoRoomHT(userId, enemyPetId);
         }
         Pet pet = petRepository.findById(enemyPetId).orElseThrow();
@@ -186,5 +189,81 @@ public class UserService {
         }
 
         return response;
+    }
+
+    /**
+     * Tính toán và cập nhật năng lượng dựa trên thời gian
+     */
+    @Transactional
+    public User updateEnergy(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        // Nếu đã đạt max energy thì không tính toán
+        if (user.getEnergy() >= user.getEnergyFull()) {
+            user.setEnergy(user.getEnergyFull());
+            user.setLastEnergyUpdate(LocalDateTime.now());
+            return userRepository.save(user);
+        }
+
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime lastUpdate = user.getLastEnergyUpdate();
+
+        // Nếu chưa có lastUpdate thì set = now
+        if (lastUpdate == null) {
+            user.setLastEnergyUpdate(now);
+            return userRepository.save(user);
+        }
+
+        // Tính số phút đã trôi qua
+        long minutesPassed = ChronoUnit.MINUTES.between(lastUpdate, now);
+
+        // Tính số năng lượng được hồi
+        int energyToAdd = (int) (minutesPassed / ENERGY_REGEN_MINUTES);
+
+        if (energyToAdd > 0) {
+            int newEnergy = user.getEnergy() + energyToAdd;
+
+            // Không vượt quá max
+            if (newEnergy > user.getEnergyFull()) {
+                newEnergy = user.getEnergyFull();
+            }
+
+            user.setEnergy(newEnergy);
+
+            // Cập nhật lastUpdate: thời gian thực tế đã hồi (bội số của 8 phút)
+            LocalDateTime newLastUpdate = lastUpdate.plusMinutes(energyToAdd * ENERGY_REGEN_MINUTES);
+            user.setLastEnergyUpdate(newLastUpdate);
+
+            userRepository.save(user);
+        }
+
+        return user;
+    }
+
+    public long getSecondsUntilNextRegen(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        // Nếu đã đạt max thì không cần hồi
+        if (user.getEnergy() >= user.getEnergyFull()) {
+            return 0;
+        }
+
+        LocalDateTime lastUpdate = user.getLastEnergyUpdate();
+        if (lastUpdate == null) {
+            lastUpdate = LocalDateTime.now();
+            user.setLastEnergyUpdate(lastUpdate);
+            userRepository.save(user);
+        }
+
+        LocalDateTime now = LocalDateTime.now();
+        long secondsPassed = ChronoUnit.SECONDS.between(lastUpdate, now);
+        long secondsPerRegen = ENERGY_REGEN_MINUTES * 60;
+
+        // Tính số giây còn lại trong chu kỳ hiện tại
+        long secondsRemaining = secondsPerRegen - (secondsPassed % secondsPerRegen);
+
+        return secondsRemaining;
     }
 }
