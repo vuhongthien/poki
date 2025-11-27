@@ -40,6 +40,7 @@ public class User {
 
 
     private int gold = 10000;
+    private int ruby = 1000;
 
     private int requestAttack = 500;
 

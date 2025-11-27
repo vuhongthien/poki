@@ -1,4 +1,4 @@
-package com.remake.poki.tets;
+package com.remake.poki.tool;
 
 /**
  * @author : ASUS ------- ^^!
@@ -20,8 +20,8 @@ public class SpriteMerger {
     private static final int FRAMES_PER_ROW = 10;
 
     public static void main(String[] args) {
-        String inputDirPath  = "C:\\Users\\ASUS\\Downloads\\sprites\\sprites\\DefineSprite_518";
-        String outputDirPath = "C:\\Users\\ASUS\\Desktop\\game\\New folder";
+        String inputDirPath  = "C:\\Users\\ASUS\\Downloads\\sprites\\sprites\\DefineSprite_146";
+        String outputDirPath = "C:\\Users\\ASUS\\Downloads\\sprites\\sprites\\DefineSprite_146\\New folder";
 
         try {
             String outputFilePath = mergeSpritesAndExport(inputDirPath, outputDirPath);
