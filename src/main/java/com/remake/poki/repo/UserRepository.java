@@ -5,6 +5,7 @@ import com.remake.poki.dto.UserDTO;
 import com.remake.poki.dto.UserRoomDTO;
 import com.remake.poki.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
@@ -29,4 +30,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByUserAndPassword(String user, String password);
 
     Optional<User> findByUser(String user);
+
+    @Modifying
+    @Query("UPDATE User u SET u.wheelDay = 2 WHERE u.wheelDay < 2")
+    int resetWheelDayForUsersBelow2();
 }

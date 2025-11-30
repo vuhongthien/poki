@@ -31,4 +31,6 @@ public interface StoneUserRepository extends JpaRepository<StoneUser, Long> {
     Optional<StoneUser> findByIdUserAndIdStone(Long idUser, Long idStone);
 
     List<StoneUser> findByIdUser(Long userId);
+
+    List<StoneUser> findByIdUserAndCountGreaterThan(Long idUser, int count);
 }

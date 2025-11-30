@@ -6,22 +6,19 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
+
 @Entity
-@Table(name = "user_card")
+@Table(name = "audit_reward")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserCard {
+public class AuditReward {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     private Long userId;
-
-    private Long cardId;
-
-    private int count;
-
-    private int level = 1;
+    private Long petId;
+    private LocalDateTime createdAt;
 }

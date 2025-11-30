@@ -10,4 +10,6 @@ import java.util.Optional;
 public interface UserStoneRepository extends JpaRepository<StoneUser, Long> {
 
     Optional<StoneUser> findByIdStone(Long id);
+
+    Optional<StoneUser> findByIdUserAndIdStone(Long userId, Long id);
 }

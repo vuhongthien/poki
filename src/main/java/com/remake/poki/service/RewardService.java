@@ -28,6 +28,12 @@ public class RewardService {
     @Autowired
     private CountPassRepository countPassRepository;
 
+    @Autowired
+    private AuditRewardRepository auditRewardRepository;
+
+    @Autowired
+    private PetRepository petRepository;
+
     /**
      * Thêm Pet cho User
      */
@@ -40,13 +46,31 @@ public class RewardService {
         user.setRequestAttack(user.getRequestAttack()+requestAttack);
         userRepository.save(user);
 
-        // Kiểm tra user đã có pet này chưa
-        if (userPetRepository.existsByUserIdAndPetId(userId, petId)) {
+//        // Kiểm tra user đã có pet này chưa
+//        if (userPetRepository.existsByUserIdAndPetId(userId, petId)) {
+//            throw new RuntimeException("User already has this pet");
+//        }
+        if (auditRewardRepository.existsByUserIdAndPetId(userId, petId)) {
             throw new RuntimeException("User already has this pet");
         }
+        Pet pet = petRepository.findById(petId).orElse(null);
+        if (pet == null) {
+            throw new RuntimeException("Pet not found");
+        }
+
+        AuditReward auditReward = new AuditReward();
+        auditReward.setUserId(userId);
+        auditReward.setPetId(petId);
+        auditReward.setCreatedAt(LocalDateTime.now());
+        auditRewardRepository.save(auditReward);
+
         UserPet userPet = new UserPet();
         userPet.setUserId(userId);
-        userPet.setPetId(petId);
+        if(pet.getChildId() != null){
+            userPet.setPetId(pet.getChildId());
+        }else{
+            userPet.setPetId(petId);
+        }
         userPetRepository.save(userPet);
     }
 
@@ -60,22 +84,29 @@ public class RewardService {
         if (user == null) {
             throw new RuntimeException("User not found");
         }
+
         ElementType elementType;
         try {
             elementType = ElementType.valueOf(element.toUpperCase());
         } catch (IllegalArgumentException e) {
             throw new RuntimeException("Invalid element type: " + element);
         }
+
         Stone stone = stoneRepository.findByElementTypeAndLever(elementType, level).orElse(null);
-        assert stone != null;
+        if (stone == null) {
+            throw new RuntimeException("Stone not found for element: " + element + " level: " + level);
+        }
+
+        // ✅ SỬA: Tìm theo CẢ userId VÀ stoneId
         StoneUser existingStone = userStoneRepository
-                .findByIdStone(stone.getId())
+                .findByIdUserAndIdStone(userId, stone.getId())  // ⬅️ THÊM userId
                 .orElse(null);
 
         if (existingStone != null) {
             // Cộng dồn số lượng
             existingStone.setCount(existingStone.getCount() + quantity);
             userStoneRepository.save(existingStone);
+            System.out.println("Updated stone: userId=" + userId + ", stoneId=" + stone.getId() + ", newCount=" + existingStone.getCount());
         } else {
             // Tạo mới
             StoneUser newStone = new StoneUser();
@@ -83,6 +114,7 @@ public class RewardService {
             newStone.setIdStone(stone.getId());
             newStone.setCount(quantity);
             userStoneRepository.save(newStone);
+            System.out.println("Created stone: userId=" + userId + ", stoneId=" + stone.getId() + ", count=" + quantity);
         }
     }
 

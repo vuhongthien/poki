@@ -1,21 +1,29 @@
 package com.remake.poki.service;
 
 import com.remake.poki.dto.*;
+import com.remake.poki.model.Card;
 import com.remake.poki.model.Pet;
 import com.remake.poki.model.User;
+import com.remake.poki.model.UserCard;
+import com.remake.poki.repo.CardRepository;
 import com.remake.poki.repo.PetRepository;
+import com.remake.poki.repo.UserCardRepository;
 import com.remake.poki.repo.UserRepository;
 import com.remake.poki.request.UpdateStarRequest;
 import com.remake.poki.response.UpdateStarResponse;
 import jakarta.transaction.Transactional;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class UserService {
@@ -25,8 +33,13 @@ public class UserService {
     @Autowired
     PetRepository petRepository;
 
-    private final
-    ModelMapper modelMapper;
+    @Autowired
+    UserCardRepository userCardRepository;
+
+    @Autowired
+    CardRepository cardRepository;
+
+    private final ModelMapper modelMapper;
 
     public UserService(UserRepository userRepository, ModelMapper modelMapper) {
         this.userRepository = userRepository;
@@ -50,7 +63,43 @@ public class UserService {
         }
         Pet pet = petRepository.findById(enemyPetId).orElseThrow();
         userRoomDTO.setElementType(pet.getElementType().name());
+        userRoomDTO.setNameEnemyPetId(pet.getName());
+
+        // Load danh sách thẻ của user
+        List<CardDTO> userCards = getUserCards(userId);
+        userRoomDTO.setCards(userCards);
+
         return userRoomDTO;
+    }
+
+    /**
+     * Lấy danh sách thẻ của user
+     */
+    public List<CardDTO> getUserCards(Long userId) {
+        List<UserCard> userCards = userCardRepository.findByUserId(userId);
+        List<CardDTO> cardDTOs = new ArrayList<>();
+
+        for (UserCard userCard : userCards) {
+            Optional<Card> cardOpt = cardRepository.findById(userCard.getCardId());
+            if (cardOpt.isPresent()) {
+                Card card = cardOpt.get();
+                CardDTO cardDTO = new CardDTO();
+                cardDTO.setId(userCard.getId());
+                cardDTO.setCardId(card.getId());
+                cardDTO.setName(card.getName());
+                cardDTO.setDescription(card.getDescription());
+                cardDTO.setElementTypeCard(card.getElementTypeCard().name());
+                cardDTO.setValue(card.getValue());
+                cardDTO.setMaxLever(card.getMaxLever());
+                cardDTO.setCount(userCard.getCount());
+                cardDTO.setLevel(userCard.getLevel());
+                cardDTO.setConditionUse(card.getConditionUse());
+
+                cardDTOs.add(cardDTO);
+            }
+        }
+
+        return cardDTOs;
     }
 
     public UserDTO login(LoginDTO request) {
@@ -201,7 +250,7 @@ public class UserService {
 
         // Nếu đã đạt max energy thì không tính toán
         if (user.getEnergy() >= user.getEnergyFull()) {
-            user.setEnergy(user.getEnergyFull());
+//            user.setEnergy(user.getEnergyFull());
             user.setLastEnergyUpdate(LocalDateTime.now());
             return userRepository.save(user);
         }
@@ -225,9 +274,9 @@ public class UserService {
             int newEnergy = user.getEnergy() + energyToAdd;
 
             // Không vượt quá max
-            if (newEnergy > user.getEnergyFull()) {
-                newEnergy = user.getEnergyFull();
-            }
+//            if (newEnergy > user.getEnergyFull()) {
+//                newEnergy = user.getEnergyFull();
+//            }
 
             user.setEnergy(newEnergy);
 
@@ -239,6 +288,17 @@ public class UserService {
         }
 
         return user;
+    }
+
+    /**
+     * Reset wheelDay về 2 mỗi ngày lúc 00:00:00
+     * Chỉ reset những user có wheelDay < 2
+     */
+    @Scheduled(cron = "0 0 0 * * ?") // Chạy lúc 00:00:00 mỗi ngày
+    @Transactional
+    public void resetWheelDay() {
+        int updatedCount = userRepository.resetWheelDayForUsersBelow2();
+        System.out.printf("updatedCount: %d\n ", updatedCount);
     }
 
     public long getSecondsUntilNextRegen(Long userId) {

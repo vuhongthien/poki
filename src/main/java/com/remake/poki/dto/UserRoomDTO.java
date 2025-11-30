@@ -4,7 +4,12 @@ import com.remake.poki.model.CountPass;
 import com.remake.poki.model.EnemyPet;
 import com.remake.poki.model.Pet;
 import com.remake.poki.model.User;
+import lombok.Getter;
+import lombok.Setter;
 
+import java.util.List;
+@Getter
+@Setter
 public class UserRoomDTO {
     private Long id;
 
@@ -30,6 +35,8 @@ public class UserRoomDTO {
 
     private String elementType;
 
+    private List<CardDTO> cards;
+
     public UserRoomDTO(User u, CountPass cp, Pet p, EnemyPet ep) {
         this.id = u.getId();
         this.energy = u.getEnergy();
@@ -41,102 +48,8 @@ public class UserRoomDTO {
         this.lever = u.getLever();
         this.petId = p.getId();
         this.enemyPetId = ep.getIdPet();
+        this.nameEnemyPetId = p.getName();
         this.elementType = p.getElementType().name();
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public int getEnergy() {
-        return energy;
-    }
-
-    public void setEnergy(int energy) {
-        this.energy = energy;
-    }
-
-    public int getEnergyFull() {
-        return energyFull;
-    }
-
-    public void setEnergyFull(int energyFull) {
-        this.energyFull = energyFull;
-    }
-
-    public int getCount() {
-        return count;
-    }
-
-    public void setCount(int count) {
-        this.count = count;
-    }
-
-    public int getRequestPass() {
-        return requestPass;
-    }
-
-    public void setRequestPass(int requestPass) {
-        this.requestPass = requestPass;
-    }
-
-    public int getRequestAttack() {
-        return requestAttack;
-    }
-
-    public void setRequestAttack(int requestAttack) {
-        this.requestAttack = requestAttack;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public int getLever() {
-        return lever;
-    }
-
-    public void setLever(int lever) {
-        this.lever = lever;
-    }
-
-    public Long getPetId() {
-        return petId;
-    }
-
-    public void setPetId(Long petId) {
-        this.petId = petId;
-    }
-
-    public Long getEnemyPetId() {
-        return enemyPetId;
-    }
-
-    public void setEnemyPetId(Long enemyPetId) {
-        this.enemyPetId = enemyPetId;
-    }
-
-    public String getNameEnemyPetId() {
-        return nameEnemyPetId;
-    }
-
-    public void setNameEnemyPetId(String nameEnemyPetId) {
-        this.nameEnemyPetId = nameEnemyPetId;
-    }
-
-    public String getElementType() {
-        return elementType;
-    }
-
-    public void setElementType(String elementType) {
-        this.elementType = elementType;
-    }
 }

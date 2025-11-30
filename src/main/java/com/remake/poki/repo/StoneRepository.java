@@ -15,4 +15,10 @@ import java.util.Optional;
 @Repository
 public interface StoneRepository extends JpaRepository<Stone, Long> {
     Optional<Stone> findByElementTypeAndLever(ElementType element, Integer level);
+    List<Stone> findByElementType(ElementType elementType);
+
+    Optional<Stone> findByElementTypeAndLever(ElementType elementType, int lever);
+
+    List<Stone> findByLever(int lever);
+
 }
