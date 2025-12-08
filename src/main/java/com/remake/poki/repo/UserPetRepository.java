@@ -48,4 +48,6 @@ public interface UserPetRepository extends JpaRepository<UserPet, Long> {
     Optional<UserPet> findByIdAndUserId(Long id, Long userId);
 
     List<UserPet> findByUserId(Long userId);
+
+    int countByUserId(Long userId);
 }

@@ -13,4 +13,6 @@ public interface UserAvatarRepository extends JpaRepository<UserAvatar, Long> {
     List<UserAvatar> findByUserId(Long userId);
 
     Optional<UserAvatar> findByUserIdAndAvatarId(Long userId, Long avatarId);
+
+    int countByUserId(Long userId);
 }
