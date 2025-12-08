@@ -20,5 +20,11 @@ public class CardDTO {
     private int maxLever;
     private int count;
     private int level;
+    private int power;
+    private int green;
+    private int blue;
+    private int red ;
+    private int yellow ;
+    private int white ;
     private Long conditionUse;
 }

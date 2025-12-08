@@ -36,6 +36,7 @@ public class UserPetDTO {
     private BigDecimal weaknessValue;
 
     private int manaSkillCard;
+    private     CardDTO cardDTO;
 
     public UserPetDTO(Pet p, UserPet up, PetStats ps, ElementWeakness ew, User u, SkillCard sc) {
         this.id = (up != null) ? up.getId() : null;
@@ -187,5 +188,13 @@ public class UserPetDTO {
 
     public void setMaxLevel(int maxLevel) {
         this.maxLevel = maxLevel;
+    }
+
+    public CardDTO getCardDTO() {
+        return cardDTO;
+    }
+
+    public void setCardDTO(CardDTO cardDTO) {
+        this.cardDTO = cardDTO;
     }
 }
