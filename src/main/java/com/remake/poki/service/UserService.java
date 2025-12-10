@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class UserService {
@@ -47,13 +46,12 @@ public class UserService {
     }
 
     public UserDTO getMoney(Long userId) {
-        if (userId == 0) {
-            userId = 1L;
-        }
-        Long finalUserId = userId;
-        return userRepository.findById(userId)
+
+        UserDTO userDTO = userRepository.findById(userId)
                 .map(user -> modelMapper.map(user, UserDTO.class))
-                .orElseThrow(() -> new NoSuchElementException("User not found with id: " + finalUserId));
+                .orElseThrow(() -> new NoSuchElementException("User not found with id: " + userId));
+
+        return userDTO;
     }
 
     public UserRoomDTO getInfoRoom(Long userId, Long enemyPetId) {
@@ -65,16 +63,12 @@ public class UserService {
         userRoomDTO.setElementType(pet.getElementType().name());
         userRoomDTO.setNameEnemyPetId(pet.getName());
 
-        // Load danh sách thẻ của user
         List<CardDTO> userCards = getUserCards(userId);
         userRoomDTO.setCards(userCards);
 
         return userRoomDTO;
     }
 
-    /**
-     * Lấy danh sách thẻ của user
-     */
     public List<CardDTO> getUserCards(Long userId) {
         List<UserCard> userCards = userCardRepository.findByUserId(userId);
         List<CardDTO> cardDTOs = new ArrayList<>();
@@ -105,7 +99,6 @@ public class UserService {
     public UserDTO login(LoginDTO request) {
         User user = userRepository.findByUserAndPassword(request.getUser(), request.getPassword())
                 .orElseThrow(() -> new NoSuchElementException("fail info login: " + request.getUser()));
-        ;
         return getMoney(user.getId());
     }
 
@@ -201,11 +194,9 @@ public class UserService {
         UpdateStarResponse response = new UpdateStarResponse();
 
         try {
-            // Tìm user
             User user = userRepository.findById(request.getUserId())
                     .orElseThrow(() -> new RuntimeException("User not found"));
 
-            // Cập nhật sao theo loại
             switch (request.getStarType().toLowerCase()) {
                 case "white":
                     user.setStarWhite(user.getStarWhite() + request.getAmount());
@@ -222,10 +213,8 @@ public class UserService {
                     return response;
             }
 
-            // Lưu user
             user = userRepository.save(user);
 
-            // Trả về response thành công
             response.setSuccess(true);
             response.setMessage("Star updated successfully");
             response.setStarWhite(user.getStarWhite());
@@ -241,42 +230,44 @@ public class UserService {
     }
 
     /**
-     * Tính toán và cập nhật năng lượng dựa trên thời gian
+     * ✅ ULTIMATE FIX: Regeneration CHỈ hồi đến max, NHƯNG GIỮ energy vượt max
      */
     @Transactional
     public User updateEnergy(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        // Nếu đã đạt max energy thì không tính toán
+        // ✅ FIX: Nếu energy đã >= max (từ gift/reward)
+        // → KHÔNG làm gì cả! GIỮ NGUYÊN energy vượt max
+        // → CHỈ update timestamp để dừng tính toán regeneration
         if (user.getEnergy() >= user.getEnergyFull()) {
-//            user.setEnergy(user.getEnergyFull());
+            // ❌ KHÔNG CẬP NHẬT energy!
+            // user.setEnergy(user.getEnergyFull()); // ← XÓA DÒNG NÀY
+
+            // ✅ CHỈ update timestamp
             user.setLastEnergyUpdate(LocalDateTime.now());
             return userRepository.save(user);
         }
 
+        // ✅ Nếu energy < max → Tính toán regeneration bình thường
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime lastUpdate = user.getLastEnergyUpdate();
 
-        // Nếu chưa có lastUpdate thì set = now
         if (lastUpdate == null) {
             user.setLastEnergyUpdate(now);
             return userRepository.save(user);
         }
 
-        // Tính số phút đã trôi qua
         long minutesPassed = ChronoUnit.MINUTES.between(lastUpdate, now);
-
-        // Tính số năng lượng được hồi
         int energyToAdd = (int) (minutesPassed / ENERGY_REGEN_MINUTES);
 
         if (energyToAdd > 0) {
             int newEnergy = user.getEnergy() + energyToAdd;
 
-            // Không vượt quá max
-//            if (newEnergy > user.getEnergyFull()) {
-//                newEnergy = user.getEnergyFull();
-//            }
+            // ✅ Regeneration CHỈ hồi đến max
+            if (newEnergy > user.getEnergyFull()) {
+                newEnergy = user.getEnergyFull();
+            }
 
             user.setEnergy(newEnergy);
 
@@ -292,20 +283,22 @@ public class UserService {
 
     /**
      * Reset wheelDay về 2 mỗi ngày lúc 00:00:00
-     * Chỉ reset những user có wheelDay < 2
      */
-    @Scheduled(cron = "0 0 0 * * ?") // Chạy lúc 00:00:00 mỗi ngày
+    @Scheduled(cron = "0 0 0 * * ?")
     @Transactional
     public void resetWheelDay() {
         int updatedCount = userRepository.resetWheelDayForUsersBelow2();
         System.out.printf("updatedCount: %d\n ", updatedCount);
     }
 
+    /**
+     * ✅ FIXED: Tính số giây còn lại đến lần hồi năng lượng tiếp theo
+     */
     public long getSecondsUntilNextRegen(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        // Nếu đã đạt max thì không cần hồi
+        // ✅ Nếu đã đạt max thì return 0 (không cần countdown)
         if (user.getEnergy() >= user.getEnergyFull()) {
             return 0;
         }
@@ -321,8 +314,11 @@ public class UserService {
         long secondsPassed = ChronoUnit.SECONDS.between(lastUpdate, now);
         long secondsPerRegen = ENERGY_REGEN_MINUTES * 60;
 
-        // Tính số giây còn lại trong chu kỳ hiện tại
         long secondsRemaining = secondsPerRegen - (secondsPassed % secondsPerRegen);
+
+        if (secondsRemaining <= 0) {
+            secondsRemaining = secondsPerRegen;
+        }
 
         return secondsRemaining;
     }

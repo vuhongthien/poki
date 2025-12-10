@@ -38,6 +38,8 @@ public class RankingService {
 
     @Autowired
     private StoneRepository stoneRepository;
+    @Autowired
+    private AvatarRepository avatarRepository;
 
     public List<TopRankingDTO> getTop9Ranking() {
         // Lấy tất cả users
@@ -123,15 +125,16 @@ public class RankingService {
                 if (pet != null) {
                     PetDTO petDTO = createPetDTO(pet);
                     UserPetDTO calculatedPet = Calculator.calculateFromPet(petDTO, currentUserPet.getLevel());
-
+                    Avatar avatar = avatarRepository.findById(user.getAvtId()).orElse(null);
                     if (calculatedPet != null) {
                         UserDetailDTO.PetDetailInfo petDetail = new UserDetailDTO.PetDetailInfo();
                         petDetail.setPetId(pet.getId());
                         petDetail.setPetName(pet.getName());
                         petDetail.setLevel(currentUserPet.getLevel());
-                        petDetail.setAttack(calculatedPet.getAttack());
-                        petDetail.setHp(calculatedPet.getHp());
-                        petDetail.setMana(calculatedPet.getMana());
+                        assert avatar != null;
+                        petDetail.setAttack(calculatedPet.getAttack()+ avatar.getAttack());
+                        petDetail.setHp(calculatedPet.getHp() + avatar.getHp());
+                        petDetail.setMana(calculatedPet.getMana()+ avatar.getMana());
                         detail.setCurrentPet(petDetail);
                     }
                 }

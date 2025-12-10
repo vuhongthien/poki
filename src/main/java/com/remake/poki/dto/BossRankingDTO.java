@@ -8,6 +8,7 @@ import lombok.*;
 public class BossRankingDTO {
     private Long userId;
     private String userName;
+    private Long userPetId;
     private int totalDamage;
     private int rank;
     private boolean isCurrentUser;

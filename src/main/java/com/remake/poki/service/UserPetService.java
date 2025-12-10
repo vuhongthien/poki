@@ -3,10 +3,7 @@ package com.remake.poki.service;
 import com.remake.poki.dto.CardDTO;
 import com.remake.poki.dto.UserPetDTO;
 import com.remake.poki.model.*;
-import com.remake.poki.repo.PetRepository;
-import com.remake.poki.repo.SkillCardRepository;
-import com.remake.poki.repo.UserPetRepository;
-import com.remake.poki.repo.UserRepository;
+import com.remake.poki.repo.*;
 import com.remake.poki.util.Calculator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -27,6 +24,8 @@ public class UserPetService {
     UserRepository userRepository;
     @Autowired
     SkillCardRepository skillCardRepository;
+    @Autowired
+    private AvatarRepository avatarRepository;
 
     public UserPetService(UserPetRepository userPetRepository) {
         this.userPetRepository = userPetRepository;
@@ -43,6 +42,11 @@ public class UserPetService {
         Pet pet = petRepository.findById(ePetId).get();
         UserPetDTO userPetDTO = Calculator.calculateStats(userPetRepository.getInfoMatch(userId, petId));
         User user = userRepository.findById(userId).get();
+        Avatar avatar = avatarRepository.findById(user.getAvtId()).orElse(null);
+        assert avatar != null;
+        userPetDTO.setMana(userPetDTO.getMana()+avatar.getMana());
+        userPetDTO.setAttack(userPetDTO.getAttack()+avatar.getAttack());
+        userPetDTO.setHp(userPetDTO.getHp()+avatar.getHp());
         user.setPetId(petId);
         userRepository.save(user);
         if(!pet.getElementType().equals(userPetDTO.getElementOther())){

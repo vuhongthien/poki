@@ -3,12 +3,16 @@ package com.remake.poki.service;
 import com.remake.poki.enums.ElementType;
 import com.remake.poki.model.*;
 import com.remake.poki.repo.*;
+import com.remake.poki.request.CreateGiftRequest;
 import com.remake.poki.request.PetRequest;
+import com.remake.poki.dto.StoneReward;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class RewardService {
@@ -34,25 +38,34 @@ public class RewardService {
     @Autowired
     private PetRepository petRepository;
 
+    @Autowired
+    private GiftService giftService;  // ✅ INJECT GiftService
+
     /**
-     * Thêm Pet cho User
+     * ✅ Thêm Pet + CT + EXP (Unity đã tính)
      */
     @Transactional
-    public void addPetToUser(Long userId, Long petId, int requestAttack) {
+    public void addPetToUser(Long userId, Long petId, int requestAttack, int expGain) {
         User user = userRepository.findById(userId).orElse(null);
         if (user == null) {
             throw new RuntimeException("User not found");
         }
-        user.setRequestAttack(user.getRequestAttack()+requestAttack);
+
+        // Cộng Request Attack
+        user.setRequestAttack(user.getRequestAttack() + requestAttack);
+
+        // ✅ Cộng EXP (Unity đã tính sẵn) + CHECK LEVEL UP
+        addExpToUser(user, expGain);
+
         userRepository.save(user);
 
-//        // Kiểm tra user đã có pet này chưa
-//        if (userPetRepository.existsByUserIdAndPetId(userId, petId)) {
-//            throw new RuntimeException("User already has this pet");
-//        }
+        System.out.println(String.format("[REWARD] User #%d - +%d CT, +%d EXP (Level %d: %d/%d)",
+                userId, requestAttack, expGain, user.getLever(), user.getExpCurrent(), user.getExp()));
+
         if (auditRewardRepository.existsByUserIdAndPetId(userId, petId)) {
             throw new RuntimeException("User already has this pet");
         }
+
         Pet pet = petRepository.findById(petId).orElse(null);
         if (pet == null) {
             throw new RuntimeException("Pet not found");
@@ -68,18 +81,159 @@ public class RewardService {
         userPet.setUserId(userId);
         if(pet.getChildId() != null){
             userPet.setPetId(pet.getChildId());
-        }else{
+        } else {
             userPet.setPetId(petId);
         }
         userPetRepository.save(userPet);
     }
 
     /**
-     * Thêm Stone cho User
+     * ✅ Chỉ cộng EXP (Unity đã tính) + CHECK LEVEL UP
+     */
+    @Transactional
+    public void addExpToUserById(Long userId, int expGain) {
+        User user = userRepository.findById(userId).orElse(null);
+        if (user == null) {
+            throw new RuntimeException("User not found");
+        }
+
+        addExpToUser(user, expGain);
+        userRepository.save(user);
+
+        System.out.println(String.format("[REWARD] User #%d - +%d EXP (Level %d: %d/%d)",
+                userId, expGain, user.getLever(), user.getExpCurrent(), user.getExp()));
+    }
+
+    /**
+     * ✅ CORE: Xử lý EXP + Level Up + AUTO GIFT
+     * Công thức: exp(level) = level * 100
+     */
+    private void addExpToUser(User user, int expGain) {
+        if (expGain <= 0) return;
+
+        user.setExpCurrent(user.getExpCurrent() + expGain);
+
+        // ✅ Track các level đã lên để gửi gift
+        List<Integer> leveledUpLevels = new ArrayList<>();
+
+        // Check level up
+        while (user.getExpCurrent() >= user.getExp()) {
+            // Trừ EXP cũ
+            user.setExpCurrent(user.getExpCurrent() - user.getExp());
+
+            // Tăng level
+            user.setLever(user.getLever() + 1);
+
+            // ✅ TRACK LEVEL UP
+            leveledUpLevels.add(user.getLever());
+
+            // Tính EXP cần cho level mới: level * 100
+            int newExpRequired = user.getLever() * 100;
+            user.setExp(newExpRequired);
+
+            System.out.println(String.format("[LEVEL UP] User #%d → Level %d (need %d EXP)",
+                    user.getId(), user.getLever(), newExpRequired));
+        }
+
+        // ✅ GỬI GIFT CHO MỖI LEVEL ĐÃ LÊN
+        for (Integer newLevel : leveledUpLevels) {
+            sendLevelUpGift(user.getId(), newLevel);
+        }
+    }
+
+    /**
+     * ✅ GỬI GIFT KHI LEVEL UP
+     * - 30 năng lượng
+     * - 5 đá Lv7 mỗi loại (Fire, Water, Earth, Wind, Metal)
+     * - Nếu level chia hết cho 10: thêm 20,000 gold
+     */
+    @Transactional
+    public void sendLevelUpGift(Long userId, int newLevel) {
+        try {
+            // ✅ TẠO GIFT REQUEST
+            CreateGiftRequest giftRequest = new CreateGiftRequest();
+            giftRequest.setUserId(userId);
+            giftRequest.setTitle("🎉 Phần thưởng Level " + newLevel);
+
+            StringBuilder description = new StringBuilder();
+            description.append("Chúc mừng bạn đã lên Level ").append(newLevel).append("!\n");
+            description.append("Phần thưởng:\n");
+            description.append("• 30 Năng lượng\n");
+            description.append("• 5 Đá Lv7 mỗi loại");
+
+            // ✅ NĂNG LƯỢNG: 30
+            giftRequest.setEnergy(30);
+
+            // ✅ ĐÁ LV7: 5 viên mỗi loại (Fire, Water, Earth, Wind, Metal)
+            List<StoneReward> stones = new ArrayList<>();
+
+            // Lấy stone IDs cho level 7 của mỗi hệ
+            // Giả sử: Fire(1-7), Water(8-14), Earth(15-21), Wind(22-28), Metal(29-35)
+            // → Level 7: Fire=7, Water=14, Earth=21, Wind=28, Metal=35
+
+            stones.add(createStoneReward(7L, 5));    // Fire Lv7
+            stones.add(createStoneReward(14L, 5));   // Water Lv7
+            stones.add(createStoneReward(21L, 5));   // Earth Lv7
+            stones.add(createStoneReward(28L, 5));   // Wind Lv7
+            stones.add(createStoneReward(35L, 5));   // Metal Lv7
+
+            giftRequest.setStones(stones);
+
+            // ✅ NẾU LEVEL CHIA HẾT CHO 10: THÊM 20,000 GOLD
+            if (newLevel % 10 == 0) {
+                giftRequest.setGold(20000);
+                description.append("\n• 20,000 Gold (Cột mốc Level ").append(newLevel).append(")");
+            }
+
+            giftRequest.setDescription(description.toString());
+
+            // ✅ HẾT HẠN SAU 7 NGÀY
+            giftRequest.setExpiredAt(LocalDateTime.now().plusDays(7));
+
+            // ✅ GỬI GIFT
+            giftService.sendGiftToUser(giftRequest);
+
+            System.out.println(String.format("[LEVEL UP GIFT] Sent gift to user #%d for reaching level %d",
+                    userId, newLevel));
+
+        } catch (Exception e) {
+            System.err.println(String.format("[LEVEL UP GIFT] Failed to send gift to user #%d: %s",
+                    userId, e.getMessage()));
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * ✅ MỚI: Chỉ cộng Gold
+     */
+    @Transactional
+    public void addGoldToUserById(Long userId, int goldAmount) {
+        User user = userRepository.findById(userId).orElse(null);
+        if (user == null) {
+            throw new RuntimeException("User not found");
+        }
+
+        user.setGold(user.getGold() + goldAmount);
+        userRepository.save(user);
+
+        System.out.println(String.format("[BONUS] User #%d - +%d Gold 🍀", userId, goldAmount));
+    }
+
+    /**
+     * ✅ HELPER: Tạo StoneReward
+     */
+    private StoneReward createStoneReward(Long stoneId, int count) {
+        StoneReward reward = new StoneReward();
+        reward.setStoneId(stoneId);
+        reward.setCount(count);
+        return reward;
+    }
+
+    /**
+     * Thêm Stone cho User (KHÔNG có EXP)
      */
     @Transactional
     public void addStoneToUser(Long userId, String element, Integer level, Integer quantity) {
-
         User user = userRepository.findById(userId).orElse(null);
         if (user == null) {
             throw new RuntimeException("User not found");
@@ -97,18 +251,15 @@ public class RewardService {
             throw new RuntimeException("Stone not found for element: " + element + " level: " + level);
         }
 
-        // ✅ SỬA: Tìm theo CẢ userId VÀ stoneId
         StoneUser existingStone = userStoneRepository
-                .findByIdUserAndIdStone(userId, stone.getId())  // ⬅️ THÊM userId
+                .findByIdUserAndIdStone(userId, stone.getId())
                 .orElse(null);
 
         if (existingStone != null) {
-            // Cộng dồn số lượng
             existingStone.setCount(existingStone.getCount() + quantity);
             userStoneRepository.save(existingStone);
             System.out.println("Updated stone: userId=" + userId + ", stoneId=" + stone.getId() + ", newCount=" + existingStone.getCount());
         } else {
-            // Tạo mới
             StoneUser newStone = new StoneUser();
             newStone.setIdUser(userId);
             newStone.setIdStone(stone.getId());
@@ -128,7 +279,7 @@ public class RewardService {
             countPass.setCount(1);
             countPass.setIdUser(userId);
             countPass.setIdPet(request.getPetId());
-        }else{
+        } else {
             countPass.setCount(countPass.getCount() + 1);
         }
         countPassRepository.save(countPass);

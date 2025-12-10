@@ -32,6 +32,8 @@ public class WorldBossService {
 
     @Autowired
     private PetRepository petRepo;
+    @Autowired
+    private UserRepository userRepository;
 
     /**
      * Lấy danh sách tất cả boss với thông tin trạng thái cho user
@@ -168,9 +170,11 @@ public class WorldBossService {
         WorldBossDamage damage = damageRepo
                 .findByUserIdAndBossScheduleId(userId, bossScheduleId)
                 .orElse(new WorldBossDamage());
+        User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found!"));
 
         if (damage.getId() == null) {
             damage.setUserId(userId);
+            damage.setUserPetId(user.getPetId());
             damage.setBossScheduleId(bossScheduleId);
             damage.setTotalDamage(0);
             damage.setBattleCount(0);
@@ -196,6 +200,7 @@ public class WorldBossService {
 
         for (WorldBossDamage damage : topDamages) {
             BossRankingDTO dto = new BossRankingDTO();
+            dto.setUserPetId(damage.getUserPetId());
             dto.setUserId(damage.getUserId());
             dto.setTotalDamage(damage.getTotalDamage());
             dto.setRank(rank++);

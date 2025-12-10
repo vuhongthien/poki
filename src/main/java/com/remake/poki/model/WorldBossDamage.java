@@ -20,6 +20,9 @@ public class WorldBossDamage {
     private Long userId;
 
     @Column(nullable = false)
+    private Long userPetId;
+
+    @Column(nullable = false)
     private Long bossScheduleId;
 
     @Column(nullable = false)

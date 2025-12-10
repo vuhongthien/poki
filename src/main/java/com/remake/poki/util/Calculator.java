@@ -10,26 +10,28 @@ public class Calculator {
     // Cấu hình chung
     private static final int DEFAULT_MAX_LEVEL = 12;
 
-    // Tăng cơ bản mỗi level (áp dụng cho mọi pet)
-    private static final double ATK_GROWTH_PER_LEVEL  = 1.08; // +8%
-    private static final double HP_GROWTH_PER_LEVEL   = 1.09; // +9%
-    private static final double MANA_GROWTH_PER_LEVEL = 1.07; // +7%
+    // ✅ THAY ĐỔI: Tăng 10% mỗi level cho TẤT CẢ thuộc tính
+    private static final double GROWTH_PER_LEVEL = 1.10; // +10% cho ATK, HP, MANA
 
-    // Mốc buff
+    // ✅ XÓA BỎ: Các mốc buff level 7 và level 10
+    // (Nếu vẫn muốn giữ buff này, uncomment lại)
+    /*
     private static final int MILESTONE_LV1 = 7;
     private static final double MILESTONE_LV1_BONUS = 1.05; // +5% khi >= 7
     private static final int MILESTONE_LV2 = 10;
     private static final double MILESTONE_LV2_BONUS = 1.07; // +7% khi >= 10
+    */
 
     /**
      * Case 1:
      *  - Input: UserPetDTO (đã có level hiện tại)
      *  - Base stat lấy ngay từ chính UserPetDTO (thường dùng nếu đang lưu base ở lv1)
-     *  - Output: UserPetDTO sau khi scale stat theo level + buff lv7/lv10
+     *  - Output: UserPetDTO sau khi scale stat theo level
      */
     public static UserPetDTO calculateStats(UserPetDTO userPet) {
         return calculateStats(userPet, null, 0);
     }
+
     public static UserPetDTO calculateStats(UserPetDTO userPet, int level) {
         return calculateStats(userPet, null, level);
     }
@@ -48,11 +50,11 @@ public class Calculator {
         // Level & MaxLevel
         level = userPet.getLevel();
 
-
         int maxLevel =
                 (userPet.getMaxLevel() > 0) ? userPet.getMaxLevel()
                         : (petBase != null && petBase.getMaxLevel() > 0) ? petBase.getMaxLevel()
                         : DEFAULT_MAX_LEVEL;
+
         if(level == 14){
             maxLevel = 14;
         }
@@ -68,11 +70,13 @@ public class Calculator {
 
         int step = level - 1;
 
-        // Scale cơ bản
-        double atk  = baseAtk  * Math.pow(ATK_GROWTH_PER_LEVEL, step);
-        double hp   = baseHp   * Math.pow(HP_GROWTH_PER_LEVEL, step);
-        double mana = baseMana * Math.pow(MANA_GROWTH_PER_LEVEL, step);
+        // ✅ CÔNG THỨC MỚI: Tất cả thuộc tính tăng 10% mỗi level
+        double atk  = baseAtk  * Math.pow(GROWTH_PER_LEVEL, step);
+        double hp   = baseHp   * Math.pow(GROWTH_PER_LEVEL, step);
+        double mana = baseMana * Math.pow(GROWTH_PER_LEVEL, step);
 
+        // ✅ XÓA BỎ: Buff mốc 7 và 10 (nếu muốn giữ thì uncomment)
+        /*
         // Buff mốc 7
         if (level >= MILESTONE_LV1) {
             atk  *= MILESTONE_LV1_BONUS;
@@ -86,6 +90,7 @@ public class Calculator {
             hp   *= MILESTONE_LV2_BONUS;
             mana *= MILESTONE_LV2_BONUS;
         }
+        */
 
         // Weakness: ưu tiên UserPetDTO, nếu null thì lấy từ PetDTO, cuối cùng default = 1
         BigDecimal weakness =
@@ -139,6 +144,6 @@ public class Calculator {
         dto.setLevel(level);
         dto.setWeaknessValue(petBase.getWeaknessValue());
 
-        return calculateStats(dto, petBase,0);
+        return calculateStats(dto, petBase, 0);
     }
 }

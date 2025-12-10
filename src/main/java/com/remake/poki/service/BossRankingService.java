@@ -71,7 +71,7 @@ public class BossRankingService {
                 BossRankingPlayerDTO playerDTO = BossRankingPlayerDTO.builder()
                         .userId(user.getId())
                         .userName(user.getName())
-                        .petId(user.getPetId() != null ? user.getPetId() : 0L)
+                        .petId(damage.getUserPetId())
                         .bossId(latestFinishedBoss.getPetId() != null ? latestFinishedBoss.getPetId() : 0L)
                         .totalDamage(damage.getTotalDamage())
                         .rank(rank++)
