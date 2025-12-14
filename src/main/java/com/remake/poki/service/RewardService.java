@@ -108,7 +108,7 @@ public class RewardService {
      * ✅ CORE: Xử lý EXP + Level Up + AUTO GIFT
      * Công thức: exp(level) = level * 100
      */
-    private void addExpToUser(User user, int expGain) {
+    public void addExpToUser(User user, int expGain) {
         if (expGain <= 0) return;
 
         user.setExpCurrent(user.getExpCurrent() + expGain);

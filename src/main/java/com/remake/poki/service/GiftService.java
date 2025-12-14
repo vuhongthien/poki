@@ -221,6 +221,7 @@ public class GiftService {
 
         if (gift.getExp() != null && gift.getExp() > 0) {
             user.setExpCurrent(user.getExpCurrent() + gift.getExp());
+            addExpToUser(user, gift.getExp());
         }
 
         if (gift.getStarWhite() != null && gift.getStarWhite() > 0) {
@@ -284,6 +285,115 @@ public class GiftService {
                 log.error("Error parsing stones JSON", e);
             }
         }
+    }
+
+    /**
+     * ✅ CORE: Xử lý EXP + Level Up + AUTO GIFT
+     * Công thức: exp(level) = level * 100
+     */
+    public void addExpToUser(User user, int expGain) {
+        if (expGain <= 0) return;
+
+        user.setExpCurrent(user.getExpCurrent() + expGain);
+
+        // ✅ Track các level đã lên để gửi gift
+        List<Integer> leveledUpLevels = new ArrayList<>();
+
+        // Check level up
+        while (user.getExpCurrent() >= user.getExp()) {
+            // Trừ EXP cũ
+            user.setExpCurrent(user.getExpCurrent() - user.getExp());
+
+            // Tăng level
+            user.setLever(user.getLever() + 1);
+
+            // ✅ TRACK LEVEL UP
+            leveledUpLevels.add(user.getLever());
+
+            // Tính EXP cần cho level mới: level * 100
+            int newExpRequired = user.getLever() * 100;
+            user.setExp(newExpRequired);
+
+            System.out.println(String.format("[LEVEL UP] User #%d → Level %d (need %d EXP)",
+                    user.getId(), user.getLever(), newExpRequired));
+        }
+
+        // ✅ GỬI GIFT CHO MỖI LEVEL ĐÃ LÊN
+        for (Integer newLevel : leveledUpLevels) {
+            sendLevelUpGift(user.getId(), newLevel);
+        }
+    }
+
+    /**
+     * ✅ GỬI GIFT KHI LEVEL UP
+     * - 30 năng lượng
+     * - 5 đá Lv7 mỗi loại (Fire, Water, Earth, Wind, Metal)
+     * - Nếu level chia hết cho 10: thêm 20,000 gold
+     */
+    @Transactional
+    public void sendLevelUpGift(Long userId, int newLevel) {
+        try {
+            // ✅ TẠO GIFT REQUEST
+            CreateGiftRequest giftRequest = new CreateGiftRequest();
+            giftRequest.setUserId(userId);
+            giftRequest.setTitle("🎉 Phần thưởng Level " + newLevel);
+
+            StringBuilder description = new StringBuilder();
+            description.append("Chúc mừng bạn đã lên Level ").append(newLevel).append("!\n");
+            description.append("Phần thưởng:\n");
+            description.append("• 30 Năng lượng\n");
+            description.append("• 5 Đá Lv7 mỗi loại");
+
+            // ✅ NĂNG LƯỢNG: 30
+            giftRequest.setEnergy(30);
+
+            // ✅ ĐÁ LV7: 5 viên mỗi loại (Fire, Water, Earth, Wind, Metal)
+            List<StoneReward> stones = new ArrayList<>();
+
+            // Lấy stone IDs cho level 7 của mỗi hệ
+            // Giả sử: Fire(1-7), Water(8-14), Earth(15-21), Wind(22-28), Metal(29-35)
+            // → Level 7: Fire=7, Water=14, Earth=21, Wind=28, Metal=35
+
+            stones.add(createStoneReward(7L, 5));    // Fire Lv7
+            stones.add(createStoneReward(14L, 5));   // Water Lv7
+            stones.add(createStoneReward(21L, 5));   // Earth Lv7
+            stones.add(createStoneReward(28L, 5));   // Wind Lv7
+            stones.add(createStoneReward(35L, 5));   // Metal Lv7
+
+            giftRequest.setStones(stones);
+
+            // ✅ NẾU LEVEL CHIA HẾT CHO 10: THÊM 20,000 GOLD
+            if (newLevel % 10 == 0) {
+                giftRequest.setGold(20000);
+                description.append("\n• 20,000 Gold (Cột mốc Level ").append(newLevel).append(")");
+            }
+
+            giftRequest.setDescription(description.toString());
+
+            // ✅ HẾT HẠN SAU 7 NGÀY
+            giftRequest.setExpiredAt(LocalDateTime.now().plusDays(7));
+
+            // ✅ GỬI GIFT
+            sendGiftToUser(giftRequest);
+
+            System.out.println(String.format("[LEVEL UP GIFT] Sent gift to user #%d for reaching level %d",
+                    userId, newLevel));
+
+        } catch (Exception e) {
+            System.err.println(String.format("[LEVEL UP GIFT] Failed to send gift to user #%d: %s",
+                    userId, e.getMessage()));
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * ✅ HELPER: Tạo StoneReward
+     */
+    private StoneReward createStoneReward(Long stoneId, int count) {
+        StoneReward reward = new StoneReward();
+        reward.setStoneId(stoneId);
+        reward.setCount(count);
+        return reward;
     }
 
     /**
