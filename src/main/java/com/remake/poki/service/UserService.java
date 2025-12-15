@@ -19,10 +19,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class UserService {
@@ -63,8 +60,6 @@ public class UserService {
         userRoomDTO.setElementType(pet.getElementType().name());
         userRoomDTO.setNameEnemyPetId(pet.getName());
 
-        List<CardDTO> userCards = getUserCards(userId);
-        userRoomDTO.setCards(userCards);
 
         return userRoomDTO;
     }

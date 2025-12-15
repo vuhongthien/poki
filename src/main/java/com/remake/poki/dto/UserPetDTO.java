@@ -42,7 +42,7 @@ public class UserPetDTO {
         this.id = (up != null) ? up.getId() : null;
         this.userId = (u != null) ? u.getId() : null;
         this.petId = (p != null) ? p.getId() : null;
-        this.skillCardId = (sc != null) ? sc.getId() : null;
+        this.skillCardId = (sc != null) ? sc.getId() : 0;
         this.name = (p != null) ? p.getName() : null;
         this.des = (sc != null) ? sc.getDescription() : null;
         this.elementType = (p != null) ? p.getElementType() : null;

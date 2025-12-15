@@ -30,6 +30,7 @@ public class UserRoomDTO {
     private Long petId;
 
     private Long enemyPetId;
+    private Long avtId;
 
     private String nameEnemyPetId;
 
@@ -39,6 +40,7 @@ public class UserRoomDTO {
 
     public UserRoomDTO(User u, CountPass cp, Pet p, EnemyPet ep) {
         this.id = u.getId();
+        this.avtId = u.getAvtId();
         this.energy = u.getEnergy();
         this.energyFull = u.getEnergyFull();
         this.count = (cp != null) ? cp.getCount() : 0;
