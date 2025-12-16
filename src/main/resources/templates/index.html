@@ -1,0 +1,1054 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${gameName} + ' - Sắp Ra Mắt'">POKIGUARD - Sắp Ra Mắt</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', 'Inter', sans-serif;
+            overflow-x: hidden;
+            background: #0a0e27;
+            color: #fff;
+            position: relative;
+        }
+
+        /* Animated gradient background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            opacity: 0.15;
+            z-index: 0;
+        }
+
+        /* Animated particles */
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 0;
+        }
+
+        /* Corner Pet GIFs */
+        .corner-pet {
+            position: fixed;
+            z-index: 999;
+            pointer-events: none;
+            max-width: 200px;
+            max-height: 200px;
+            opacity: 0;
+            animation: fadeInPet 1s ease-out 0.5s forwards;
+        }
+
+        .corner-pet img {
+            width: 100%;
+            height: auto;
+            filter: drop-shadow(0 10px 30px rgba(102, 126, 234, 0.5));
+            animation: floatPet 3s ease-in-out infinite;
+        }
+
+        .corner-pet-left {
+            bottom: 20px;
+            left: 20px;
+        }
+
+        .corner-pet-right {
+            bottom: 20px;
+            right: 20px;
+        }
+
+        @keyframes fadeInPet {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes floatPet {
+            0%, 100% {
+                transform: translateY(0px);
+            }
+            50% {
+                transform: translateY(-15px);
+            }
+        }
+
+        /* Hide corner pets on mobile */
+        @media (max-width: 768px) {
+            .corner-pet {
+                max-width: 120px;
+                max-height: 120px;
+            }
+
+            .corner-pet-left {
+                bottom: 10px;
+                left: 10px;
+            }
+
+            .corner-pet-right {
+                bottom: 10px;
+                right: 10px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .corner-pet {
+                display: none;
+            }
+        }
+
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: rgba(102, 126, 234, 0.6);
+            border-radius: 50%;
+            animation: rise 10s infinite ease-in;
+        }
+
+        .particle:nth-child(2n) {
+            background: rgba(118, 75, 162, 0.6);
+            animation-duration: 12s;
+        }
+
+        .particle:nth-child(3n) {
+            background: rgba(240, 147, 251, 0.6);
+            animation-duration: 8s;
+        }
+
+        @keyframes rise {
+            0% {
+                bottom: -10%;
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                bottom: 110%;
+                opacity: 0;
+            }
+        }
+
+        /* Generate particles */
+        .particle:nth-child(1) { left: 5%; animation-delay: 0s; }
+        .particle:nth-child(2) { left: 15%; animation-delay: 2s; }
+        .particle:nth-child(3) { left: 25%; animation-delay: 4s; }
+        .particle:nth-child(4) { left: 35%; animation-delay: 1s; }
+        .particle:nth-child(5) { left: 45%; animation-delay: 3s; }
+        .particle:nth-child(6) { left: 55%; animation-delay: 5s; }
+        .particle:nth-child(7) { left: 65%; animation-delay: 2.5s; }
+        .particle:nth-child(8) { left: 75%; animation-delay: 4.5s; }
+        .particle:nth-child(9) { left: 85%; animation-delay: 1.5s; }
+        .particle:nth-child(10) { left: 95%; animation-delay: 3.5s; }
+
+        /* Container */
+        .container {
+            position: relative;
+            z-index: 1;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            padding: 40px 0;
+            animation: fadeInDown 1s ease-out;
+        }
+
+        .game-logo {
+            font-size: 5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: 2px;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            animation: glow 3s ease-in-out infinite;
+        }
+
+        @keyframes glow {
+            0%, 100% {
+                filter: drop-shadow(0 0 20px rgba(102, 126, 234, 0.5));
+            }
+            50% {
+                filter: drop-shadow(0 0 40px rgba(118, 75, 162, 0.8));
+            }
+        }
+
+        .game-subtitle {
+            font-size: 1.3rem;
+            color: #a8b2d1;
+            font-weight: 400;
+            margin-bottom: 20px;
+        }
+
+        /* Banner */
+        .banner-section {
+            margin: 50px 0;
+            animation: fadeIn 1s ease-out 0.3s both;
+        }
+
+        .banner-container {
+            position: relative;
+            max-width: 1200px;
+            margin: 0 auto;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(102, 126, 234, 0.3);
+            border: 2px solid rgba(102, 126, 234, 0.3);
+            transition: all 0.4s ease;
+        }
+
+        .banner-container:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 30px 80px rgba(102, 126, 234, 0.5);
+            border-color: rgba(102, 126, 234, 0.6);
+        }
+
+        .banner-image {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .banner-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(to top, rgba(10, 14, 39, 0.95), transparent);
+            padding: 40px;
+            text-align: center;
+        }
+
+        .banner-text {
+            font-size: 2.5rem;
+            color: #fff;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            animation: pulse 2s infinite;
+        }
+
+        /* Countdown */
+        .countdown-section {
+            margin: 80px 0;
+            animation: fadeInUp 1s ease-out 0.5s both;
+        }
+
+        .countdown-title {
+            text-align: center;
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, #667eea, #f093fb);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .countdown-subtitle {
+            text-align: center;
+            font-size: 1.2rem;
+            color: #a8b2d1;
+            margin-bottom: 50px;
+        }
+
+        .countdown-wrapper {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 50px;
+            max-width: 1000px;
+            margin: 0 auto;
+            border: 1px solid rgba(102, 126, 234, 0.2);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .countdown {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 30px;
+        }
+
+        .countdown-item {
+            background: rgba(10, 14, 39, 0.8);
+            border-radius: 15px;
+            padding: 30px 20px;
+            text-align: center;
+            border: 2px solid rgba(102, 126, 234, 0.3);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .countdown-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(102, 126, 234, 0.3), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .countdown-item:hover::before {
+            left: 100%;
+        }
+
+        .countdown-item:hover {
+            transform: translateY(-10px);
+            border-color: rgba(102, 126, 234, 0.8);
+            box-shadow: 0 15px 40px rgba(102, 126, 234, 0.4);
+        }
+
+        .countdown-number {
+            font-size: 4rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #667eea, #f093fb);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            display: block;
+            line-height: 1;
+        }
+
+        .countdown-label {
+            font-size: 0.9rem;
+            color: #a8b2d1;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-top: 15px;
+            font-weight: 600;
+        }
+
+        /* Thank You Section */
+        .thankyou-section {
+            margin: 100px 0;
+            animation: fadeInUp 1s ease-out 0.6s both;
+        }
+
+        .thankyou-container {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 30px;
+            padding: 60px 50px;
+            max-width: 900px;
+            margin: 0 auto;
+            border: 2px solid rgba(102, 126, 234, 0.3);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .thankyou-container::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(102, 126, 234, 0.1) 0%, transparent 70%);
+            animation: rotate 20s linear infinite;
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .thankyou-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            animation: heartbeat 1.5s infinite;
+            position: relative;
+            z-index: 1;
+        }
+
+        @keyframes heartbeat {
+            0%, 100% { transform: scale(1); }
+            10%, 30% { transform: scale(1.1); }
+            20% { transform: scale(1); }
+        }
+
+        .thankyou-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 30px;
+            background: linear-gradient(135deg, #667eea, #f093fb);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .thankyou-content {
+            position: relative;
+            z-index: 1;
+            line-height: 2;
+            font-size: 1.1rem;
+            color: #fff;
+            margin-bottom: 30px;
+        }
+
+        .thankyou-content p {
+            margin-bottom: 20px;
+        }
+
+        .thankyou-content strong {
+            background: linear-gradient(135deg, #667eea, #f093fb);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 700;
+        }
+
+        .thankyou-signature {
+            font-size: 1.2rem;
+            color: #a8b2d1;
+            font-weight: 600;
+            font-style: italic;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Pet Gallery */
+        .pet-section {
+            margin: 100px 0;
+            animation: fadeInUp 1s ease-out 0.7s both;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: 15px;
+            background: linear-gradient(135deg, #667eea, #f093fb);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-transform: uppercase;
+        }
+
+        .section-subtitle {
+            text-align: center;
+            font-size: 1.2rem;
+            color: #a8b2d1;
+            margin-bottom: 60px;
+        }
+
+        .pet-gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            max-width: 1300px;
+            margin: 0 auto;
+        }
+
+        .pet-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 25px;
+            border: 2px solid rgba(102, 126, 234, 0.2);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .pet-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(240, 147, 251, 0.1));
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .pet-card:hover::before {
+            opacity: 1;
+        }
+
+        .pet-card:hover {
+            transform: translateY(-15px);
+            border-color: rgba(102, 126, 234, 0.8);
+            box-shadow: 0 20px 60px rgba(102, 126, 234, 0.4);
+        }
+
+        .pet-rarity {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #ffd700, #ff8c00);
+            color: #000;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            z-index: 2;
+            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.4);
+        }
+
+        .pet-image-container {
+            width: 100%;
+            height: 200px;
+            background: rgba(10, 14, 39, 0.5);
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            overflow: hidden;
+            position: relative;
+            border: 2px solid rgba(102, 126, 234, 0.2);
+        }
+
+        .pet-image {
+            max-width: 85%;
+            max-height: 85%;
+            object-fit: contain;
+            transition: transform 0.4s ease;
+            filter: drop-shadow(0 10px 20px rgba(102, 126, 234, 0.4));
+        }
+
+        .pet-card:hover .pet-image {
+            transform: scale(1.1);
+        }
+
+        .pet-name {
+            color: #fff;
+            font-size: 1.4rem;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .pet-type {
+            color: #a8b2d1;
+            font-size: 0.95rem;
+            text-align: center;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Features */
+        .features-section {
+            margin: 100px 0;
+            animation: fadeInUp 1s ease-out 0.8s both;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 40px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .feature-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            border: 2px solid rgba(102, 126, 234, 0.2);
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            border-color: rgba(102, 126, 234, 0.8);
+            box-shadow: 0 20px 60px rgba(102, 126, 234, 0.3);
+        }
+
+        .feature-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            filter: drop-shadow(0 5px 15px rgba(102, 126, 234, 0.5));
+        }
+
+        .feature-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+            color: #fff;
+        }
+
+        .feature-desc {
+            color: #a8b2d1;
+            line-height: 1.6;
+            font-size: 1rem;
+        }
+
+        /* Newsletter */
+        .newsletter-section {
+            margin: 100px 0;
+            padding: 60px 40px;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 30px;
+            max-width: 900px;
+            margin: 100px auto;
+            border: 2px solid rgba(102, 126, 234, 0.3);
+            animation: fadeInUp 1s ease-out 1s both;
+        }
+
+        .newsletter-title {
+            font-size: 2rem;
+            color: #fff;
+            text-align: center;
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+
+        .newsletter-subtitle {
+            text-align: center;
+            color: #a8b2d1;
+            margin-bottom: 30px;
+        }
+
+        .newsletter-form {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .newsletter-input {
+            padding: 18px 30px;
+            font-size: 1rem;
+            border: 2px solid rgba(102, 126, 234, 0.3);
+            border-radius: 50px;
+            background: rgba(10, 14, 39, 0.8);
+            color: #fff;
+            min-width: 350px;
+            font-family: 'Poppins', sans-serif;
+            transition: all 0.3s ease;
+        }
+
+        .newsletter-input::placeholder {
+            color: #a8b2d1;
+        }
+
+        .newsletter-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 30px rgba(102, 126, 234, 0.3);
+        }
+
+        .newsletter-btn {
+            padding: 18px 50px;
+            font-size: 1rem;
+            font-weight: 700;
+            border: none;
+            border-radius: 50px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: #fff;
+            cursor: pointer;
+            font-family: 'Poppins', sans-serif;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .newsletter-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(102, 126, 234, 0.5);
+            background: linear-gradient(135deg, #764ba2, #f093fb);
+        }
+
+        /* Social Links */
+        .social-section {
+            text-align: center;
+            margin: 80px 0;
+            animation: fadeInUp 1s ease-out 1.1s both;
+        }
+
+        .social-title {
+            font-size: 1.5rem;
+            color: #fff;
+            margin-bottom: 30px;
+            font-weight: 600;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 25px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .social-link {
+            width: 60px;
+            height: 60px;
+            border-radius: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(102, 126, 234, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .social-link:hover {
+            transform: translateY(-5px);
+            border-color: #667eea;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+            background: rgba(102, 126, 234, 0.2);
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 40px;
+            color: #a8b2d1;
+            border-top: 1px solid rgba(102, 126, 234, 0.2);
+            margin-top: 80px;
+        }
+
+        .footer p {
+            margin: 5px 0;
+        }
+
+        /* Animations */
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .game-logo {
+                font-size: 3rem;
+            }
+
+            .game-subtitle {
+                font-size: 1rem;
+            }
+
+            .banner-text {
+                font-size: 1.5rem;
+            }
+
+            .countdown-title {
+                font-size: 2rem;
+            }
+
+            .countdown-wrapper {
+                padding: 30px 20px;
+            }
+
+            .countdown {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 20px;
+            }
+
+            .countdown-number {
+                font-size: 3rem;
+            }
+
+            .section-title {
+                font-size: 2rem;
+            }
+
+            .pet-gallery {
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                gap: 20px;
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+                gap: 30px;
+            }
+
+            .newsletter-input {
+                min-width: 280px;
+            }
+
+            .newsletter-section {
+                padding: 40px 25px;
+            }
+
+            .thankyou-container {
+                padding: 40px 30px;
+            }
+
+            .thankyou-title {
+                font-size: 1.8rem;
+            }
+
+            .thankyou-content {
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+<!-- Corner Pet GIFs -->
+<div class="corner-pet corner-pet-left">
+    <img th:src="@{'/images/' + ${leftPetGif}}"
+         alt="Left Pet"
+         onerror="this.parentElement.style.display='none'">
+</div>
+<div class="corner-pet corner-pet-right" style="margin-bottom: 40px;">
+    <img th:src="@{'/images/' + ${rightPetGif}}"
+         alt="Right Pet"
+         onerror="this.parentElement.style.display='none'">
+</div>
+
+<!-- Particles Background -->
+<div class="particles">
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+</div>
+
+<div class="container">
+    <!-- Header -->
+    <div class="header">
+        <h1 class="game-logo" th:text="${gameName}">POKI ADVENTURE</h1>
+        <p class="game-subtitle" th:text="${gameDescription}">Hành trình thu phục và tiến hóa các sinh vật huyền thoại!</p>
+    </div>
+
+    <!-- Banner -->
+    <div class="banner-section">
+        <div class="banner-container">
+            <img th:src="@{'/images/' + ${bannerImage}}"
+                 alt="Game Banner"
+                 class="banner-image"
+                 onerror="this.style.display='none'">
+            <div class="banner-overlay">
+                <div class="banner-text">⚡ COMING SOON ⚡</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Countdown -->
+    <div class="countdown-section">
+        <h2 class="countdown-title">LAUNCH COUNTDOWN</h2>
+        <p class="countdown-subtitle">Đếm ngược đến ngày ra mắt chính thức</p>
+        <div class="countdown-wrapper">
+            <div class="countdown" id="countdown">
+                <div class="countdown-item">
+                    <span class="countdown-number" id="days">00</span>
+                    <span class="countdown-label">Days</span>
+                </div>
+                <div class="countdown-item">
+                    <span class="countdown-number" id="hours">00</span>
+                    <span class="countdown-label">Hours</span>
+                </div>
+                <div class="countdown-item">
+                    <span class="countdown-number" id="minutes">00</span>
+                    <span class="countdown-label">Minutes</span>
+                </div>
+                <div class="countdown-item">
+                    <span class="countdown-number" id="seconds">00</span>
+                    <span class="countdown-label">Seconds</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Thank You Section -->
+    <div class="thankyou-section">
+        <div class="thankyou-container">
+            <div class="thankyou-icon">💙</div>
+            <h2 class="thankyou-title">CẢM ƠN CÁC BẠN</h2>
+            <div class="thankyou-content">
+                <p>Xin chân thành cảm ơn tất cả mọi người đã kiên nhẫn chờ đợi và luôn ủng hộ trong suốt thời gian qua.</p>
+                <p>Chính sự tin tưởng, động viên và tình cảm của các bạn là <strong>động lực lớn nhất</strong> để game có thể quay trở lại.</p>
+                <p>Hy vọng phiên bản lần này sẽ mang đến những <strong>kỷ niệm quen thuộc</strong> và cả những <strong>trải nghiệm mới mẻ</strong> cho tất cả người chơi.</p>
+            </div>
+            <div class="thankyou-signature">— POKI Fan ⚡</div>
+        </div>
+    </div>
+
+    <!-- Features -->
+    <div class="features-section">
+        <h2 class="section-title">GAME FEATURES</h2>
+        <p class="section-subtitle">Khám phá những tính năng độc đáo</p>
+
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">⚔️</div>
+                <h3 class="feature-title">Epic Battles</h3>
+                <p class="feature-desc">Chiến đấu PvP và PvE với hệ thống combat mượt mà, đa dạng skill và combo</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🔮</div>
+                <h3 class="feature-title">Evolution System</h3>
+                <p class="feature-desc">Tiến hóa pet của bạn qua nhiều cấp độ, mở khóa hình dạng và kỹ năng mới</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🌍</div>
+                <h3 class="feature-title">Open World</h3>
+                <p class="feature-desc">Khám phá thế giới rộng lớn với nhiều vùng đất và dungeon bí ẩn</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pet Gallery -->
+    <div class="pet-section">
+        <h2 class="section-title">FEATURED PETS</h2>
+        <p class="section-subtitle">Gặp gỡ những chiến binh trong game</p>
+
+        <div class="pet-gallery">
+            <div class="pet-card" th:each="petImage, iterStat : ${petImages}">
+                <span class="pet-rarity">★ RARE</span>
+                <div class="pet-image-container">
+                    <img th:src="@{'/images/pets/' + ${petImage}}"
+                         th:alt="'Pet ' + ${iterStat.index + 1}"
+                         class="pet-image"
+                         onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22200%22%3E%3Crect fill=%22%230a0e27%22 width=%22200%22 height=%22200%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 font-size=%2260%22 text-anchor=%22middle%22 dy=%22.3em%22 fill=%22%23667eea%22%3E%3F%3C/text%3E%3C/svg%3E'">
+                </div>
+                <div class="pet-name" th:text="'Huyền thoại ' + ${iterStat.index + 1}"></div>
+                <div class="pet-type">Mystic Type</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Newsletter -->
+    <div class="newsletter-section">
+        <h3 class="newsletter-title">GET NOTIFIED</h3>
+        <p class="newsletter-subtitle">Đăng ký để nhận thông báo khi game ra mắt</p>
+        <form class="newsletter-form" onsubmit="return subscribeNewsletter(event)">
+            <input type="email" class="newsletter-input" placeholder="Enter your email..." required>
+            <button type="submit" class="newsletter-btn">Subscribe</button>
+        </form>
+    </div>
+
+    <!-- Social Links -->
+    <div class="social-section">
+        <h3 class="social-title">FOLLOW US</h3>
+        <div class="social-links">
+            <a href="#" class="social-link" title="Facebook">📘</a>
+            <a href="#" class="social-link" title="Discord">💬</a>
+            <a href="#" class="social-link" title="YouTube">▶️</a>
+            <a href="#" class="social-link" title="Twitter">🐦</a>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+        <p><strong>POKIGUARD</strong> © 2025 All Rights Reserved</p>
+        <p>Made with ⚡ by POKI Fan</p>
+    </div>
+</div>
+
+<script th:inline="javascript">
+    // Countdown Timer
+    const launchDate = /*[[${launchDate}]]*/ '2025-12-31 00:00:00';
+    const countDownDate = new Date(launchDate).getTime();
+
+    const updateCountdown = () => {
+        const now = new Date().getTime();
+        const distance = countDownDate - now;
+
+        if (distance < 0) {
+            document.querySelector('.countdown-wrapper').innerHTML =
+                '<h2 style="color: #667eea; font-size: 2.5rem; text-align: center;">🎮 GAME IS LIVE! 🎮</h2>';
+            return;
+        }
+
+        const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+        document.getElementById('days').textContent = days.toString().padStart(2, '0');
+        document.getElementById('hours').textContent = hours.toString().padStart(2, '0');
+        document.getElementById('minutes').textContent = minutes.toString().padStart(2, '0');
+        document.getElementById('seconds').textContent = seconds.toString().padStart(2, '0');
+    };
+
+    updateCountdown();
+    setInterval(updateCountdown, 1000);
+
+    // Newsletter Subscription
+    function subscribeNewsletter(event) {
+        event.preventDefault();
+        const email = event.target.querySelector('input[type="email"]').value;
+
+        alert('✅ Successfully subscribed!\n\nWe will notify you when the game launches.\n\nEmail: ' + email);
+        event.target.reset();
+
+        return false;
+    }
+</script>
+</body>
+</html>
