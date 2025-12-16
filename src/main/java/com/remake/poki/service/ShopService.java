@@ -317,14 +317,18 @@ public class ShopService {
     }
 
     private boolean addCardToUser(User user, Shop shop) {
-        if (userCardRepository.existsByUserIdAndCardId(user.getId(), shop.getItemId())) {
+        UserCard userCard = userCardRepository.findByUserIdAndCardId(user.getId(), shop.getItemId()).orElse(null);
+        if (userCard != null) {
+            userCard.setCount(userCard.getCount() + shop.getValue());
+            userCardRepository.save(userCard);
             return true;
         }
 
-        UserCard userCard = new UserCard();
+        userCard = new UserCard();
         userCard.setUserId(user.getId());
         userCard.setCardId(shop.getItemId());
         userCard.setLevel(1);
+        userCard.setCount(shop.getValue());
         userCardRepository.save(userCard);
 
         return true;
