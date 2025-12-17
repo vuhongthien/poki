@@ -42,5 +42,18 @@ public class User {
     private int starRed = 0;
     private Long petId;
     private Long avtId;
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private LocalDateTime createdAt;
+
+    // ⭐ THÊM ANNOTATION NÀY:
+    @PrePersist
+    protected void onCreate() {
+        if (createdAt == null) {
+            createdAt = LocalDateTime.now();
+        }
+        if (lastEnergyUpdate == null) {
+            lastEnergyUpdate = LocalDateTime.now();
+        }
+    }
 
 }

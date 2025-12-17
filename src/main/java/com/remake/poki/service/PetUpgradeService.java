@@ -56,9 +56,10 @@ public class PetUpgradeService {
             stoneUser.setCount(stoneUser.getCount() - 1);
             stoneUserRepository.save(stoneUser);
         }
+
         if (request.isPreventDowngrade()) {
             User user = userRepository.findById(userPet.getUserId()).orElseThrow();
-            if(user.getGold()<5000){
+            if(user.getGold() < 5000){
                 return new PetUpgradeResponse(
                         false,
                         "Nâng cấp thất bại! bạn đã hết gold",
@@ -71,13 +72,16 @@ public class PetUpgradeService {
 
         // 4. ✅ Xử lý theo kết quả với preventDowngrade
         if (request.isSuccess()) {
-
             // Thành công: Tăng cấp
             userPet.setLevel(userPet.getLevel() + 1);
 
-            // Kiểm tra nếu đạt max level và có pet cha thì tiến hóa
-            if(userPet.getLevel() == pet.getMaxLevel() && pet.getParentId() != 0) {
+            // Kiểm tra nếu đạt max level và có pet cha (không phải tự trỏ) thì tiến hóa
+            if(userPet.getLevel() == pet.getMaxLevel()
+                    && pet.getParentId() != 0
+                    && pet.getParentId() != pet.getId()) { // ✅ Kiểm tra không phải tự trỏ
+
                 userPet.setPetId((long) pet.getParentId());
+                userPet.setLevel(pet.getMaxLevel());
             }
 
             userPet = userPetRepository.save(userPet);
@@ -95,20 +99,40 @@ public class PetUpgradeService {
             // ✅ Thất bại: Kiểm tra preventDowngrade
             if (!request.isPreventDowngrade()) {
                 // Nếu không bảo vệ → Giảm cấp
-                if (userPet.getLevel() > 1) { // Đảm bảo không giảm xuống dưới level 1
-                    userPet.setLevel(userPet.getLevel() - 1);
-                    userPetRepository.save(userPet);
+                int newLevel = userPet.getLevel() - 1;
+
+                // ✅ Tìm pet con (form trước đó) - Loại trừ trường hợp tự trỏ
+                Pet previousPet = petRepository.findByParentId(Math.toIntExact(pet.getId()))
+                        .stream()
+                        .filter(p -> p.getId() != pet.getId()) // ✅ Loại trừ chính nó
+                        .findFirst()
+                        .orElse(null);
+
+                if (previousPet != null && newLevel < previousPet.getMaxLevel()) {
+                    // ✅ Thoái hóa về form trước
+                    // VD: Form 2 đang level 7, giảm xuống 6 → Thoái hóa về Form 1 level 6
+                    userPet.setPetId((long) previousPet.getId());
+                    userPet.setLevel(newLevel);
+                } else if (newLevel >= 1) {
+                    // Giảm level bình thường (không cần thoái hóa)
+                    userPet.setLevel(newLevel);
+                } else {
+                    // Không cho giảm xuống dưới level 1
+                    userPet.setLevel(1);
                 }
+
+                userPetRepository.save(userPet);
+
                 return new PetUpgradeResponse(
                         false,
-                        "Nâng cấp thất bại!",
+                        "Nâng cấp thất bại! Pet đã bị giảm cấp.",
                         null
                 );
             } else {
                 // Nếu có bảo vệ → Không giảm cấp
                 return new PetUpgradeResponse(
                         false,
-                        "Nâng cấp thất bại!",
+                        "Nâng cấp thất bại! (Đã bảo vệ, không giảm cấp)",
                         null
                 );
             }

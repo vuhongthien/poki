@@ -322,4 +322,8 @@ public class UserService {
 
         return secondsRemaining;
     }
+
+    public boolean usernameExists(String user) {
+        return userRepository.existsByUser(user);
+    }
 }
