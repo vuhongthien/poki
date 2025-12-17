@@ -199,7 +199,7 @@ public class RegistrationApiController {
 
         try {
 
-            LocalDateTime cutoffDate = LocalDateTime.of(2025, 12, 18, 5, 0, 0);
+            LocalDateTime cutoffDate = LocalDateTime.of(2025, 12, 17, 5, 0, 0);
             List<User> allUsers = userRepository.findByCreatedAtAfterOrderByCreatedAtDesc(cutoffDate);
 
             List<Map<String, Object>> accounts = allUsers.stream()
