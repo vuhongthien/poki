@@ -50,4 +50,6 @@ public interface UserPetRepository extends JpaRepository<UserPet, Long> {
     List<UserPet> findByUserId(Long userId);
 
     int countByUserId(Long userId);
+
+    List<UserPet> findByUserIdIn(List<Long> top9UserIds);
 }

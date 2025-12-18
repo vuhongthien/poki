@@ -43,4 +43,19 @@ public interface UserRepository extends JpaRepository<User, Long> {
     List<User> findAllByOrderByIdDesc();
     List<User> findAllByOrderByCreatedAtDesc();
     List<User> findByCreatedAtAfterOrderByCreatedAtDesc(LocalDateTime cutoffDate);
+    @Query(value = """
+        SELECT 
+            u.id,
+            u.name,
+            u.pet_id,
+            u.avt_id,
+            u.lever,
+            COUNT(up.id) as pet_count
+        FROM users u
+        LEFT JOIN user_pet up ON u.id = up.user_id
+        GROUP BY u.id, u.name, u.pet_id, u.avt_id, u.lever
+        ORDER BY u.lever DESC, pet_count DESC
+        LIMIT 9
+        """, nativeQuery = true)
+    List<Object[]> findTop9UsersByLevelAndPetCount();
 }

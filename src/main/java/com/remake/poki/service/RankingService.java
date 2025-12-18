@@ -10,9 +10,7 @@ import com.remake.poki.util.Calculator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -42,65 +40,82 @@ public class RankingService {
     private AvatarRepository avatarRepository;
 
     public List<TopRankingDTO> getTop9Ranking() {
-        // Lấy tất cả users
-        List<User> allUsers = userRepository.findAll();
+        // 1. Lấy top 9 users có level cao nhất và nhiều pet nhất (1 query)
+        List<Object[]> top9Users = userRepository.findTop9UsersByLevelAndPetCount();
+
+        if (top9Users.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        // 2. Lấy userIds của top 9
+        List<Long> top9UserIds = top9Users.stream()
+                .map(row -> (Long) row[0])
+                .collect(Collectors.toList());
+
+        // 3. Lấy TẤT CẢ pets của 9 users này (1 query thay vì 9)
+        List<UserPet> userPets = userPetRepository.findByUserIdIn(top9UserIds);
+
+        // 4. Lấy TẤT CẢ pet info cần thiết (1 query)
+        List<Long> petIds = userPets.stream()
+                .map(UserPet::getPetId)
+                .distinct()
+                .collect(Collectors.toList());
+        List<Pet> pets = petRepository.findAllById(petIds);
+
+        // 5. Tạo Map để tra cứu nhanh O(1)
+        Map<Long, List<UserPet>> userPetsMap = userPets.stream()
+                .collect(Collectors.groupingBy(UserPet::getUserId));
+
+        Map<Long, Pet> petMap = pets.stream()
+                .collect(Collectors.toMap(Pet::getId, pet -> pet));
+
+        // 6. Tính combat power cho 9 users
         List<TopRankingDTO> rankings = new ArrayList<>();
 
-        for (User user : allUsers) {
-            // Lấy tất cả pet của user
-            List<UserPet> userPets = userPetRepository.findByUserId(user.getId());
+        for (Object[] row : top9Users) {
+            Long userId = (Long) row[0];
+            String userName = (String) row[1];
+            Long currentPetId = (Long) row[2];
+            Long avtId = (Long) row[3];
+            Integer level = (Integer) row[4];
 
-            if (userPets.isEmpty()) {
-                continue; // Bỏ qua user không có pet
-            }
+            List<UserPet> userPetList = userPetsMap.getOrDefault(userId, Collections.emptyList());
 
             int totalCombatPower = 0;
 
-            // Tính combat power cho từng pet
-            for (UserPet userPet : userPets) {
-                // Lấy thông tin Pet base
-                Pet pet = petRepository.findById(userPet.getPetId()).orElse(null);
-
+            for (UserPet userPet : userPetList) {
+                Pet pet = petMap.get(userPet.getPetId());
                 if (pet == null) continue;
 
-                // Tạo PetDTO từ Pet
                 PetDTO petDTO = createPetDTO(pet);
-
-                // Tính stats theo Calculator với level của user_pet
                 UserPetDTO calculatedPet = Calculator.calculateFromPet(petDTO, userPet.getLevel());
 
-                // Cộng attack + hp vào tổng lực chiến
                 if (calculatedPet != null) {
                     totalCombatPower += (calculatedPet.getAttack() + calculatedPet.getHp());
                 }
             }
 
-            // Tạo DTO cho user
             TopRankingDTO dto = new TopRankingDTO();
-            dto.setUserId(user.getId());
-            dto.setUserName(user.getName());
-            dto.setCurrentPetId(user.getPetId());
-            dto.setAvtId(user.getAvtId());
-            dto.setLevel(user.getLever());
+            dto.setUserId(userId);
+            dto.setUserName(userName);
+            dto.setCurrentPetId(currentPetId);
+            dto.setAvtId(avtId);
+            dto.setLevel(level);
             dto.setTotalCombatPower(totalCombatPower);
 
             rankings.add(dto);
         }
 
-        // Sort theo totalCombatPower giảm dần
+        // 7. Sort lại theo combat power (vì có thể thay đổi thứ tự)
         rankings.sort(Comparator.comparingInt(TopRankingDTO::getTotalCombatPower).reversed());
 
-        // Lấy top 9 và gán rank
-        List<TopRankingDTO> top9 = rankings.stream()
-                .limit(9)
-                .collect(Collectors.toList());
-
+        // 8. Gán rank
         int rank = 1;
-        for (TopRankingDTO dto : top9) {
+        for (TopRankingDTO dto : rankings) {
             dto.setRank(rank++);
         }
 
-        return top9;
+        return rankings;
     }
 
     public UserDetailDTO getUserDetail(Long userId) {
