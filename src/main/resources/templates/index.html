@@ -1231,7 +1231,7 @@
 
             <!-- Accounts List -->
             <div class="accounts-list-container">
-                <h2 class="accounts-list-title">DANH SÁCH TÀI KHOẢN</h2>
+                <h2 class="accounts-list-title">DANH SÁCH TÀI KHOẢN <span id="accountCount" style="color: #f093fb;">(0)</span></h2>
                 <p class="accounts-list-subtitle">Tất cả tài khoản đã đăng ký</p>
 
                 <ul class="accounts-list" id="accountsList">
@@ -1392,12 +1392,16 @@
 
     async function renderAccountsList() {
         const accountsList = document.getElementById('accountsList');
+        const accountCount = document.getElementById('accountCount');
 
         try {
             const response = await fetch('/api/registered-accounts');
             const data = await response.json();
 
             if (data.success && data.accounts && data.accounts.length > 0) {
+                // Cập nhật số lượng tài khoản
+                accountCount.textContent = `(${data.accounts.length})`;
+
                 accountsList.innerHTML = data.accounts.map((acc, idx) => {
                     let dateStr = '';
                     if (acc.createdAt) {
@@ -1412,18 +1416,20 @@
                     }
 
                     return `
-                        <li class="account-item">
-                            <div class="account-username">🎮 ${acc.username}</div>
-                            <div class="account-character">👤 ${acc.characterName}</div>
-                            <div class="account-date">⭐ Level ${acc.level}${dateStr ? ' • 📅 ' + dateStr : ''}</div>
-                        </li>
-                    `;
+                    <li class="account-item">
+                        <div class="account-username">🎮 ${acc.username}</div>
+                        <div class="account-character">👤 ${acc.characterName}</div>
+                        <div class="account-date">⭐ Level ${acc.level}${dateStr ? ' • 📅 ' + dateStr : ''}</div>
+                    </li>
+                `;
                 }).join('');
             } else {
+                accountCount.textContent = '(0)';
                 accountsList.innerHTML = '<li class="no-accounts">Chưa có tài khoản nào được đăng ký</li>';
             }
         } catch (error) {
             console.error('Error loading accounts:', error);
+            accountCount.textContent = '(0)';
             accountsList.innerHTML = '<li class="no-accounts">Không thể tải danh sách tài khoản</li>';
         }
     }
