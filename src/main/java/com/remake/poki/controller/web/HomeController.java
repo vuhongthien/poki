@@ -30,7 +30,7 @@ public class HomeController {
         );
 
         model.addAttribute("launchDate", launchDate);
-        model.addAttribute("gameName", "POKIGUARD");
+        model.addAttribute("gameName", "Pokiguard");
         model.addAttribute("gameDescription", "Hành trình thu phục và tiến hóa các sinh vật huyền thoại!");
         model.addAttribute("bannerImage", bannerImage);
         model.addAttribute("leftPetGif", leftPetGif);
