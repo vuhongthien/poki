@@ -326,4 +326,12 @@ public class UserService {
     public boolean usernameExists(String user) {
         return userRepository.existsByUser(user);
     }
+
+    public User authenticate(String username, String password) {
+        return userRepository.findByUserAndPassword(username, password).orElseThrow();
+    }
+
+    public User findByUser(String username) {
+        return userRepository.findByUser(username).orElseThrow();
+    }
 }
