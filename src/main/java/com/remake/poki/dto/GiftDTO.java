@@ -31,9 +31,12 @@ public class GiftDTO {
     private Integer starBlue;
     private Integer starRed;
     private Integer wheel;
+    private Integer wheelDay;
+    private Integer ruby;
 
     // Complex rewards
     private Long petId;
+    private Long avtId;
     private String petName;
 
     private Long cardId;

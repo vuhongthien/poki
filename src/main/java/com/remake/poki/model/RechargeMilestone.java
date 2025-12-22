@@ -1,7 +1,6 @@
 package com.remake.poki.model;
 
 import com.remake.poki.enums.GiftStatus;
-import com.remake.poki.enums.GiftType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -10,67 +9,65 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "gifts")
+@Table(name = "recharge_milestones")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Gift {
+public class RechargeMilestone {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "user_id")
-    private Long userId; // null = tất cả user
-
     @Column(nullable = false)
-    private String title; // "Quà Tết 2025"
+    private String name; // "Mốc 50K", "Mốc 5 Triệu"
 
     @Column(length = 500)
-    private String description; // "Chúc mừng năm mới"
+    private String description;
 
-    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private GiftType giftType; // INDIVIDUAL, ALL_USERS
+    private Integer requiredAmount; // Số tiền cần hỗ trợ (VNĐ)
 
-    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private GiftStatus status; // PENDING, CLAIMED, EXPIRED
+    private Integer sortOrder; // Thứ tự hiển thị
 
-    // Rewards
+    // === REWARDS ===
     private Integer gold;
+    private Integer ruby;
     private Integer energy;
     private Integer exp;
     private Integer starWhite;
     private Integer starBlue;
     private Integer starRed;
     private Integer wheel;
-    private Integer wheelDay;
-    private Integer ruby;
 
-    // Foreign keys cho rewards phức tạp
+    // Rewards đặc biệt
     private Long petId;
-    private Long avtId;
     private Long cardId;
 
     // Multiple stones support
     @Column(name = "stones_json", columnDefinition = "TEXT")
-    private String stonesJson; // JSON format: [{"stoneId":1,"count":10},{"stoneId":5,"count":20}]
+    private String stonesJson;
+
+    private String iconUrl;
+
+    @Column(nullable = false)
+    private Boolean isActive = true;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
-    @Column(name = "expired_at")
-    private LocalDateTime expiredAt;
-
-    @Column(name = "claimed_at")
-    private LocalDateTime claimedAt;
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
 
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();
-        if (status == null) {
-            status = GiftStatus.PENDING;
-        }
+        updatedAt = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        updatedAt = LocalDateTime.now();
     }
 }

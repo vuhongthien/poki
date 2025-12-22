@@ -204,6 +204,274 @@
             margin-bottom: 20px;
         }
 
+        /* ========== NAVIGATION TABS - NEW ========== */
+        .nav-tabs {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 40px 0;
+            flex-wrap: wrap;
+        }
+
+        .nav-tab {
+            padding: 15px 35px;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(102, 126, 234, 0.3);
+            border-radius: 15px;
+            color: #a8b2d1;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .nav-tab:hover {
+            border-color: rgba(102, 126, 234, 0.8);
+            background: rgba(102, 126, 234, 0.1);
+            transform: translateY(-3px);
+        }
+
+        .nav-tab.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-color: #667eea;
+            color: white;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+        }
+
+        /* Tab Content */
+        .tab-content-section {
+            display: none;
+        }
+
+        .tab-content-section.active {
+            display: block;
+            animation: fadeInContent 0.5s ease-out;
+        }
+
+        @keyframes fadeInContent {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ========== RECHARGE TAB STYLES - NEW ========== */
+        .recharge-page {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .recharge-header-section {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .recharge-main-title {
+            font-size: 3rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #667eea, #f093fb);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 15px;
+        }
+
+        .recharge-main-subtitle {
+            font-size: 1.2rem;
+            color: #a8b2d1;
+        }
+
+        .packages-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 30px;
+        }
+
+        .package-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(102, 126, 234, 0.3);
+            border-radius: 20px;
+            padding: 30px;
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .package-card:hover {
+            transform: translateY(-10px);
+            border-color: rgba(102, 126, 234, 0.8);
+            box-shadow: 0 20px 60px rgba(102, 126, 234, 0.4);
+        }
+
+        .package-card.first-time {
+            border: 3px solid #ffd700;
+        }
+
+        .package-card.first-time::after {
+            content: '🎁 LẦN ĐẦU';
+            position: absolute;
+            top: 15px;
+            right: -35px;
+            background: linear-gradient(135deg, #ffd700, #ff8c00);
+            color: #000;
+            padding: 5px 40px;
+            font-size: 12px;
+            font-weight: 700;
+            transform: rotate(45deg);
+            box-shadow: 0 3px 10px rgba(255, 215, 0, 0.5);
+        }
+
+        .package-name {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 10px;
+        }
+
+        .package-price {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: #667eea;
+            margin-bottom: 20px;
+        }
+
+        .package-bonus {
+            background: linear-gradient(135deg, #f093fb, #f5576c);
+            color: white;
+            padding: 12px;
+            border-radius: 12px;
+            text-align: center;
+            font-size: 14px;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+
+        .package-rewards {
+            background: rgba(10, 14, 39, 0.6);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .reward-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(102, 126, 234, 0.2);
+        }
+
+        .reward-item:last-child {
+            border-bottom: none;
+        }
+
+        .reward-label {
+            font-size: 14px;
+            color: #a8b2d1;
+        }
+
+        .reward-value {
+            font-size: 16px;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .reward-value.highlight {
+            color: #f093fb;
+        }
+
+        .package-button {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .package-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.5);
+        }
+
+        /* Login Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 9999;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal.active {
+            display: flex;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .modal-content {
+            background: rgba(10, 14, 39, 0.95);
+            backdrop-filter: blur(20px);
+            border: 2px solid rgba(102, 126, 234, 0.5);
+            border-radius: 25px;
+            padding: 50px;
+            max-width: 500px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            position: relative;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: none;
+            border: none;
+            color: #a8b2d1;
+            font-size: 30px;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .modal-close:hover {
+            color: #fff;
+        }
+
+        .modal-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .modal-title {
+            font-size: 2rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #667eea, #f093fb);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+        }
+
+        .modal-subtitle {
+            color: #a8b2d1;
+            font-size: 1rem;
+        }
+
+        /* ========== END NEW STYLES ========== */
+
         /* Banner */
         .banner-section {
             margin: 50px 0;
@@ -375,7 +643,6 @@
             padding: 50px 40px;
             border: 2px solid rgba(102, 126, 234, 0.3);
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
-            /* THÊM SCROLL */
             max-height: 800px;
             display: flex;
             flex-direction: column;
@@ -569,13 +836,11 @@
             list-style: none;
             padding: 0;
             margin: 0;
-            /* THÊM SCROLL */
             overflow-y: auto;
             max-height: 500px;
             padding-right: 10px;
         }
 
-        /* Custom scrollbar đẹp hơn */
         .accounts-list::-webkit-scrollbar {
             width: 8px;
         }
@@ -594,7 +859,6 @@
             background: linear-gradient(135deg, #764ba2, #f093fb);
         }
 
-        /* Firefox scrollbar */
         .accounts-list {
             scrollbar-width: thin;
             scrollbar-color: #667eea rgba(10, 14, 39, 0.5);
@@ -1013,6 +1277,15 @@
                 font-size: 1rem;
             }
 
+            .nav-tabs {
+                gap: 10px;
+            }
+
+            .nav-tab {
+                padding: 12px 20px;
+                font-size: 0.9rem;
+            }
+
             .banner-text {
                 font-size: 1.5rem;
             }
@@ -1075,6 +1348,19 @@
             .accounts-list {
                 max-height: 400px;
             }
+
+            .packages-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .recharge-main-title {
+                font-size: 2rem;
+            }
+
+            .modal-content {
+                padding: 30px 25px;
+            }
         }
     </style>
 </head>
@@ -1112,213 +1398,269 @@
         <p class="game-subtitle" th:text="${gameDescription}">Hành trình thu phục và tiến hóa các sinh vật huyền thoại!</p>
     </div>
 
-    <!-- Banner -->
-    <div class="banner-section">
-        <div class="banner-container">
-            <img th:src="@{'/images/' + ${bannerImage}}"
-                 alt="Game Banner"
-                 class="banner-image"
-                 onerror="this.style.display='none'">
-            <div class="banner-overlay">
-                <div class="banner-text">⚡ COMING SOON ⚡</div>
-            </div>
-        </div>
+    <!-- ========== NAVIGATION TABS - NEW ========== -->
+    <div class="nav-tabs">
+        <button class="nav-tab active" onclick="switchTab('home')">🏠 Trang Chủ</button>
+        <button class="nav-tab" onclick="switchTab('recharge')">💎 Gói hỗ trợ</button>
     </div>
 
-    <!-- Countdown -->
-    <div class="countdown-section">
-        <h2 class="countdown-title">LAUNCH COUNTDOWN</h2>
-        <p class="countdown-subtitle">Đếm ngược đến ngày ra mắt chính thức</p>
-        <div class="countdown-wrapper">
-            <div class="countdown" id="countdown">
-                <div class="countdown-item">
-                    <span class="countdown-number" id="days">00</span>
-                    <span class="countdown-label">Days</span>
-                </div>
-                <div class="countdown-item">
-                    <span class="countdown-number" id="hours">00</span>
-                    <span class="countdown-label">Hours</span>
-                </div>
-                <div class="countdown-item">
-                    <span class="countdown-number" id="minutes">00</span>
-                    <span class="countdown-label">Minutes</span>
-                </div>
-                <div class="countdown-item">
-                    <span class="countdown-number" id="seconds">00</span>
-                    <span class="countdown-label">Seconds</span>
+    <!-- ========== HOME TAB (Original Content) ========== -->
+    <div id="homeTab" class="tab-content-section active">
+        <!-- Banner -->
+        <div class="banner-section">
+            <div class="banner-container">
+                <img th:src="@{'/images/' + ${bannerImage}}"
+                     alt="Game Banner"
+                     class="banner-image"
+                     onerror="this.style.display='none'">
+                <div class="banner-overlay">
+                    <div class="banner-text">⚡ COMING SOON ⚡</div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <!-- Registration Section -->
-    <div class="register-section">
-        <div class="register-wrapper">
-            <!-- Registration Form -->
-            <div class="register-container">
-                <h2 class="register-title">TẠO TÀI KHOẢN</h2>
-                <p class="register-subtitle">Đăng ký ngay để nhận quà tân thủ</p>
+        <!-- Countdown -->
+        <div class="countdown-section">
+            <h2 class="countdown-title">LAUNCH COUNTDOWN</h2>
+            <p class="countdown-subtitle">Đếm ngược đến ngày ra mắt chính thức</p>
+            <div class="countdown-wrapper">
+                <div class="countdown" id="countdown">
+                    <div class="countdown-item">
+                        <span class="countdown-number" id="days">00</span>
+                        <span class="countdown-label">Days</span>
+                    </div>
+                    <div class="countdown-item">
+                        <span class="countdown-number" id="hours">00</span>
+                        <span class="countdown-label">Hours</span>
+                    </div>
+                    <div class="countdown-item">
+                        <span class="countdown-number" id="minutes">00</span>
+                        <span class="countdown-label">Minutes</span>
+                    </div>
+                    <div class="countdown-item">
+                        <span class="countdown-number" id="seconds">00</span>
+                        <span class="countdown-label">Seconds</span>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-                <div class="error-message" id="errorMessage"></div>
-                <div class="success-message" id="successMessage"></div>
-                <div class="warning-message" id="warningMessage"></div>
+        <!-- Registration Section -->
+        <div class="register-section">
+            <div class="register-wrapper">
+                <!-- Registration Form -->
+                <div class="register-container">
+                    <h2 class="register-title">TẠO TÀI KHOẢN</h2>
+                    <p class="register-subtitle">Đăng ký ngay để nhận quà tân thủ</p>
 
-                <form id="registerForm">
-                    <div class="form-group">
-                        <label class="form-label" for="username">Tên đăng nhập</label>
-                        <input type="text"
-                               class="form-input"
-                               id="username"
-                               name="user"
-                               placeholder="Nhập tên đăng nhập (3-20 ký tự)"
-                               minlength="3"
-                               maxlength="20"
-                               required>
+                    <div class="error-message" id="errorMessage"></div>
+                    <div class="success-message" id="successMessage"></div>
+                    <div class="warning-message" id="warningMessage"></div>
+
+                    <form id="registerForm">
+                        <div class="form-group">
+                            <label class="form-label" for="username">Tên đăng nhập</label>
+                            <input type="text"
+                                   class="form-input"
+                                   id="username"
+                                   name="user"
+                                   placeholder="Nhập tên đăng nhập (3-20 ký tự)"
+                                   minlength="3"
+                                   maxlength="20"
+                                   required>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="name">Tên nhân vật</label>
+                            <input type="text"
+                                   class="form-input"
+                                   id="name"
+                                   name="name"
+                                   placeholder="Nhập tên nhân vật (3-20 ký tự)"
+                                   minlength="3"
+                                   maxlength="20"
+                                   required>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="password">Mật khẩu</label>
+                            <input type="password"
+                                   class="form-input"
+                                   id="password"
+                                   name="password"
+                                   placeholder="Nhập mật khẩu (tối thiểu 6 ký tự)"
+                                   minlength="6"
+                                   required>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="confirmPassword">Xác nhận mật khẩu</label>
+                            <input type="password"
+                                   class="form-input"
+                                   id="confirmPassword"
+                                   name="confirmPassword"
+                                   placeholder="Nhập lại mật khẩu"
+                                   required>
+                        </div>
+
+                        <button type="submit" class="submit-btn" id="submitBtn">ĐĂNG KÝ NGAY</button>
+                    </form>
+
+                    <div class="starter-info">
+                        <div class="starter-title">🎁 Quà tặng tân thủ:</div>
+                        <ul class="starter-list">
+                            <li>⚡ 3 Pet khởi đầu: Bunny Boy, Gila, Hamma</li>
+                            <li>👤 3 Avatar miễn phí</li>
+                            <li>💎 25 Đá tiến hóa cấp 7 (mỗi hệ 5 viên)</li>
+                            <li>🃏 3 Thẻ chiến đấu (mỗi loại 99 lá)</li>
+                            <li>💰 50,000 Gold</li>
+                            <li>⚔️ 1,000 Chiến tích</li>
+                            <li>🎯 80 Energy</li>
+                        </ul>
                     </div>
 
-                    <div class="form-group">
-                        <label class="form-label" for="name">Tên nhân vật</label>
-                        <input type="text"
-                               class="form-input"
-                               id="name"
-                               name="name"
-                               placeholder="Nhập tên nhân vật (3-20 ký tự)"
-                               minlength="3"
-                               maxlength="20"
-                               required>
+                    <div class="login-link">
+                        Đã có tài khoản? <a href="/login">Đăng nhập ngay</a>
                     </div>
+                </div>
 
-                    <div class="form-group">
-                        <label class="form-label" for="password">Mật khẩu</label>
-                        <input type="password"
-                               class="form-input"
-                               id="password"
-                               name="password"
-                               placeholder="Nhập mật khẩu (tối thiểu 6 ký tự)"
-                               minlength="6"
-                               required>
-                    </div>
+                <!-- Accounts List -->
+                <div class="accounts-list-container">
+                    <h2 class="accounts-list-title">DANH SÁCH TÀI KHOẢN <span id="accountCount" style="color: #f093fb;">(0)</span></h2>
+                    <p class="accounts-list-subtitle">Tất cả tài khoản đã đăng ký</p>
 
-                    <div class="form-group">
-                        <label class="form-label" for="confirmPassword">Xác nhận mật khẩu</label>
-                        <input type="password"
-                               class="form-input"
-                               id="confirmPassword"
-                               name="confirmPassword"
-                               placeholder="Nhập lại mật khẩu"
-                               required>
-                    </div>
-
-                    <button type="submit" class="submit-btn" id="submitBtn">ĐĂNG KÝ NGAY</button>
-                </form>
-
-                <div class="starter-info">
-                    <div class="starter-title">🎁 Quà tặng tân thủ:</div>
-                    <ul class="starter-list">
-                        <li>⚡ 3 Pet khởi đầu: Bunny Boy, Gila, Hamma</li>
-                        <li>👤 3 Avatar miễn phí</li>
-                        <li>💎 25 Đá tiến hóa cấp 7 (mỗi hệ 5 viên)</li>
-                        <li>🃏 3 Thẻ chiến đấu (mỗi loại 99 lá)</li>
-                        <li>💰 50,000 Gold</li>
-                        <li>⚔️ 1,000 Chiến tích</li>
-                        <li>🎯 80 Energy</li>
+                    <ul class="accounts-list" id="accountsList">
+                        <li class="no-accounts">Đang tải...</li>
                     </ul>
                 </div>
+            </div>
+        </div>
 
-                <div class="login-link">
-                    Đã có tài khoản? <a href="/login">Đăng nhập ngay</a>
+        <!-- Thank You Section -->
+        <div class="thankyou-section">
+            <div class="thankyou-container">
+                <div class="thankyou-icon">💙</div>
+                <h2 class="thankyou-title">CẢM ƠN CÁC BẠN</h2>
+                <div class="thankyou-content">
+                    <p>Xin chân thành cảm ơn tất cả mọi người đã kiên nhẫn chờ đợi và luôn ủng hộ trong suốt thời gian qua.</p>
+                    <p>Chính sự tin tưởng, động viên và tình cảm của các bạn là <strong>động lực lớn nhất</strong> để game có thể quay trở lại.</p>
+                    <p>Hy vọng phiên bản lần này sẽ mang đến những <strong>kỷ niệm quen thuộc</strong> và cả những <strong>trải nghiệm mới mẻ</strong> cho tất cả người chơi.</p>
+                </div>
+                <div class="thankyou-signature">— POKI Fan ⚡</div>
+            </div>
+        </div>
+
+        <!-- Pet Gallery -->
+        <div class="pet-section">
+            <h2 class="section-title">FEATURED PETS</h2>
+            <p class="section-subtitle">Gặp gỡ những chiến binh trong game</p>
+
+            <div class="pet-gallery">
+                <div class="pet-card" th:each="petImage, iterStat : ${petImages}">
+                    <span class="pet-rarity">★ RARE</span>
+                    <div class="pet-image-container">
+                        <img th:src="@{'/images/pets/' + ${petImage}}"
+                             th:alt="'Pet ' + ${iterStat.index + 1}"
+                             class="pet-image"
+                             onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22200%22%3E%3Crect fill=%22%230a0e27%22 width=%22200%22 height=%22200%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 font-size=%2260%22 text-anchor=%22middle%22 dy=%22.3em%22 fill=%22%23667eea%22%3E%3F%3C/text%3E%3C/svg%3E'">
+                    </div>
+                    <div class="pet-name" th:text="'Huyền thoại ' + ${iterStat.index + 1}"></div>
+                    <div class="pet-type">Mystic Type</div>
                 </div>
             </div>
-
-            <!-- Accounts List -->
-            <div class="accounts-list-container">
-                <h2 class="accounts-list-title">DANH SÁCH TÀI KHOẢN <span id="accountCount" style="color: #f093fb;">(0)</span></h2>
-                <p class="accounts-list-subtitle">Tất cả tài khoản đã đăng ký</p>
-
-                <ul class="accounts-list" id="accountsList">
-                    <li class="no-accounts">Đang tải...</li>
-                </ul>
-            </div>
         </div>
-    </div>
 
-    <!-- Thank You Section -->
-    <div class="thankyou-section">
-        <div class="thankyou-container">
-            <div class="thankyou-icon">💙</div>
-            <h2 class="thankyou-title">CẢM ƠN CÁC BẠN</h2>
-            <div class="thankyou-content">
-                <p>Xin chân thành cảm ơn tất cả mọi người đã kiên nhẫn chờ đợi và luôn ủng hộ trong suốt thời gian qua.</p>
-                <p>Chính sự tin tưởng, động viên và tình cảm của các bạn là <strong>động lực lớn nhất</strong> để game có thể quay trở lại.</p>
-                <p>Hy vọng phiên bản lần này sẽ mang đến những <strong>kỷ niệm quen thuộc</strong> và cả những <strong>trải nghiệm mới mẻ</strong> cho tất cả người chơi.</p>
-            </div>
-            <div class="thankyou-signature">— POKI Fan ⚡</div>
-        </div>
-    </div>
+        <!-- Features -->
+        <div class="features-section">
+            <h2 class="section-title">GAME FEATURES</h2>
+            <p class="section-subtitle">Khám phá những tính năng độc đáo</p>
 
-    <!-- Pet Gallery -->
-    <div class="pet-section">
-        <h2 class="section-title">FEATURED PETS</h2>
-        <p class="section-subtitle">Gặp gỡ những chiến binh trong game</p>
-
-        <div class="pet-gallery">
-            <div class="pet-card" th:each="petImage, iterStat : ${petImages}">
-                <span class="pet-rarity">★ RARE</span>
-                <div class="pet-image-container">
-                    <img th:src="@{'/images/pets/' + ${petImage}}"
-                         th:alt="'Pet ' + ${iterStat.index + 1}"
-                         class="pet-image"
-                         onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22200%22%3E%3Crect fill=%22%230a0e27%22 width=%22200%22 height=%22200%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 font-size=%2260%22 text-anchor=%22middle%22 dy=%22.3em%22 fill=%22%23667eea%22%3E%3F%3C/text%3E%3C/svg%3E'">
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">⚔️</div>
+                    <h3 class="feature-title">Epic Battles</h3>
+                    <p class="feature-desc">Chiến đấu PvP và PvE với hệ thống combat mượt mà, đa dạng skill và combo</p>
                 </div>
-                <div class="pet-name" th:text="'Huyền thoại ' + ${iterStat.index + 1}"></div>
-                <div class="pet-type">Mystic Type</div>
+                <div class="feature-card">
+                    <div class="feature-icon">🔮</div>
+                    <h3 class="feature-title">Evolution System</h3>
+                    <p class="feature-desc">Tiến hóa pet của bạn qua nhiều cấp độ, mở khóa hình dạng và kỹ năng mới</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🌍</div>
+                    <h3 class="feature-title">Open World</h3>
+                    <p class="feature-desc">Khám phá thế giới rộng lớn với nhiều vùng đất và dungeon bí ẩn</p>
+                </div>
             </div>
+        </div>
+
+        <!-- Social Links -->
+        <div class="social-section">
+            <h3 class="social-title">FOLLOW US</h3>
+            <div class="social-links">
+                <a href="#" class="social-link" title="Facebook">📘</a>
+                <a href="#" class="social-link" title="Discord">💬</a>
+                <a href="#" class="social-link" title="YouTube">▶️</a>
+                <a href="#" class="social-link" title="Twitter">🐦</a>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p><strong>POKIGUARD</strong> © 2025 All Rights Reserved</p>
+            <p>Made with ⚡ by POKI Fan</p>
         </div>
     </div>
 
-    <!-- Features -->
-    <div class="features-section">
-        <h2 class="section-title">GAME FEATURES</h2>
-        <p class="section-subtitle">Khám phá những tính năng độc đáo</p>
+    <!-- ========== RECHARGE TAB - NEW ========== -->
+    <div id="rechargeTab" class="tab-content-section">
+        <div class="recharge-page">
+            <div class="recharge-header-section">
+                <h2 class="recharge-main-title">💎 GÓI HỖ TRỢ ƯU ĐÃI</h2>
+                <p class="recharge-main-subtitle">hỗ trợ ngay để nhận quà khủng!</p>
+            </div>
 
-        <div class="features-grid">
-            <div class="feature-card">
-                <div class="feature-icon">⚔️</div>
-                <h3 class="feature-title">Epic Battles</h3>
-                <p class="feature-desc">Chiến đấu PvP và PvE với hệ thống combat mượt mà, đa dạng skill và combo</p>
-            </div>
-            <div class="feature-card">
-                <div class="feature-icon">🔮</div>
-                <h3 class="feature-title">Evolution System</h3>
-                <p class="feature-desc">Tiến hóa pet của bạn qua nhiều cấp độ, mở khóa hình dạng và kỹ năng mới</p>
-            </div>
-            <div class="feature-card">
-                <div class="feature-icon">🌍</div>
-                <h3 class="feature-title">Open World</h3>
-                <p class="feature-desc">Khám phá thế giới rộng lớn với nhiều vùng đất và dungeon bí ẩn</p>
+            <div class="packages-grid" id="packagesGrid">
+                <div style="grid-column: 1/-1; text-align: center; padding: 40px; color: #a8b2d1;">
+                    Đang tải gói hỗ trợ...
+                </div>
             </div>
         </div>
     </div>
+</div>
 
-    <!-- Social Links -->
-    <div class="social-section">
-        <h3 class="social-title">FOLLOW US</h3>
-        <div class="social-links">
-            <a href="#" class="social-link" title="Facebook">📘</a>
-            <a href="#" class="social-link" title="Discord">💬</a>
-            <a href="#" class="social-link" title="YouTube">▶️</a>
-            <a href="#" class="social-link" title="Twitter">🐦</a>
+<!-- Login Modal -->
+<div id="loginModal" class="modal">
+    <div class="modal-content">
+        <button class="modal-close" onclick="closeLoginModal()">×</button>
+        <div class="modal-header">
+            <h2 class="modal-title">ĐĂNG NHẬP</h2>
+            <p class="modal-subtitle">Đăng nhập để xem và mua gói hỗ trợ</p>
         </div>
-    </div>
 
-    <!-- Footer -->
-    <div class="footer">
-        <p><strong>POKIGUARD</strong> © 2025 All Rights Reserved</p>
-        <p>Made with ⚡ by POKI Fan</p>
+        <div class="error-message" id="loginErrorMessage"></div>
+
+        <form id="loginForm">
+            <div class="form-group">
+                <label class="form-label">Tên đăng nhập</label>
+                <input type="text" class="form-input" id="loginUsername" placeholder="Nhập tên đăng nhập" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Mật khẩu</label>
+                <input type="password" class="form-input" id="loginPassword" placeholder="Nhập mật khẩu" required>
+            </div>
+            <button type="submit" class="submit-btn" id="loginButton">ĐĂNG NHẬP</button>
+        </form>
+
+        <div class="login-link">
+            Chưa có tài khoản? <a href="javascript:void(0)" onclick="closeLoginModal(); switchTab('home')">Đăng ký ngay</a>
+        </div>
     </div>
 </div>
 
 <script th:inline="javascript">
+    // ========== EXISTING SCRIPTS (Keep all original) ==========
+
     // Device Fingerprinting
     function generateDeviceFingerprint() {
         const canvas = document.createElement('canvas');
@@ -1341,7 +1683,6 @@
             touchSupport: 'ontouchstart' in window
         };
 
-        // Create a hash from fingerprint data
         const fingerprintString = JSON.stringify(fingerprint);
         return hashCode(fingerprintString);
     }
@@ -1356,7 +1697,6 @@
         return Math.abs(hash).toString(36);
     }
 
-    // Check account limit
     function checkAccountLimit(deviceId) {
         const storageKey = 'device_accounts_' + deviceId;
         const accountsData = localStorage.getItem(storageKey);
@@ -1400,7 +1740,6 @@
             const data = await response.json();
 
             if (data.success && data.accounts && data.accounts.length > 0) {
-                // Cập nhật số lượng tài khoản
                 accountCount.textContent = `(${data.accounts.length})`;
 
                 accountsList.innerHTML = data.accounts.map((acc, idx) => {
@@ -1485,7 +1824,6 @@
         }
 
         const deviceId = generateDeviceFingerprint();
-
         const accountLimit = checkAccountLimit(deviceId);
 
         if (!accountLimit.canCreate) {
@@ -1543,7 +1881,6 @@
                 }
             } else {
                 successMessage.style.display = 'none';
-
                 errorMessage.textContent = '❌ ' + (data.message || 'Đăng ký thất bại! Vui lòng thử lại.');
                 errorMessage.style.display = 'block';
                 errorMessage.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -1552,7 +1889,6 @@
             }
         } catch (error) {
             successMessage.style.display = 'none';
-
             errorMessage.textContent = '❌ Lỗi kết nối! Vui lòng kiểm tra kết nối mạng và thử lại.';
             errorMessage.style.display = 'block';
             errorMessage.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -1561,22 +1897,306 @@
         }
     });
 
-    window.addEventListener('load', function() {
-        const deviceId = generateDeviceFingerprint();
-        const accountLimit = checkAccountLimit(deviceId);
-        renderAccountsList();
+    window.addEventListener('load', async function() {
+    const deviceId = generateDeviceFingerprint();
+    const accountLimit = checkAccountLimit(deviceId);
+    renderAccountsList();
 
-        if (!accountLimit.canCreate) {
-            const submitBtn = document.getElementById('submitBtn');
-            const errorMessage = document.getElementById('errorMessage');
+    if (!accountLimit.canCreate) {
+        const submitBtn = document.getElementById('submitBtn');
+        const errorMessage = document.getElementById('errorMessage');
 
-            submitBtn.disabled = true;
-            submitBtn.textContent = 'ĐÃ ĐẠT GIỚI HẠN';
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'ĐÃ ĐẠT GIỚI HẠN';
 
-            errorMessage.textContent = '❌ Thiết bị này đã tạo đủ 3 tài khoản! Không thể tạo thêm.';
+        errorMessage.textContent = '❌ Thiết bị này đã tạo đủ 3 tài khoản! Không thể tạo thêm.';
+        errorMessage.style.display = 'block';
+    }
+
+    // Kiểm tra xem user đã login chưa (từ server)
+    try {
+        const response = await fetch('/api/check-login');
+        const data = await response.json();
+
+        if (data.success && data.user) {
+            currentUser = data.user;
+            // Nếu đang ở tab recharge thì load packages
+            const rechargeTab = document.getElementById('rechargeTab');
+            if (rechargeTab && rechargeTab.classList.contains('active')) {
+                await loadPackages();
+            }
+        }
+    } catch (error) {
+        console.log('Not logged in or error checking login status');
+    }
+});
+
+    // ========== NEW SCRIPTS FOR RECHARGE TAB ==========
+
+    let currentUser = null;
+
+    // Switch Tab Function
+    function switchTab(tabName) {
+        // Update tab buttons
+        document.querySelectorAll('.nav-tab').forEach(tab => tab.classList.remove('active'));
+        event.target.classList.add('active');
+
+        // Update tab contents
+        document.querySelectorAll('.tab-content-section').forEach(content => content.classList.remove('active'));
+        document.getElementById(tabName + 'Tab').classList.add('active');
+
+        // Load packages if recharge tab
+        if (tabName === 'recharge') {
+            if (!currentUser) {
+                openLoginModal();
+            } else {
+                loadPackages();
+            }
+        }
+    }
+
+    // Login Modal Functions
+    function openLoginModal() {
+        document.getElementById('loginModal').classList.add('active');
+    }
+
+    function closeLoginModal() {
+        document.getElementById('loginModal').classList.remove('active');
+        document.getElementById('loginErrorMessage').style.display = 'none';
+        document.getElementById('loginForm').reset();
+    }
+
+    // Login Form Handler
+    document.getElementById('loginForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+
+    const username = document.getElementById('loginUsername').value;
+    const password = document.getElementById('loginPassword').value;
+    const errorMessage = document.getElementById('loginErrorMessage');
+    const loginButton = document.getElementById('loginButton');
+
+    errorMessage.style.display = 'none';
+    loginButton.disabled = true;
+    loginButton.textContent = 'ĐANG ĐĂNG NHẬP...';
+
+    try {
+        const response = await fetch('/api/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ user: username, password: password })
+        });
+
+        const data = await response.json();
+
+        if (response.ok && data.success) {
+            // Lưu thông tin user
+            currentUser = {
+                id: data.user.id,
+                username: data.user.username || data.user.user,
+                name: data.user.name
+            };
+
+            closeLoginModal();
+
+            // Load packages sau khi login
+            await loadPackages();
+
+        } else {
+            errorMessage.textContent = '❌ ' + (data.message || 'Đăng nhập thất bại!');
             errorMessage.style.display = 'block';
         }
-    });
+    } catch (error) {
+        console.error('Login error:', error);
+        errorMessage.textContent = '❌ Lỗi kết nối! Vui lòng thử lại.';
+        errorMessage.style.display = 'block';
+    } finally {
+        loginButton.disabled = false;
+        loginButton.textContent = 'ĐĂNG NHẬP';
+    }
+});
+
+    // Load Packages
+    async function loadPackages() {
+    const grid = document.getElementById('packagesGrid');
+
+    if (!currentUser) {
+        grid.innerHTML = `
+            <div style="grid-column: 1/-1; text-align: center; padding: 60px;">
+                <h3 style="color: #a8b2d1; font-size: 1.5rem; margin-bottom: 20px;">🔒 Vui lòng đăng nhập</h3>
+                <button class="package-button" onclick="openLoginModal()" style="max-width: 300px; margin: 0 auto;">
+                    ĐĂNG NHẬP NGAY
+                </button>
+            </div>
+        `;
+        return;
+    }
+
+    // Hiển thị loading
+    grid.innerHTML = `
+        <div style="grid-column: 1/-1; text-align: center; padding: 40px; color: #a8b2d1;">
+            <div style="font-size: 3rem; margin-bottom: 20px;">⏳</div>
+            Đang tải gói hỗ trợ...
+        </div>
+    `;
+
+    try {
+        // Gọi API lấy packages từ server
+        const response = await fetch('/api/recharge/packages');
+        const data = await response.json();
+
+        if (data.success && data.packages && data.packages.length > 0) {
+            // Render packages từ server
+            grid.innerHTML = data.packages.map(pkg => {
+                const isFirstTime = pkg.isFirstTimePurchase;
+                const bonusHTML = pkg.bonusGoldPercent && pkg.bonusGoldPercent > 0 ?
+                    `<div class="package-bonus">🎉 TẶNG THÊM ${pkg.bonusGoldPercent}% GOLD!</div>` : '';
+
+                let rewardsHTML = '<div class="package-rewards">';
+
+                if (pkg.gold && pkg.gold > 0) {
+                    const totalGold = pkg.totalGold || pkg.gold;
+                    rewardsHTML += `
+                        <div class="reward-item">
+                            <span class="reward-label"><img style="width: 30px;" src="/images/reward/g.png"/> Gold</span>
+                            <span class="reward-value highlight">${formatNumber(totalGold)}</span>
+                        </div>`;
+                }
+
+                if (pkg.ruby && pkg.ruby > 0) {
+                    rewardsHTML += `
+                        <div class="reward-item">
+                            <span class="reward-label"><img style="width: 30px;" src="/images/reward/ruby.png"/>  Ruby</span>
+                            <span class="reward-value">${formatNumber(pkg.ruby)}</span>
+                        </div>`;
+                }
+                if (pkg.exp && pkg.exp > 0) {
+                    rewardsHTML += `
+                        <div class="reward-item">
+                            <span class="reward-label"><img style="width: 30px;" src="/images/reward/exp.png"/>  EXP</span>
+                            <span class="reward-value">${formatNumber(pkg.exp)}</span>
+                        </div>`;
+                }
+                if (pkg.wheelDay && pkg.wheelDay > 0) {
+                    rewardsHTML += `
+                        <div class="reward-item">
+                            <span class="reward-label"><img style="width: 30px;" src="/images/reward/wheel.png"/> Vòng quay hàng ngày</span>
+                            <span class="reward-value">${formatNumber(pkg.wheelDay)}</span>
+                        </div>`;
+                }
+
+                if (pkg.wheel && pkg.wheel > 0) {
+                    rewardsHTML += `
+                        <div class="reward-item">
+                            <span class="reward-label"><img style="width: 30px;" src="/images/reward/rw.png"/> Vòng quay Huyền thoại</span>
+                            <span class="reward-value">${formatNumber(pkg.wheel)}</span>
+                        </div>`;
+                }
+                if (pkg.starWhite && pkg.starWhite > 0) {
+                    rewardsHTML += `
+                        <div class="reward-item">
+                            <span class="reward-label"><img style="width: 30px;" src="/images/reward/w.png"/> Sao trắng</span>
+                            <span class="reward-value">${formatNumber(pkg.starWhite)}</span>
+                        </div>`;
+                }
+                if (pkg.starBlue && pkg.starBlue > 0) {
+                    rewardsHTML += `
+                        <div class="reward-item">
+                            <span class="reward-label"><img style="width: 30px;" src="/images/reward/b.png"/> Sao xanh</span>
+                            <span class="reward-value">${formatNumber(pkg.starBlue)}</span>
+                        </div>`;
+                }
+                if (pkg.starRed && pkg.starRed > 0) {
+                    rewardsHTML += `
+                        <div class="reward-item">
+                            <span class="reward-label"><img style="width: 30px;" src="/images/reward/r.png"/> Sao đỏ</span>
+                            <span class="reward-value">${formatNumber(pkg.starRed)}</span>
+                        </div>`;
+                }
+
+                if (pkg.energy && pkg.energy > 0) {
+                    rewardsHTML += `
+                        <div class="reward-item">
+                            <span class="reward-label"><img style="width: 30px;" src="/images/reward/e.png"/>  Energy</span>
+                            <span class="reward-value">${formatNumber(pkg.energy)}</span>
+                        </div>`;
+                }
+                if (pkg.stones ) {
+                    rewardsHTML += `
+                        <div class="reward-item">
+                            <span class="reward-label"><img style="width: 60px;" src="/images/reward/s.png"/> </span>
+                            <span class="reward-value">Đá nâng cấp lv7 các loại</span>
+
+                        </div>`;
+                }
+                if (pkg.petId) {
+                    rewardsHTML += `
+                        <div class="reward-item">
+                            <span class="reward-label">🐾 Pet</span>
+                            <span class="reward-value">Thú Cưng Đặc Biệt</span>
+                        </div>`;
+                }
+
+                rewardsHTML += '</div>';
+
+                return `
+                    <div class="package-card ${isFirstTime ? 'first-time' : ''}">
+                        <div class="package-name">${pkg.name}</div>
+                        <div class="package-price">${formatPrice(pkg.price)}</div>
+                        ${bonusHTML}
+                        ${rewardsHTML}
+                        <button class="package-button" onclick="purchasePackage(${pkg.id}, '${pkg.name}', ${pkg.price})">
+                            MUA NGAY
+                        </button>
+                    </div>
+                `;
+            }).join('');
+        } else {
+            // Không có packages
+            grid.innerHTML = `
+                <div style="grid-column: 1/-1; text-align: center; padding: 60px;">
+                    <h3 style="color: #a8b2d1; font-size: 1.5rem;">📦 Chưa có gói hỗ trợ nào</h3>
+                    <p style="color: #667eea; margin-top: 15px;">Vui lòng quay lại sau!</p>
+                </div>
+            `;
+        }
+    } catch (error) {
+        console.error('Error loading packages:', error);
+        grid.innerHTML = `
+            <div style="grid-column: 1/-1; text-align: center; padding: 60px;">
+                <h3 style="color: #ff6b6b; font-size: 1.5rem; margin-bottom: 20px;">❌ Lỗi tải dữ liệu</h3>
+                <p style="color: #a8b2d1; margin-bottom: 20px;">Không thể tải gói hỗ trợ. Vui lòng thử lại!</p>
+                <button class="package-button" onclick="loadPackages()" style="max-width: 300px; margin: 0 auto;">
+                    THỬ LẠI
+                </button>
+            </div>
+        `;
+    }
+}
+
+    async function purchasePackage(packageId, packageName, price) {
+        if (!currentUser) {
+            openLoginModal();
+            return;
+        }
+
+        if (!confirm(`Xác nhận dùng gói "${packageName}" với giá ${formatPrice(price)}?`)) {
+            return;
+        }
+
+        // Chuyển hướng đến trang thanh toán
+        window.location.href = '/payment/' + packageId;
+    }
+
+    function formatPrice(price) {
+        return new Intl.NumberFormat('vi-VN', {
+            style: 'currency',
+            currency: 'VND'
+        }).format(price);
+    }
+
+    function formatNumber(num) {
+        return new Intl.NumberFormat('vi-VN').format(num);
+    }
 </script>
 </body>
 </html>

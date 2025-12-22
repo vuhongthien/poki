@@ -1,14 +1,8 @@
 package com.remake.poki.service;
 
 import com.remake.poki.dto.*;
-import com.remake.poki.model.Card;
-import com.remake.poki.model.Pet;
-import com.remake.poki.model.User;
-import com.remake.poki.model.UserCard;
-import com.remake.poki.repo.CardRepository;
-import com.remake.poki.repo.PetRepository;
-import com.remake.poki.repo.UserCardRepository;
-import com.remake.poki.repo.UserRepository;
+import com.remake.poki.model.*;
+import com.remake.poki.repo.*;
 import com.remake.poki.request.UpdateStarRequest;
 import com.remake.poki.response.UpdateStarResponse;
 import jakarta.transaction.Transactional;
@@ -39,6 +33,8 @@ public class UserService {
     CardRepository cardRepository;
 
     private final ModelMapper modelMapper;
+    @Autowired
+    private VersionRepository versionRepository;
 
     public UserService(UserRepository userRepository, ModelMapper modelMapper) {
         this.userRepository = userRepository;
@@ -99,6 +95,8 @@ public class UserService {
     public UserDTO login(LoginDTO request) {
         User user = userRepository.findByUserAndPassword(request.getUser(), request.getPassword())
                 .orElseThrow(() -> new NoSuchElementException("fail info login: " + request.getUser()));
+        versionRepository.findByVersion(request.getVersion()).orElseThrow(() -> new NoSuchElementException("Phiên bản đã hết hạn" + request.getVersion()));
+
         return getMoney(user.getId());
     }
 
@@ -325,5 +323,13 @@ public class UserService {
 
     public boolean usernameExists(String user) {
         return userRepository.existsByUser(user);
+    }
+
+    public User authenticate(String username, String password) {
+        return userRepository.findByUserAndPassword(username, password).orElseThrow();
+    }
+
+    public User findByUser(String username) {
+        return userRepository.findByUser(username).orElseThrow();
     }
 }

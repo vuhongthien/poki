@@ -36,6 +36,7 @@ public class GiftService {
     private final UserPetRepository userPetRepository;
     private final UserCardRepository userCardRepository;
     private final StoneUserRepository stoneUserRepository;
+    private final UserAvatarRepository userAvatarRepository;
 
     /**
      * ✅ Gửi quà cho 1 user cụ thể
@@ -240,14 +241,39 @@ public class GiftService {
             user.setWheel(user.getWheel() + gift.getWheel());
         }
 
+        if (gift.getWheelDay() != null && gift.getWheelDay() > 0) {
+            user.setWheelDay(user.getWheelDay() + gift.getWheelDay());
+        }
+
+        if (gift.getRuby() != null && gift.getRuby() > 0) {
+            user.setRuby(user.getRuby() + gift.getRuby());
+        }
+
         // Complex rewards
         if (gift.getPetId() != null) {
-            UserPet userPet = new UserPet();
-            userPet.setUserId(user.getId());
-            userPet.setPetId(gift.getPetId());
-            userPet.setLevel(1);
-            userPetRepository.save(userPet);
+            boolean check = userPetRepository.existsByUserIdAndPetId(user.getId(), gift.getPetId());
+            if (!check) {
+                UserPet userPet = new UserPet();
+                userPet.setUserId(user.getId());
+                userPet.setPetId(gift.getPetId());
+                userPet.setLevel(1);
+                userPetRepository.save(userPet);
+            }
+
             log.info("✓ Added pet #{} to user #{}", gift.getPetId(), user.getId());
+        }
+        // Complex rewards avt
+        if (gift.getAvtId() != null) {
+            boolean check = userAvatarRepository.existsByUserIdAndAvatarId(user.getId(), gift.getAvtId());
+            if (!check) {
+                UserAvatar userAvatar = new UserAvatar();
+                userAvatar.setUserId(user.getId());
+                userAvatar.setAvatarId(gift.getAvtId());
+                userAvatar.setCreated(LocalDateTime.now());
+                userAvatarRepository.save(userAvatar);
+            }
+
+            log.info("✓ Added avt #{} to user #{}", gift.getAvtId(), user.getId());
         }
 
         if (gift.getCardId() != null) {
@@ -458,7 +484,10 @@ public class GiftService {
         gift.setStarBlue(request.getStarBlue());
         gift.setStarRed(request.getStarRed());
         gift.setWheel(request.getWheel());
+        gift.setWheelDay(request.getWheelDay());
+        gift.setRuby(request.getRuby());
         gift.setPetId(request.getPetId());
+        gift.setAvtId(request.getAvtId());
         gift.setCardId(request.getCardId());
 
         // Convert stones list to JSON
@@ -491,7 +520,10 @@ public class GiftService {
                 .starBlue(gift.getStarBlue())
                 .starRed(gift.getStarRed())
                 .wheel(gift.getWheel())
+                .wheelDay(gift.getWheelDay())
+                .ruby(gift.getRuby())
                 .petId(gift.getPetId())
+                .avtId(gift.getAvtId())
                 .cardId(gift.getCardId())
                 .createdAt(gift.getCreatedAt())
                 .expiredAt(gift.getExpiredAt())
