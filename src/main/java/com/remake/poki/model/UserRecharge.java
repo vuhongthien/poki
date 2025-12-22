@@ -22,10 +22,10 @@ public class UserRecharge {
     private Long userId;
 
     @Column(name = "package_id")
-    private Long packageId; // null nếu nạp tự do
+    private Long packageId; // null nếu hỗ trợ tự do
 
     @Column(nullable = false)
-    private Integer amount; // Số tiền nạp (VNĐ)
+    private Integer amount; // Số tiền hỗ trợ (VNĐ)
 
     @Column(nullable = false)
     private Integer goldReceived; // Số gold nhận được
@@ -38,6 +38,8 @@ public class UserRecharge {
     private Integer starBlueReceived;
     private Integer starRedReceived;
     private Integer wheelReceived;
+    private Integer wheelDayReceived;
+    private Long avtReceived;
 
     private Long petReceived;
     private Long cardReceived;

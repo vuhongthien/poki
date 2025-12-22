@@ -18,4 +18,6 @@ public interface UserRechargeRepository extends JpaRepository<UserRecharge, Long
     
     @Query("SELECT COALESCE(SUM(ur.amount), 0) FROM UserRecharge ur WHERE ur.userId = :userId AND ur.status = :status")
     Integer sumAmountByUserIdAndStatus(@Param("userId") Long userId, @Param("status") String status);
+
+    List<UserRecharge> findByStatus(String pending);
 }

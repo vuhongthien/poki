@@ -26,7 +26,7 @@ public class RechargeMilestone {
     private String description;
 
     @Column(nullable = false)
-    private Integer requiredAmount; // Số tiền cần nạp (VNĐ)
+    private Integer requiredAmount; // Số tiền cần hỗ trợ (VNĐ)
 
     @Column(nullable = false)
     private Integer sortOrder; // Thứ tự hiển thị

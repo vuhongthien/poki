@@ -83,7 +83,7 @@ public class RechargePackage {
     // === BONUS ===
     private Integer bonusGoldPercent; // % gold thêm (vd: 100 = x2 gold)
 
-    private String iconUrl; // URL icon gói nạp
+    private String iconUrl; // URL icon gói hỗ trợ
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
@@ -109,7 +109,7 @@ public class RechargePackage {
     }
 
     /**
-     * Kiểm tra gói nạp còn khả dụng không
+     * Kiểm tra gói hỗ trợ còn khả dụng không
      */
     public boolean isAvailable() {
         if (status != PackageStatus.ACTIVE) {

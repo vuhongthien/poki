@@ -2,22 +2,27 @@ package com.remake.poki.service;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.remake.poki.dto.*;
+import com.remake.poki.dto.RechargePackageDTO;
+import com.remake.poki.dto.StoneRewardDTO;
+import com.remake.poki.dto.UserRechargeDTO;
 import com.remake.poki.enums.PackageStatus;
 import com.remake.poki.enums.PackageType;
-import com.remake.poki.model.*;
-import com.remake.poki.repo.*;
-import com.remake.poki.request.PurchasePackageRequest;
-import com.remake.poki.response.PaymentResponse;
+import com.remake.poki.model.RechargePackage;
+import com.remake.poki.model.User;
+import com.remake.poki.model.UserPackagePurchase;
+import com.remake.poki.model.UserRecharge;
+import com.remake.poki.repo.RechargePackageRepository;
+import com.remake.poki.repo.UserPackagePurchaseRepository;
+import com.remake.poki.repo.UserRechargeRepository;
+import com.remake.poki.repo.UserRepository;
+import com.remake.poki.request.CreateGiftRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -31,47 +36,50 @@ public class RechargeService {
     private final UserRepository userRepository;
     private final ObjectMapper objectMapper;
 
+    // ⭐ THÊM GiftService
+    private final GiftService giftService;
+
     /**
-     * Lấy tất cả gói nạp đang active
+     * Lấy tất cả gói hỗ trợ đang active
      */
     public List<RechargePackageDTO> getAllActivePackages(Long userId) {
         List<RechargePackage> packages = packageRepository.findByStatusOrderBySortOrder(PackageStatus.ACTIVE);
-        
+
         return packages.stream()
+                .filter(RechargePackage::isAvailable)
                 .map(pkg -> convertToDTO(pkg, userId))
                 .collect(Collectors.toList());
     }
 
     /**
-     * Lấy gói nạp lần đầu
+     * Lấy gói hỗ trợ lần đầu
      */
     public List<RechargePackageDTO> getFirstTimePackages(Long userId) {
         List<RechargePackage> packages = packageRepository
                 .findByPackageTypeAndStatusOrderBySortOrder(PackageType.FIRST_TIME, PackageStatus.ACTIVE);
-        
+
         return packages.stream()
+                .filter(RechargePackage::isAvailable)
                 .map(pkg -> convertToDTO(pkg, userId))
                 .collect(Collectors.toList());
     }
 
     /**
-     * Lấy chi tiết 1 gói nạp
+     * Lấy chi tiết 1 gói hỗ trợ - CHO TRANG PAYMENT
      */
     public RechargePackageDTO getPackageById(Long packageId, Long userId) {
         RechargePackage pkg = packageRepository.findById(packageId)
                 .orElseThrow(() -> new RuntimeException("Package not found: " + packageId));
-        
+
         return convertToDTO(pkg, userId);
     }
 
     /**
-     * Mua gói nạp
+     * Tạo transaction PENDING khi user nhấn "MUA NGAY"
+     * Transaction này sẽ được confirm sau khi admin xác nhận chuyển khoản
      */
     @Transactional
-    public PaymentResponse purchasePackage(PurchasePackageRequest request) {
-        Long userId = request.getUserId();
-        Long packageId = request.getPackageId();
-
+    public String createPendingTransaction(Long userId, Long packageId) {
         // Validate package
         RechargePackage pkg = packageRepository.findById(packageId)
                 .orElseThrow(() -> new RuntimeException("Package not found"));
@@ -84,7 +92,7 @@ public class RechargeService {
         if (pkg.getIsFirstTimePurchase()) {
             boolean alreadyPurchased = userPackagePurchaseRepository
                     .existsByUserIdAndPackageId(userId, packageId);
-            
+
             if (alreadyPurchased) {
                 throw new RuntimeException("You can only purchase this package once");
             }
@@ -101,9 +109,9 @@ public class RechargeService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        // Create transaction
-        String transactionId = "TXN_" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
-        
+        // Create transaction với status PENDING
+        String transactionId = "TXN_" + System.currentTimeMillis() + "_" + userId;
+
         UserRecharge recharge = new UserRecharge();
         recharge.setUserId(userId);
         recharge.setPackageId(packageId);
@@ -116,35 +124,30 @@ public class RechargeService {
         recharge.setStarBlueReceived(pkg.getStarBlue());
         recharge.setStarRedReceived(pkg.getStarRed());
         recharge.setWheelReceived(pkg.getWheel());
+        recharge.setWheelDayReceived(pkg.getWheelDay());
+        recharge.setAvtReceived(pkg.getAvtId());
         recharge.setPetReceived(pkg.getPetId());
         recharge.setCardReceived(pkg.getCardId());
         recharge.setStonesReceivedJson(pkg.getStonesJson());
         recharge.setTransactionId(transactionId);
-        recharge.setPaymentMethod(request.getPaymentMethod());
+        recharge.setPaymentMethod("BANK_TRANSFER");
         recharge.setStatus("PENDING");
-        
+        recharge.setNote("Waiting for bank transfer confirmation");
+
         userRechargeRepository.save(recharge);
 
-        // TODO: Integrate with real payment gateway (Momo, ZaloPay, etc.)
-        // For now, return mock payment URL
-        String paymentUrl = generatePaymentUrl(transactionId, pkg.getPrice(), request.getPaymentMethod());
-
-        return PaymentResponse.builder()
-                .transactionId(transactionId)
-                .paymentUrl(paymentUrl)
-                .amount(pkg.getPrice())
-                .status("PENDING")
-                .message("Redirect to payment gateway")
-                .build();
+        log.info("✅ Created PENDING transaction: {} for user #{}", transactionId, userId);
+        return transactionId;
     }
 
     /**
-     * Xác nhận thanh toán thành công (webhook từ payment gateway)
+     * ⭐⭐⭐ XÁC NHẬN THANH TOÁN - ADMIN GỌI API NÀY SAU KHI CHECK NGÂN HÀNG
+     * TÍCH HỢP GIFT SERVICE - TẠO GIFT THAY VÌ CỘNG TRỰC TIẾP VÀO USER
      */
     @Transactional
     public void confirmPayment(String transactionId) {
         UserRecharge recharge = userRechargeRepository.findByTransactionId(transactionId)
-                .orElseThrow(() -> new RuntimeException("Transaction not found"));
+                .orElseThrow(() -> new RuntimeException("Transaction not found: " + transactionId));
 
         if ("SUCCESS".equals(recharge.getStatus())) {
             log.warn("Transaction already completed: {}", transactionId);
@@ -156,46 +159,21 @@ public class RechargeService {
         recharge.setCompletedAt(LocalDateTime.now());
         userRechargeRepository.save(recharge);
 
-        // Add rewards to user
+        // Validate user
         User user = userRepository.findById(recharge.getUserId())
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        if (recharge.getGoldReceived() != null) {
-            user.setGold(user.getGold() + recharge.getGoldReceived());
-        }
-        if (recharge.getRubyReceived() != null) {
-            user.setRuby(user.getRuby() + recharge.getRubyReceived());
-        }
-        if (recharge.getEnergyReceived() != null) {
-            user.setEnergy(user.getEnergy() + recharge.getEnergyReceived());
-        }
-        if (recharge.getExpReceived() != null) {
-            user.setExp(user.getExp() + recharge.getExpReceived());
-        }
-        if (recharge.getStarWhiteReceived() != null) {
-            user.setStarWhite(user.getStarWhite() + recharge.getStarWhiteReceived());
-        }
-        if (recharge.getStarBlueReceived() != null) {
-            user.setStarBlue(user.getStarBlue() + recharge.getStarBlueReceived());
-        }
-        if (recharge.getStarRedReceived() != null) {
-            user.setStarRed(user.getStarRed() + recharge.getStarRedReceived());
-        }
-        if (recharge.getWheelReceived() != null) {
-            user.setWheel(user.getWheel() + recharge.getWheelReceived());
-        }
-        // TODO: Handle pet, card, stones rewards
+        // ⭐⭐⭐ TẠO GIFT THAY VÌ CỘNG TRỰC TIẾP
+        createRechargeGift(recharge, user);
 
-        userRepository.save(user);
-
-        // Update package purchase tracking
+        // Update package tracking
         if (recharge.getPackageId() != null) {
             RechargePackage pkg = packageRepository.findById(recharge.getPackageId())
                     .orElse(null);
-            
+
             if (pkg != null) {
-                // Increase sold count
-                pkg.setSoldCount(pkg.getSoldCount() + 1);
+                // Tăng số lượng đã bán
+                pkg.setSoldCount((pkg.getSoldCount() != null ? pkg.getSoldCount() : 0) + 1);
                 packageRepository.save(pkg);
 
                 // Track first time purchase
@@ -203,48 +181,285 @@ public class RechargeService {
                     UserPackagePurchase purchase = userPackagePurchaseRepository
                             .findByUserIdAndPackageId(user.getId(), pkg.getId())
                             .orElse(new UserPackagePurchase());
-                    
+
                     if (purchase.getId() == null) {
                         purchase.setUserId(user.getId());
                         purchase.setPackageId(pkg.getId());
                         purchase.setPurchaseCount(1);
+                        purchase.setFirstPurchaseAt(LocalDateTime.now());
                     } else {
                         purchase.setPurchaseCount(purchase.getPurchaseCount() + 1);
                     }
-                    
+                    purchase.setLastPurchaseAt(LocalDateTime.now());
+
                     userPackagePurchaseRepository.save(purchase);
                 }
             }
         }
 
-        log.info("✅ Payment confirmed: {} - User #{} received {} gold", 
-                transactionId, user.getId(), recharge.getGoldReceived());
+        log.info("✅ Payment confirmed successfully: {} - Gift created for user #{}",
+                transactionId, user.getId());
     }
 
     /**
-     * Lấy lịch sử nạp của user
+     * ⭐⭐⭐ TẠO GIFT KHI CONFIRM THANH TOÁN
+     * Gift này sẽ được user nhận từ hệ thống Gift
+     */
+    private void createRechargeGift(UserRecharge recharge, User user) {
+        try {
+            // Lấy thông tin package
+            String packageName = "Gói hỗ trợ";
+            if (recharge.getPackageId() != null) {
+                packageName = packageRepository.findById(recharge.getPackageId())
+                        .map(RechargePackage::getName)
+                        .orElse("Gói hỗ trợ");
+            }
+
+            // Tạo Gift Request
+            CreateGiftRequest giftRequest = new CreateGiftRequest();
+            giftRequest.setUserId(user.getId());
+            giftRequest.setTitle("🎁 " + packageName);
+
+            // Build description
+            StringBuilder description = new StringBuilder();
+            description.append("Cảm ơn bạn đã hỗ trợ tiền!\n");
+            description.append("Mã giao dịch: ").append(recharge.getTransactionId()).append("\n\n");
+            description.append("Phần thưởng:\n");
+
+            // Gold
+            if (recharge.getGoldReceived() != null && recharge.getGoldReceived() > 0) {
+                giftRequest.setGold(recharge.getGoldReceived());
+                description.append("• ").append(formatNumber(recharge.getGoldReceived())).append(" Gold\n");
+            }
+
+            // Ruby
+            if (recharge.getRubyReceived() != null && recharge.getRubyReceived() > 0) {
+                giftRequest.setRuby(recharge.getRubyReceived());
+                description.append("• ").append(formatNumber(recharge.getRubyReceived())).append(" Ruby\n");
+            }
+
+            // Energy
+            if (recharge.getEnergyReceived() != null && recharge.getEnergyReceived() > 0) {
+                giftRequest.setEnergy(recharge.getEnergyReceived());
+                description.append("• ").append(formatNumber(recharge.getEnergyReceived())).append(" Energy\n");
+            }
+
+            // EXP
+            if (recharge.getExpReceived() != null && recharge.getExpReceived() > 0) {
+                giftRequest.setExp(recharge.getExpReceived());
+                description.append("• ").append(formatNumber(recharge.getExpReceived())).append(" EXP\n");
+            }
+
+            // Star White
+            if (recharge.getStarWhiteReceived() != null && recharge.getStarWhiteReceived() > 0) {
+                giftRequest.setStarWhite(recharge.getStarWhiteReceived());
+                description.append("• ").append(formatNumber(recharge.getStarWhiteReceived())).append(" Sao trắng\n");
+            }
+
+            // Star Blue
+            if (recharge.getStarBlueReceived() != null && recharge.getStarBlueReceived() > 0) {
+                giftRequest.setStarBlue(recharge.getStarBlueReceived());
+                description.append("• ").append(formatNumber(recharge.getStarBlueReceived())).append(" Sao xanh\n");
+            }
+
+            // Star Red
+            if (recharge.getStarRedReceived() != null && recharge.getStarRedReceived() > 0) {
+                giftRequest.setStarRed(recharge.getStarRedReceived());
+                description.append("• ").append(formatNumber(recharge.getStarRedReceived())).append(" Sao đỏ\n");
+            }
+
+            // Wheel
+            if (recharge.getWheelReceived() != null && recharge.getWheelReceived() > 0) {
+                giftRequest.setWheel(recharge.getWheelReceived());
+                description.append("• ").append(formatNumber(recharge.getWheelReceived())).append(" Vòng quay huyền thoại\n");
+            }
+
+            // Wheel Day
+            if (recharge.getWheelDayReceived() != null && recharge.getWheelDayReceived() > 0) {
+                giftRequest.setWheelDay(recharge.getWheelDayReceived());
+                description.append("• ").append(formatNumber(recharge.getWheelDayReceived())).append(" Vòng quay hàng ngày\n");
+            }
+
+            // Pet
+            if (recharge.getPetReceived() != null) {
+                giftRequest.setPetId(recharge.getPetReceived());
+                description.append("• 1 Pet đặc biệt\n");
+            }
+
+
+            // avt
+            if (recharge.getAvtReceived() != null) {
+                giftRequest.setAvtId(recharge.getAvtReceived());
+                description.append("• 1 Avatar \n");
+            }
+
+            // Card
+            if (recharge.getCardReceived() != null) {
+                giftRequest.setCardId(recharge.getCardReceived());
+                description.append("• 1 Thẻ chiến đấu đặc biệt\n");
+            }
+
+            // Stones
+            if (recharge.getStonesReceivedJson() != null && !recharge.getStonesReceivedJson().isEmpty()) {
+                List<StoneRewardDTO> stones = parseStones(recharge.getStonesReceivedJson());
+                if (!stones.isEmpty()) {
+                    giftRequest.setStones(stones.stream()
+                            .map(s -> {
+                                com.remake.poki.dto.StoneReward sr = new com.remake.poki.dto.StoneReward();
+                                sr.setStoneId(s.getStoneId());
+                                sr.setCount(s.getCount());
+                                return sr;
+                            })
+                            .collect(Collectors.toList()));
+
+                    description.append("• Đá tiến hóa các loại\n");
+                }
+            }
+
+            giftRequest.setDescription(description.toString());
+
+            // Gift hết hạn sau 30 ngày
+            giftRequest.setExpiredAt(LocalDateTime.now().plusDays(30));
+
+            // ⭐ GỬI GIFT QUA GiftService
+            giftService.sendGiftToUser(giftRequest);
+
+            log.info("🎁 Created recharge gift for user #{} from transaction {}",
+                    user.getId(), recharge.getTransactionId());
+
+        } catch (Exception e) {
+            log.error("❌ Failed to create recharge gift for user #{}: {}",
+                    user.getId(), e.getMessage(), e);
+            // Không throw exception để không làm fail transaction
+            // Gift sẽ được tạo lại bằng cách khác nếu cần
+        }
+    }
+
+    /**
+     * Lấy danh sách giao dịch PENDING (cho admin)
+     */
+    @Transactional(readOnly = true)
+    public List<Map<String, Object>> getPendingTransactions() {
+        long startTime = System.currentTimeMillis();
+
+        // Query 1: Lấy tất cả pending transactions
+        List<UserRecharge> pending = userRechargeRepository.findByStatus("PENDING");
+
+        if (pending.isEmpty()) {
+            log.info("✅ No pending transactions found");
+            return Collections.emptyList();
+        }
+
+        log.info("📊 Found {} pending transactions", pending.size());
+
+        // Collect unique userIds và packageIds
+        Set<Long> userIds = pending.stream()
+                .map(UserRecharge::getUserId)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
+
+        Set<Long> packageIds = pending.stream()
+                .map(UserRecharge::getPackageId)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
+
+        // Query 2: Batch load tất cả users (1 query thay vì N queries)
+        Map<Long, User> usersMap = Collections.emptyMap();
+        if (!userIds.isEmpty()) {
+            usersMap = userRepository.findAllById(userIds).stream()
+                    .collect(Collectors.toMap(User::getId, user -> user));
+            log.debug("📥 Loaded {} users in batch", usersMap.size());
+        }
+
+        // Query 3: Batch load tất cả packages (1 query thay vì N queries)
+        Map<Long, RechargePackage> packagesMap = Collections.emptyMap();
+        if (!packageIds.isEmpty()) {
+            packagesMap = packageRepository.findAllById(packageIds).stream()
+                    .collect(Collectors.toMap(RechargePackage::getId, pkg -> pkg));
+            log.debug("📥 Loaded {} packages in batch", packagesMap.size());
+        }
+
+        // Map final để tránh effectively final issue
+        final Map<Long, User> finalUsersMap = usersMap;
+        final Map<Long, RechargePackage> finalPackagesMap = packagesMap;
+
+        // Build response - Chỉ lookup từ Map, không query thêm
+        List<Map<String, Object>> result = pending.stream()
+                .map(r -> {
+                    Map<String, Object> map = new HashMap<>();
+
+                    // Basic info
+                    map.put("id", r.getId());
+                    map.put("transactionId", r.getTransactionId());
+                    map.put("userId", r.getUserId());
+                    map.put("packageId", r.getPackageId());
+                    map.put("amount", r.getAmount());
+                    map.put("goldReceived", r.getGoldReceived());
+                    map.put("createdAt", r.getCreatedAt());
+                    map.put("status", r.getStatus());
+
+                    // User info - O(1) lookup từ HashMap
+                    User user = finalUsersMap.get(r.getUserId());
+                    if (user != null) {
+                        map.put("username", user.getUser());
+                        map.put("name", user.getName());
+                    } else {
+                        map.put("username", "Unknown");
+                        map.put("name", "Unknown");
+                    }
+
+                    // Package info - O(1) lookup từ HashMap
+                    RechargePackage pkg = finalPackagesMap.get(r.getPackageId());
+                    if (pkg != null) {
+                        map.put("packageName", pkg.getName());
+                    } else {
+                        map.put("packageName", "Unknown Package");
+                    }
+
+                    return map;
+                })
+                .collect(Collectors.toList());
+
+        long endTime = System.currentTimeMillis();
+        long executionTime = endTime - startTime;
+
+        log.info("✅ Loaded {} pending transactions in {}ms (3 queries total)",
+                result.size(), executionTime);
+
+        // Warning nếu query chậm
+        if (executionTime > 500) {
+            log.warn("⚠️ Query took longer than expected: {}ms. Consider adding indexes.",
+                    executionTime);
+        }
+
+        return result;
+    }
+
+    /**
+     * Lấy lịch sử hỗ trợ của user
      */
     public List<UserRechargeDTO> getUserRechargeHistory(Long userId) {
         List<UserRecharge> recharges = userRechargeRepository
                 .findByUserIdOrderByCreatedAtDesc(userId);
-        
+
         return recharges.stream()
                 .map(this::convertToRechargeDTO)
                 .collect(Collectors.toList());
     }
 
     /**
-     * Tính tổng số tiền user đã nạp
+     * Tính tổng số tiền user đã hỗ trợ thành công
      */
     public Integer getUserTotalRecharge(Long userId) {
-        return userRechargeRepository.sumAmountByUserIdAndStatus(userId, "SUCCESS");
+        Integer total = userRechargeRepository.sumAmountByUserIdAndStatus(userId, "SUCCESS");
+        return total != null ? total : 0;
     }
 
-    // === PRIVATE METHODS ===
+    // === PRIVATE HELPER METHODS ===
 
     private RechargePackageDTO convertToDTO(RechargePackage pkg, Long userId) {
         List<StoneRewardDTO> stones = parseStones(pkg.getStonesJson());
-        
+
         boolean canPurchase = true;
         if (pkg.getIsFirstTimePurchase()) {
             canPurchase = !userPackagePurchaseRepository
@@ -272,8 +487,10 @@ public class RechargeService {
                 .starBlue(pkg.getStarBlue())
                 .starRed(pkg.getStarRed())
                 .wheel(pkg.getWheel())
+                .wheelDay(pkg.getWheelDay())
                 .petId(pkg.getPetId())
                 .cardId(pkg.getCardId())
+                .avtId(pkg.getAvtId())
                 .stones(stones)
                 .isFirstTimePurchase(pkg.getIsFirstTimePurchase())
                 .isLimitedQuantity(pkg.getIsLimitedQuantity())
@@ -316,6 +533,7 @@ public class RechargeService {
                 .starBlueReceived(recharge.getStarBlueReceived())
                 .starRedReceived(recharge.getStarRedReceived())
                 .wheelReceived(recharge.getWheelReceived())
+                .wheelDayReceived(recharge.getWheelDayReceived())
                 .petReceived(recharge.getPetReceived())
                 .cardReceived(recharge.getCardReceived())
                 .stonesReceived(stones)
@@ -329,10 +547,10 @@ public class RechargeService {
     }
 
     private List<StoneRewardDTO> parseStones(String stonesJson) {
-        if (stonesJson == null || stonesJson.isEmpty()) {
+        if (stonesJson == null || stonesJson.trim().isEmpty()) {
             return new ArrayList<>();
         }
-        
+
         try {
             return objectMapper.readValue(stonesJson, new TypeReference<List<StoneRewardDTO>>() {});
         } catch (Exception e) {
@@ -341,10 +559,8 @@ public class RechargeService {
         }
     }
 
-    private String generatePaymentUrl(String transactionId, Integer amount, String paymentMethod) {
-        // TODO: Integrate with real payment gateway
-        // This is a mock implementation
-        return String.format("https://payment.example.com/pay?txn=%s&amount=%d&method=%s", 
-                transactionId, amount, paymentMethod);
+    private String formatNumber(Integer number) {
+        if (number == null) return "0";
+        return String.format("%,d", number);
     }
 }

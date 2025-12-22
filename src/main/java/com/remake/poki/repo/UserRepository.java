@@ -52,7 +52,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
             u.lever,
             COUNT(up.id) as pet_count
         FROM users u
-        LEFT JOIN user_pet up ON u.id = up.user_id
+        LEFT JOIN user_pet up ON u.id = up.user_id WHERE u.blind IS NULL OR u.blind != 'Y'
         GROUP BY u.id, u.name, u.pet_id, u.avt_id, u.lever
         ORDER BY u.lever DESC, pet_count DESC
         LIMIT 9

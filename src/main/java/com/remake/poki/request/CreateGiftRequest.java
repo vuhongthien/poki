@@ -29,8 +29,11 @@ public class CreateGiftRequest {
     private Integer starBlue;
     private Integer starRed;
     private Integer wheel;
+    private Integer wheelDay;
+    private Integer ruby;
 
     private Long petId;
+    private Long avtId;
     private Long cardId;
 
     // Multiple stones - JSON format hoặc List

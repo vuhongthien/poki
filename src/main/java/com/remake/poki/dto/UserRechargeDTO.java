@@ -26,6 +26,7 @@ public class UserRechargeDTO {
     private Integer starBlueReceived;
     private Integer starRedReceived;
     private Integer wheelReceived;
+    private Integer wheelDayReceived;
     private Long petReceived;
     private Long cardReceived;
     private List<StoneRewardDTO> stonesReceived;

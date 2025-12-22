@@ -32,8 +32,10 @@ public class RechargePackageDTO {
     private Integer starBlue;
     private Integer starRed;
     private Integer wheel;
+    private Integer wheelDay;
     private Long petId;
     private Long cardId;
+    private Long avtId;
     private List<StoneRewardDTO> stones;
     
     // Special flags

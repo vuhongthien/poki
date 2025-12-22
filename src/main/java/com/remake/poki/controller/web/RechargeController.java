@@ -1,11 +1,7 @@
 package com.remake.poki.controller.web;
 
 import com.remake.poki.dto.RechargePackageDTO;
-import com.remake.poki.dto.RechargeMilestoneDTO;
 import com.remake.poki.model.User;
-import com.remake.poki.request.PurchasePackageRequest;
-import com.remake.poki.response.PaymentResponse;
-import com.remake.poki.service.MilestoneService;
 import com.remake.poki.service.RechargeService;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
@@ -26,37 +22,96 @@ import java.util.Map;
 public class RechargeController {
 
     private final RechargeService rechargeService;
-    private final MilestoneService milestoneService;
+
+    // ========== TRANG THANH TOÁN ==========
 
     /**
-     * Trang gói nạp
+     * Hiển thị trang thanh toán khi user click "MUA NGAY"
+     * URL: /payment/{packageId}
      */
-    @GetMapping("/recharge")
-    public String rechargePage(Model model, HttpSession session) {
+    @GetMapping("/payment/{packageId}")
+    public String showPaymentPage(@PathVariable Long packageId,
+                                  Model model,
+                                  HttpSession session,
+                                  RedirectAttributes redirectAttributes) {
+        // Kiểm tra đăng nhập
         User user = (User) session.getAttribute("user");
-
-        // Chưa login thì redirect về login
         if (user == null) {
-            return "redirect:/login";
+            redirectAttributes.addFlashAttribute("error", "Vui lòng đăng nhập để tiếp tục!");
+            return "redirect:/?tab=recharge";
         }
 
-        // Load packages và milestones
-        List<RechargePackageDTO> packages = rechargeService.getAllActivePackages(user.getId());
-        List<RechargeMilestoneDTO> milestones = milestoneService.getAllMilestones(user.getId());
-        Integer totalRecharge = rechargeService.getUserTotalRecharge(user.getId());
+        try {
+            // Lấy thông tin gói hỗ trợ
+            RechargePackageDTO packageInfo = rechargeService.getPackageById(packageId, user.getId());
 
-        model.addAttribute("packages", packages);
-        model.addAttribute("milestones", milestones);
-        model.addAttribute("totalRecharge", totalRecharge != null ? totalRecharge : 0);
-        model.addAttribute("currentUser", user);
+            if (packageInfo == null || !packageInfo.getIsAvailable()) {
+                redirectAttributes.addFlashAttribute("error", "Gói hỗ trợ không khả dụng!");
+                return "redirect:/?tab=recharge";
+            }
 
-        return "recharge";
+            if (!packageInfo.getCanPurchase()) {
+                redirectAttributes.addFlashAttribute("error", "Bạn đã mua gói này rồi!");
+                return "redirect:/?tab=recharge";
+            }
+
+            // Tạo transaction PENDING
+            String transactionId = rechargeService.createPendingTransaction(user.getId(), packageId);
+
+            // ⚠️ CẬP NHẬT THÔNG TIN NGÂN HÀNG CỦA BẠN Ở ĐÂY
+            String bankName = "Agribank";
+            String accountNumber = "5908205318924";
+            String accountName = "VU HONG THIEN";
+
+            // Nội dung chuyển khoản: POKI {username} {packageId}
+            String transferContent = "SUPORTPOKI " + user.getUser() + " " + packageId;
+
+            // Thêm data vào model
+            model.addAttribute("package", packageInfo);
+            model.addAttribute("user", user);
+            model.addAttribute("bankName", bankName);
+            model.addAttribute("accountNumber", accountNumber);
+            model.addAttribute("accountName", accountName);
+            model.addAttribute("transferContent", transferContent);
+            model.addAttribute("transactionId", transactionId);
+            model.addAttribute("gameName", "Pokiguard");
+
+            log.info("📄 User #{} ({}) viewing payment page for package #{}",
+                    user.getId(), user.getUser(), packageId);
+
+            return "payment";
+        } catch (Exception e) {
+            log.error("Error loading payment page", e);
+            redirectAttributes.addFlashAttribute("error", "Đã có lỗi xảy ra: " + e.getMessage());
+            return "redirect:/?tab=recharge";
+        }
     }
 
-    // ========== API ENDPOINTS cho AJAX calls ==========
+    /**
+     * Trang thông báo thanh toán thành công
+     * URL: /payment/success
+     */
+    @GetMapping("/payment/success")
+    public String paymentSuccess(Model model) {
+        model.addAttribute("gameName", "Pokiguard");
+        return "payment-success";
+    }
 
     /**
-     * API: Lấy gói nạp (cho AJAX)
+     * Xử lý hủy thanh toán
+     * URL: /payment/cancel
+     */
+    @GetMapping("/payment/cancel")
+    public String paymentCancel(RedirectAttributes redirectAttributes) {
+        redirectAttributes.addFlashAttribute("warning", "Bạn đã hủy thanh toán!");
+        return "redirect:/?tab=recharge";
+    }
+
+    // ========== API ENDPOINTS cho AJAX ==========
+
+    /**
+     * API: Lấy danh sách gói hỗ trợ
+     * GET /api/recharge/packages
      */
     @GetMapping("/api/recharge/packages")
     @ResponseBody
@@ -64,131 +119,30 @@ public class RechargeController {
         User user = (User) session.getAttribute("user");
 
         if (user == null) {
-            Map<String, Object> response = new HashMap<>();
-            response.put("success", false);
-            response.put("message", "Vui lòng đăng nhập");
-            return ResponseEntity.ok(response);
+            return ResponseEntity.ok(Map.of(
+                    "success", false,
+                    "message", "Vui lòng đăng nhập"
+            ));
         }
 
         try {
             List<RechargePackageDTO> packages = rechargeService.getAllActivePackages(user.getId());
-            Map<String, Object> response = new HashMap<>();
-            response.put("success", true);
-            response.put("packages", packages);
-            return ResponseEntity.ok(response);
+            return ResponseEntity.ok(Map.of(
+                    "success", true,
+                    "packages", packages
+            ));
         } catch (Exception e) {
             log.error("Error loading packages", e);
-            Map<String, Object> response = new HashMap<>();
-            response.put("success", false);
-            response.put("message", e.getMessage());
-            return ResponseEntity.ok(response);
+            return ResponseEntity.ok(Map.of(
+                    "success", false,
+                    "message", e.getMessage()
+            ));
         }
     }
 
     /**
-     * API: Mua gói nạp
-     */
-    @PostMapping("/api/recharge/purchase")
-    @ResponseBody
-    public ResponseEntity<?> purchasePackage(
-            @RequestBody PurchasePackageRequest request,
-            HttpSession session) {
-
-        User user = (User) session.getAttribute("user");
-
-        if (user == null) {
-            Map<String, Object> response = new HashMap<>();
-            response.put("success", false);
-            response.put("message", "Vui lòng đăng nhập");
-            return ResponseEntity.ok(response);
-        }
-
-        try {
-            // Set userId from session
-            request.setUserId(user.getId());
-
-            PaymentResponse paymentResponse = rechargeService.purchasePackage(request);
-
-            Map<String, Object> response = new HashMap<>();
-            response.put("success", true);
-            response.put("payment", paymentResponse);
-            return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            log.error("Error purchasing package", e);
-            Map<String, Object> response = new HashMap<>();
-            response.put("success", false);
-            response.put("message", e.getMessage());
-            return ResponseEntity.ok(response);
-        }
-    }
-
-    /**
-     * API: Lấy mốc nạp
-     */
-    @GetMapping("/api/recharge/milestones")
-    @ResponseBody
-    public ResponseEntity<?> getMilestones(HttpSession session) {
-        User user = (User) session.getAttribute("user");
-
-        if (user == null) {
-            Map<String, Object> response = new HashMap<>();
-            response.put("success", false);
-            response.put("message", "Vui lòng đăng nhập");
-            return ResponseEntity.ok(response);
-        }
-
-        try {
-            List<RechargeMilestoneDTO> milestones = milestoneService.getAllMilestones(user.getId());
-            Map<String, Object> response = new HashMap<>();
-            response.put("success", true);
-            response.put("milestones", milestones);
-            return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            log.error("Error loading milestones", e);
-            Map<String, Object> response = new HashMap<>();
-            response.put("success", false);
-            response.put("message", e.getMessage());
-            return ResponseEntity.ok(response);
-        }
-    }
-
-    /**
-     * API: Nhận thưởng mốc nạp
-     */
-    @PostMapping("/api/recharge/milestones/{milestoneId}/claim")
-    @ResponseBody
-    public ResponseEntity<?> claimMilestone(
-            @PathVariable Long milestoneId,
-            HttpSession session) {
-
-        User user = (User) session.getAttribute("user");
-
-        if (user == null) {
-            Map<String, Object> response = new HashMap<>();
-            response.put("success", false);
-            response.put("message", "Vui lòng đăng nhập");
-            return ResponseEntity.ok(response);
-        }
-
-        try {
-            RechargeMilestoneDTO milestone = milestoneService.claimMilestone(milestoneId, user.getId());
-
-            Map<String, Object> response = new HashMap<>();
-            response.put("success", true);
-            response.put("milestone", milestone);
-            response.put("message", "Nhận thưởng thành công!");
-            return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            log.error("Error claiming milestone", e);
-            Map<String, Object> response = new HashMap<>();
-            response.put("success", false);
-            response.put("message", e.getMessage());
-            return ResponseEntity.ok(response);
-        }
-    }
-
-    /**
-     * API: Lấy tổng nạp
+     * API: Lấy tổng hỗ trợ của user
+     * GET /api/recharge/total
      */
     @GetMapping("/api/recharge/total")
     @ResponseBody
@@ -196,46 +150,26 @@ public class RechargeController {
         User user = (User) session.getAttribute("user");
 
         if (user == null) {
-            Map<String, Object> response = new HashMap<>();
-            response.put("success", false);
-            response.put("message", "Vui lòng đăng nhập");
-            return ResponseEntity.ok(response);
+            return ResponseEntity.ok(Map.of(
+                    "success", false,
+                    "message", "Vui lòng đăng nhập"
+            ));
         }
 
         try {
             Integer total = rechargeService.getUserTotalRecharge(user.getId());
-            Map<String, Object> response = new HashMap<>();
-            response.put("success", true);
-            response.put("totalAmount", total != null ? total : 0);
-            return ResponseEntity.ok(response);
+            return ResponseEntity.ok(Map.of(
+                    "success", true,
+                    "totalAmount", total
+            ));
         } catch (Exception e) {
             log.error("Error getting total recharge", e);
-            Map<String, Object> response = new HashMap<>();
-            response.put("success", false);
-            response.put("message", e.getMessage());
-            return ResponseEntity.ok(response);
+            return ResponseEntity.ok(Map.of(
+                    "success", false,
+                    "message", e.getMessage()
+            ));
         }
     }
 
-    /**
-     * Webhook xác nhận thanh toán (từ payment gateway)
-     */
-    @PostMapping("/api/recharge/confirm/{transactionId}")
-    @ResponseBody
-    public ResponseEntity<?> confirmPayment(@PathVariable String transactionId) {
-        try {
-            rechargeService.confirmPayment(transactionId);
 
-            Map<String, Object> response = new HashMap<>();
-            response.put("success", true);
-            response.put("message", "Payment confirmed");
-            return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            log.error("Error confirming payment", e);
-            Map<String, Object> response = new HashMap<>();
-            response.put("success", false);
-            response.put("message", e.getMessage());
-            return ResponseEntity.ok(response);
-        }
-    }
 }

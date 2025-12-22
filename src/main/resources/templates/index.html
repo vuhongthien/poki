@@ -1401,7 +1401,7 @@
     <!-- ========== NAVIGATION TABS - NEW ========== -->
     <div class="nav-tabs">
         <button class="nav-tab active" onclick="switchTab('home')">🏠 Trang Chủ</button>
-        <button class="nav-tab" onclick="switchTab('recharge')">💎 Gói Nạp</button>
+        <button class="nav-tab" onclick="switchTab('recharge')">💎 Gói hỗ trợ</button>
     </div>
 
     <!-- ========== HOME TAB (Original Content) ========== -->
@@ -1616,13 +1616,13 @@
     <div id="rechargeTab" class="tab-content-section">
         <div class="recharge-page">
             <div class="recharge-header-section">
-                <h2 class="recharge-main-title">💎 GÓI NẠP ƯU ĐÃI</h2>
-                <p class="recharge-main-subtitle">Nạp ngay để nhận quà khủng!</p>
+                <h2 class="recharge-main-title">💎 GÓI HỖ TRỢ ƯU ĐÃI</h2>
+                <p class="recharge-main-subtitle">hỗ trợ ngay để nhận quà khủng!</p>
             </div>
 
             <div class="packages-grid" id="packagesGrid">
                 <div style="grid-column: 1/-1; text-align: center; padding: 40px; color: #a8b2d1;">
-                    Đang tải gói nạp...
+                    Đang tải gói hỗ trợ...
                 </div>
             </div>
         </div>
@@ -1635,7 +1635,7 @@
         <button class="modal-close" onclick="closeLoginModal()">×</button>
         <div class="modal-header">
             <h2 class="modal-title">ĐĂNG NHẬP</h2>
-            <p class="modal-subtitle">Đăng nhập để xem và mua gói nạp</p>
+            <p class="modal-subtitle">Đăng nhập để xem và mua gói hỗ trợ</p>
         </div>
 
         <div class="error-message" id="loginErrorMessage"></div>
@@ -2035,7 +2035,7 @@
     grid.innerHTML = `
         <div style="grid-column: 1/-1; text-align: center; padding: 40px; color: #a8b2d1;">
             <div style="font-size: 3rem; margin-bottom: 20px;">⏳</div>
-            Đang tải gói nạp...
+            Đang tải gói hỗ trợ...
         </div>
     `;
 
@@ -2057,7 +2057,7 @@
                     const totalGold = pkg.totalGold || pkg.gold;
                     rewardsHTML += `
                         <div class="reward-item">
-                            <span class="reward-label">💰 Gold</span>
+                            <span class="reward-label"><img style="width: 30px;" src="/images/reward/g.png"/> Gold</span>
                             <span class="reward-value highlight">${formatNumber(totalGold)}</span>
                         </div>`;
                 }
@@ -2065,40 +2065,69 @@
                 if (pkg.ruby && pkg.ruby > 0) {
                     rewardsHTML += `
                         <div class="reward-item">
-                            <span class="reward-label">💎 Ruby</span>
+                            <span class="reward-label"><img style="width: 30px;" src="/images/reward/ruby.png"/>  Ruby</span>
                             <span class="reward-value">${formatNumber(pkg.ruby)}</span>
                         </div>`;
                 }
                 if (pkg.exp && pkg.exp > 0) {
                     rewardsHTML += `
                         <div class="reward-item">
-                            <span class="reward-label">💎 EXP</span>
+                            <span class="reward-label"><img style="width: 30px;" src="/images/reward/exp.png"/>  EXP</span>
                             <span class="reward-value">${formatNumber(pkg.exp)}</span>
                         </div>`;
                 }
                 if (pkg.wheelDay && pkg.wheelDay > 0) {
                     rewardsHTML += `
                         <div class="reward-item">
-                            <span class="reward-label">💎 Vòng quay hàng ngày</span>
+                            <span class="reward-label"><img style="width: 30px;" src="/images/reward/wheel.png"/> Vòng quay hàng ngày</span>
                             <span class="reward-value">${formatNumber(pkg.wheelDay)}</span>
                         </div>`;
                 }
+
                 if (pkg.wheel && pkg.wheel > 0) {
                     rewardsHTML += `
                         <div class="reward-item">
-                            <span class="reward-label">💎 Vòng quay Huyền thoại</span>
+                            <span class="reward-label"><img style="width: 30px;" src="/images/reward/rw.png"/> Vòng quay Huyền thoại</span>
                             <span class="reward-value">${formatNumber(pkg.wheel)}</span>
+                        </div>`;
+                }
+                if (pkg.starWhite && pkg.starWhite > 0) {
+                    rewardsHTML += `
+                        <div class="reward-item">
+                            <span class="reward-label"><img style="width: 30px;" src="/images/reward/w.png"/> Sao trắng</span>
+                            <span class="reward-value">${formatNumber(pkg.starWhite)}</span>
+                        </div>`;
+                }
+                if (pkg.starBlue && pkg.starBlue > 0) {
+                    rewardsHTML += `
+                        <div class="reward-item">
+                            <span class="reward-label"><img style="width: 30px;" src="/images/reward/b.png"/> Sao xanh</span>
+                            <span class="reward-value">${formatNumber(pkg.starBlue)}</span>
+                        </div>`;
+                }
+                if (pkg.starRed && pkg.starRed > 0) {
+                    rewardsHTML += `
+                        <div class="reward-item">
+                            <span class="reward-label"><img style="width: 30px;" src="/images/reward/r.png"/> Sao đỏ</span>
+                            <span class="reward-value">${formatNumber(pkg.starRed)}</span>
                         </div>`;
                 }
 
                 if (pkg.energy && pkg.energy > 0) {
                     rewardsHTML += `
                         <div class="reward-item">
-                            <span class="reward-label">⚡ Energy</span>
+                            <span class="reward-label"><img style="width: 30px;" src="/images/reward/e.png"/>  Energy</span>
                             <span class="reward-value">${formatNumber(pkg.energy)}</span>
                         </div>`;
                 }
+                if (pkg.stones ) {
+                    rewardsHTML += `
+                        <div class="reward-item">
+                            <span class="reward-label"><img style="width: 60px;" src="/images/reward/s.png"/> </span>
+                            <span class="reward-value">Đá nâng cấp lv7 các loại</span>
 
+                        </div>`;
+                }
                 if (pkg.petId) {
                     rewardsHTML += `
                         <div class="reward-item">
@@ -2125,7 +2154,7 @@
             // Không có packages
             grid.innerHTML = `
                 <div style="grid-column: 1/-1; text-align: center; padding: 60px;">
-                    <h3 style="color: #a8b2d1; font-size: 1.5rem;">📦 Chưa có gói nạp nào</h3>
+                    <h3 style="color: #a8b2d1; font-size: 1.5rem;">📦 Chưa có gói hỗ trợ nào</h3>
                     <p style="color: #667eea; margin-top: 15px;">Vui lòng quay lại sau!</p>
                 </div>
             `;
@@ -2135,7 +2164,7 @@
         grid.innerHTML = `
             <div style="grid-column: 1/-1; text-align: center; padding: 60px;">
                 <h3 style="color: #ff6b6b; font-size: 1.5rem; margin-bottom: 20px;">❌ Lỗi tải dữ liệu</h3>
-                <p style="color: #a8b2d1; margin-bottom: 20px;">Không thể tải gói nạp. Vui lòng thử lại!</p>
+                <p style="color: #a8b2d1; margin-bottom: 20px;">Không thể tải gói hỗ trợ. Vui lòng thử lại!</p>
                 <button class="package-button" onclick="loadPackages()" style="max-width: 300px; margin: 0 auto;">
                     THỬ LẠI
                 </button>
@@ -2145,41 +2174,18 @@
 }
 
     async function purchasePackage(packageId, packageName, price) {
-    if (!currentUser) {
-        openLoginModal();
-        return;
-    }
-
-    if (!confirm(`Xác nhận mua gói "${packageName}" với giá ${formatPrice(price)}?`)) {
-        return;
-    }
-
-    try {
-        const response = await fetch('/api/recharge/purchase', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                packageId: packageId,
-                paymentMethod: 'BANK_TRANSFER' // hoặc payment method khác
-            })
-        });
-
-        const data = await response.json();
-
-        if (data.success) {
-            alert(`✅ Đã tạo đơn hàng thành công!\n\nGói: ${packageName}\nGiá: ${formatPrice(price)}\n\nVui lòng hoàn tất thanh toán!`);
-            // Có thể redirect đến trang thanh toán hoặc hiển thị QR code
-            if (data.payment && data.payment.paymentUrl) {
-                window.location.href = data.payment.paymentUrl;
-            }
-        } else {
-            alert('❌ ' + (data.message || 'Không thể tạo đơn hàng!'));
+        if (!currentUser) {
+            openLoginModal();
+            return;
         }
-    } catch (error) {
-        console.error('Error purchasing package:', error);
-        alert('❌ Lỗi kết nối! Vui lòng thử lại.');
+
+        if (!confirm(`Xác nhận dùng gói "${packageName}" với giá ${formatPrice(price)}?`)) {
+            return;
+        }
+
+        // Chuyển hướng đến trang thanh toán
+        window.location.href = '/payment/' + packageId;
     }
-}
 
     function formatPrice(price) {
         return new Intl.NumberFormat('vi-VN', {

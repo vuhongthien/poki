@@ -42,6 +42,7 @@ public class User {
     private int starRed = 0;
     private Long petId;
     private Long avtId;
+    private String blind = "N";
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 

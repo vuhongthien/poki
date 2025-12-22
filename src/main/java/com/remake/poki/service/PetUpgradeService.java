@@ -125,7 +125,7 @@ public class PetUpgradeService {
 
                 return new PetUpgradeResponse(
                         false,
-                        "Nâng cấp thất bại! Pet đã bị giảm cấp.",
+                        "Nâng cấp thất bại!",
                         null
                 );
             } else {

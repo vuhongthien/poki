@@ -36,7 +36,7 @@ public class RechargeMilestoneDTO {
     private Boolean isActive;
     
     // User progress
-    private Integer userTotalRecharge; // Tổng nạp của user
+    private Integer userTotalRecharge; // Tổng hỗ trợ của user
     private Boolean canClaim; // Đủ điều kiện nhận chưa
     private Boolean claimed; // Đã nhận chưa
     private LocalDateTime claimedAt;

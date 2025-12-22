@@ -21,7 +21,7 @@ public class RechargePackageService {
     private final RechargePackageRepository rechargePackageRepository;
 
     /**
-     * Tạo gói nạp mới
+     * Tạo gói hỗ trợ mới
      */
     @Transactional
     public RechargePackage createPackage(CreateRechargePackageRequest request) {
@@ -67,19 +67,19 @@ public class RechargePackageService {
     }
 
     /**
-     * Lấy tất cả gói nạp
+     * Lấy tất cả gói hỗ trợ
      */
     public List<RechargePackage> getAllPackages() {
         return rechargePackageRepository.findAll();
     }
 
     /**
-     * Cập nhật gói nạp
+     * Cập nhật gói hỗ trợ
      */
     @Transactional
     public RechargePackage updatePackage(Long id, CreateRechargePackageRequest request) {
         RechargePackage pkg = rechargePackageRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy gói nạp ID: " + id));
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy gói hỗ trợ ID: " + id));
 
         pkg.setName(request.getName());
         pkg.setDescription(request.getDescription());
@@ -114,18 +114,18 @@ public class RechargePackageService {
     }
 
     /**
-     * Xóa gói nạp
+     * Xóa gói hỗ trợ
      */
     @Transactional
     public void deletePackage(Long id) {
         if (!rechargePackageRepository.existsById(id)) {
-            throw new RuntimeException("Không tìm thấy gói nạp ID: " + id);
+            throw new RuntimeException("Không tìm thấy gói hỗ trợ ID: " + id);
         }
         rechargePackageRepository.deleteById(id);
     }
 
     /**
-     * Tạo các gói nạp mẫu (demo data)
+     * Tạo các gói hỗ trợ mẫu (demo data)
      */
     @Transactional
     public List<RechargePackage> createDemoPackages() {
@@ -134,7 +134,7 @@ public class RechargePackageService {
         // Gói Tân Thủ Đặc Biệt
         RechargePackage firstTime = new RechargePackage();
         firstTime.setName("Gói Tân Thủ Đặc Biệt");
-        firstTime.setDescription("Gói nạp lần đầu siêu ưu đãi: x2 Gold + Thú cưng hiếm + 5 đá mỗi loại! Chỉ mua 1 lần duy nhất!");
+        firstTime.setDescription("Gói hỗ trợ lần đầu siêu ưu đãi: x2 Gold + Thú cưng hiếm + 5 đá mỗi loại! Chỉ mua 1 lần duy nhất!");
         firstTime.setPackageType(PackageType.FIRST_TIME);
         firstTime.setStatus(PackageStatus.ACTIVE);
         firstTime.setPrice(50000);
@@ -157,7 +157,7 @@ public class RechargePackageService {
         // Gói Khởi Đầu - 20k
         RechargePackage starter = new RechargePackage();
         starter.setName("Gói Khởi Đầu");
-        starter.setDescription("Gói nạp nhỏ để bắt đầu hành trình");
+        starter.setDescription("Gói hỗ trợ nhỏ để bắt đầu hành trình");
         starter.setPackageType(PackageType.NORMAL);
         starter.setStatus(PackageStatus.ACTIVE);
         starter.setPrice(20000);
@@ -194,7 +194,7 @@ public class RechargePackageService {
         // Gói Phổ Thông - 100k
         RechargePackage common = new RechargePackage();
         common.setName("Gói Phổ Thông");
-        common.setDescription("Gói nạp được ưa chuộng");
+        common.setDescription("Gói hỗ trợ được ưa chuộng");
         common.setPackageType(PackageType.NORMAL);
         common.setStatus(PackageStatus.ACTIVE);
         common.setPrice(100000);
@@ -213,7 +213,7 @@ public class RechargePackageService {
 
         RechargePackage vip = new RechargePackage();
         vip.setName("Gói VIP");
-        vip.setDescription("Gói nạp cao cấp cho player");
+        vip.setDescription("Gói hỗ trợ cao cấp cho player");
         vip.setPackageType(PackageType.NORMAL);
         vip.setStatus(PackageStatus.ACTIVE);
         vip.setPrice(500000);
@@ -234,7 +234,7 @@ public class RechargePackageService {
         // Gói Đế Vương - 1000k
         RechargePackage emperor = new RechargePackage();
         emperor.setName("Gói Đế Vương");
-        emperor.setDescription("Gói nạp tối thượng dành cho bậc đế vương");
+        emperor.setDescription("Gói hỗ trợ tối thượng dành cho bậc đế vương");
         emperor.setPackageType(PackageType.NORMAL);
         emperor.setStatus(PackageStatus.ACTIVE);
         emperor.setPrice(1000000);

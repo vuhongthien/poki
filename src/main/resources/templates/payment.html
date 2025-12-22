@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${gameName} + ' - Thanh Toán'">Pokiguard - Thanh Toán</title>
+    <link rel="icon" type="image/png" th:href="@{/images/favicon.png}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #0a0e27;
+            color: #fff;
+            min-height: 100vh;
+            padding: 20px;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            opacity: 0.15;
+            z-index: 0;
+        }
+
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 0;
+        }
+
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: rgba(102, 126, 234, 0.6);
+            border-radius: 50%;
+            animation: rise 10s infinite ease-in;
+        }
+
+        @keyframes rise {
+            0% { bottom: -10%; opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { bottom: 110%; opacity: 0; }
+        }
+
+        .particle:nth-child(1) { left: 10%; animation-delay: 0s; }
+        .particle:nth-child(2) { left: 20%; animation-delay: 2s; }
+        .particle:nth-child(3) { left: 30%; animation-delay: 4s; }
+        .particle:nth-child(4) { left: 40%; animation-delay: 1s; }
+        .particle:nth-child(5) { left: 50%; animation-delay: 3s; }
+        .particle:nth-child(6) { left: 60%; animation-delay: 5s; }
+        .particle:nth-child(7) { left: 70%; animation-delay: 2.5s; }
+        .particle:nth-child(8) { left: 80%; animation-delay: 4.5s; }
+        .particle:nth-child(9) { left: 90%; animation-delay: 1.5s; }
+
+        .container {
+            position: relative;
+            z-index: 1;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .payment-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 30px;
+            padding: 50px;
+            border: 2px solid rgba(102, 126, 234, 0.3);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .payment-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .payment-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #667eea, #f093fb);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+
+        .payment-subtitle {
+            color: #a8b2d1;
+            font-size: 1.1rem;
+        }
+
+        /* Package Card - Giống Index */
+        .package-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(102, 126, 234, 0.3);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 40px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .package-card.first-time {
+            border: 3px solid #ffd700;
+        }
+
+        .package-card.first-time::after {
+            content: '🎁 LẦN ĐẦU';
+            position: absolute;
+            top: 15px;
+            right: -35px;
+            background: linear-gradient(135deg, #ffd700, #ff8c00);
+            color: #000;
+            padding: 5px 40px;
+            font-size: 12px;
+            font-weight: 700;
+            transform: rotate(45deg);
+            box-shadow: 0 3px 10px rgba(255, 215, 0, 0.5);
+        }
+
+        .package-name {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .package-price {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: #667eea;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .package-bonus {
+            background: linear-gradient(135deg, #f093fb, #f5576c);
+            color: white;
+            padding: 12px;
+            border-radius: 12px;
+            text-align: center;
+            font-size: 14px;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+
+        /* Rewards - GIỐNG INDEX.HTML */
+        .package-rewards {
+            background: rgba(10, 14, 39, 0.6);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .reward-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(102, 126, 234, 0.2);
+        }
+
+        .reward-item:last-child {
+            border-bottom: none;
+        }
+
+        .reward-label {
+            font-size: 14px;
+            color: #a8b2d1;
+        }
+
+        .reward-label img {
+            width: 30px;
+            vertical-align: middle;
+        }
+
+        .reward-value {
+            font-size: 16px;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .reward-value.highlight {
+            color: #f093fb;
+        }
+
+        .bank-info {
+            background: rgba(102, 126, 234, 0.1);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            border: 2px solid rgba(102, 126, 234, 0.3);
+        }
+
+        .bank-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #667eea;
+            margin-bottom: 25px;
+            text-align: center;
+            text-transform: uppercase;
+        }
+
+        .bank-detail {
+            background: rgba(10, 14, 39, 0.6);
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid rgba(102, 126, 234, 0.2);
+        }
+
+        .bank-label {
+            font-size: 1rem;
+            color: #a8b2d1;
+            font-weight: 600;
+        }
+
+        .bank-value {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* ⭐ STYLES MỚI CHO ẨN/HIỆN SỐ TÀI KHOẢN */
+        .account-masked {
+            font-size: 1.5rem;
+            letter-spacing: 8px;
+            color: #667eea;
+        }
+
+        .account-real {
+            font-family: 'Courier New', monospace;
+            letter-spacing: 3px;
+            font-size: 1.3rem;
+        }
+
+        .toggle-btn {
+            background: linear-gradient(135deg, #51cf66, #37b24d);
+            border: none;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .toggle-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(81, 207, 102, 0.4);
+        }
+
+        .toggle-btn.active {
+            background: linear-gradient(135deg, #f56565, #c92a2a);
+        }
+
+        .copy-btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border: none;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .copy-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .transfer-content-box {
+            background: rgba(255, 215, 0, 0.1);
+            border: 2px solid rgba(255, 215, 0, 0.5);
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .transfer-content-label {
+            color: #ffd700;
+            font-weight: 700;
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+        }
+
+        .transfer-content-value {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: #ffd700;
+            font-family: monospace;
+            letter-spacing: 3px;
+            margin-bottom: 15px;
+        }
+
+        .warning-box {
+            background: rgba(255, 193, 7, 0.1);
+            border: 2px solid rgba(255, 193, 7, 0.3);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+
+        .warning-title {
+            color: #ffd43b;
+            font-weight: 700;
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+        }
+
+        .warning-list {
+            color: #a8b2d1;
+            font-size: 0.95rem;
+            line-height: 1.8;
+            list-style: none;
+        }
+
+        .warning-list li {
+            margin-bottom: 10px;
+            padding-left: 30px;
+            position: relative;
+        }
+
+        .warning-list li::before {
+            content: '⚠️';
+            position: absolute;
+            left: 0;
+        }
+
+        .action-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .btn {
+            padding: 18px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(102, 126, 234, 0.5);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: #a8b2d1;
+            border: 2px solid rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(102, 126, 234, 0.6);
+        }
+
+        .contact-support {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 30px;
+            border-top: 1px solid rgba(102, 126, 234, 0.2);
+        }
+
+        .contact-support p {
+            color: #a8b2d1;
+            margin-bottom: 15px;
+        }
+
+        .support-link {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .support-link:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 768px) {
+            .payment-card { padding: 30px 20px; }
+            .payment-title { font-size: 2rem; }
+            .package-price { font-size: 2rem; }
+            .action-buttons { grid-template-columns: 1fr; }
+            .bank-detail { flex-direction: column; gap: 10px; text-align: center; }
+            .bank-value { flex-wrap: wrap; justify-content: center; }
+        }
+    </style>
+</head>
+<body>
+<div class="particles">
+    <div class="particle"></div><div class="particle"></div><div class="particle"></div>
+    <div class="particle"></div><div class="particle"></div><div class="particle"></div>
+    <div class="particle"></div><div class="particle"></div><div class="particle"></div>
+</div>
+
+<div class="container">
+    <div class="payment-card">
+        <div class="payment-header">
+            <h1 class="payment-title">💳 Thanh Toán</h1>
+            <p class="payment-subtitle">Hoàn tất thanh toán để nhận quà ngay!</p>
+        </div>
+
+        <!-- Package Card - Giống Index -->
+        <div class="package-card" th:classappend="${package.isFirstTimePurchase ? 'first-time' : ''}">
+            <div class="package-name" th:text="${package.name}">Gói VIP</div>
+            <div class="package-price" th:text="${#numbers.formatInteger(package.price, 0, 'COMMA')} + ' VNĐ'">100,000 VNĐ</div>
+
+            <div class="package-bonus" th:if="${package.bonusGoldPercent != null && package.bonusGoldPercent > 0}">
+                🎉 TẶNG THÊM <span th:text="${package.bonusGoldPercent}">50</span>% GOLD!
+            </div>
+
+            <!-- Rewards - GIỐNG INDEX -->
+            <div class="package-rewards">
+                <div class="reward-item" th:if="${package.gold != null && package.gold > 0}">
+                    <span class="reward-label"><img src="/images/reward/g.png"/> Gold</span>
+                    <span class="reward-value highlight" th:text="${#numbers.formatInteger(package.totalGold != null ? package.totalGold : package.gold, 0, 'COMMA')}">10,000</span>
+                </div>
+
+                <div class="reward-item" th:if="${package.ruby != null && package.ruby > 0}">
+                    <span class="reward-label"><img src="/images/reward/ruby.png"/> Ruby</span>
+                    <span class="reward-value" th:text="${#numbers.formatInteger(package.ruby, 0, 'COMMA')}">100</span>
+                </div>
+
+                <div class="reward-item" th:if="${package.exp != null && package.exp > 0}">
+                    <span class="reward-label"><img src="/images/reward/exp.png"/> EXP</span>
+                    <span class="reward-value" th:text="${#numbers.formatInteger(package.exp, 0, 'COMMA')}">1,000</span>
+                </div>
+
+                <div class="reward-item" th:if="${package.wheelDay != null && package.wheelDay > 0}">
+                    <span class="reward-label"><img src="/images/reward/wheel.png"/> Vòng quay hàng ngày</span>
+                    <span class="reward-value" th:text="${#numbers.formatInteger(package.wheelDay, 0, 'COMMA')}">5</span>
+                </div>
+
+                <div class="reward-item" th:if="${package.wheel != null && package.wheel > 0}">
+                    <span class="reward-label"><img src="/images/reward/rw.png"/> Vòng quay Huyền thoại</span>
+                    <span class="reward-value" th:text="${#numbers.formatInteger(package.wheel, 0, 'COMMA')}">3</span>
+                </div>
+
+                <div class="reward-item" th:if="${package.starWhite != null && package.starWhite > 0}">
+                    <span class="reward-label"><img src="/images/reward/w.png"/> Sao trắng</span>
+                    <span class="reward-value" th:text="${#numbers.formatInteger(package.starWhite, 0, 'COMMA')}">10</span>
+                </div>
+
+                <div class="reward-item" th:if="${package.starBlue != null && package.starBlue > 0}">
+                    <span class="reward-label"><img src="/images/reward/b.png"/> Sao xanh</span>
+                    <span class="reward-value" th:text="${#numbers.formatInteger(package.starBlue, 0, 'COMMA')}">5</span>
+                </div>
+
+                <div class="reward-item" th:if="${package.starRed != null && package.starRed > 0}">
+                    <span class="reward-label"><img src="/images/reward/r.png"/> Sao đỏ</span>
+                    <span class="reward-value" th:text="${#numbers.formatInteger(package.starRed, 0, 'COMMA')}">3</span>
+                </div>
+
+                <div class="reward-item" th:if="${package.energy != null && package.energy > 0}">
+                    <span class="reward-label"><img src="/images/reward/e.png"/> Energy</span>
+                    <span class="reward-value" th:text="${#numbers.formatInteger(package.energy, 0, 'COMMA')}">50</span>
+                </div>
+
+                <div class="reward-item" th:if="${package.stones != null}">
+                    <span class="reward-label"><img src="/images/reward/s.png" style="width: 60px;"/></span>
+                    <span class="reward-value">Đá nâng cấp lv7 các loại</span>
+                </div>
+
+                <div class="reward-item" th:if="${package.petId != null}">
+                    <span class="reward-label">🐾 Pet</span>
+                    <span class="reward-value">Thú Cưng Đặc Biệt</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bank Info -->
+        <div class="bank-info">
+            <div class="bank-title">🏦 Thông Tin Chuyển Khoản</div>
+
+            <div class="bank-detail">
+                <span class="bank-label">Ngân hàng:</span>
+                <span class="bank-value" th:text="${bankName}">Vietcombank</span>
+            </div>
+
+            <!-- ⭐ SỐ TÀI KHOẢN VỚI TÍNH NĂNG ẨN/HIỆN -->
+            <div class="bank-detail">
+                <span class="bank-label">Số tài khoản:</span>
+                <div class="bank-value">
+                    <span id="accountNumberMasked" class="account-masked">**********</span>
+                    <span id="accountNumberReal" class="account-real" style="display: none;" th:text="${accountNumber}">1234567890</span>
+                    <button class="toggle-btn" id="toggleAccountBtn" onclick="toggleAccountNumber()">
+                        👁️ Hiện
+                    </button>
+                    <button class="copy-btn" onclick="copyAccountNumber()">📋 Copy</button>
+                </div>
+            </div>
+
+            <div class="bank-detail">
+                <span class="bank-label">Chủ tài khoản:</span>
+                <span class="bank-value" th:text="${accountName}">POKIGUARD GAME</span>
+            </div>
+
+            <div class="bank-detail">
+                <span class="bank-label">Số tiền:</span>
+                <div class="bank-value">
+                    <span id="amount" th:text="${#numbers.formatInteger(package.price, 0, 'COMMA')} + ' VNĐ'">100,000 VNĐ</span>
+                    <button class="copy-btn" onclick="copyText('amount')">📋 Copy</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Transfer Content -->
+        <div class="transfer-content-box">
+            <div class="transfer-content-label">⚡ NỘI DUNG CHUYỂN KHOẢN (BẮT BUỘC)</div>
+            <div class="transfer-content-value" id="transferContent" th:text="${transferContent}">POKI USERNAME 123</div>
+            <button class="copy-btn" onclick="copyText('transferContent')">📋 Copy Nội Dung</button>
+        </div>
+
+        <!-- Warning -->
+        <div class="warning-box">
+            <div class="warning-title">⚠️ Lưu Ý Quan Trọng</div>
+            <ul class="warning-list">
+                <li>Vui lòng chuyển khoản <strong>CHÍNH XÁC</strong> số tiền và nội dung</li>
+                <li>Nội dung <strong>SAI</strong> sẽ không được xử lý tự động</li>
+                <li>Chờ <strong>1-5 phút</strong> sau khi chuyển khoản</li>
+                <li>Sau <strong>10 phút</strong> chưa nhận được, liên hệ hỗ trợ</li>
+            </ul>
+        </div>
+
+        <!-- Buttons -->
+        <div class="action-buttons">
+            <a href="/" class="btn btn-primary">✅ Đã Chuyển Khoản</a>
+            <a href="/?tab=recharge" class="btn btn-secondary">❌ Hủy Thanh Toán</a>
+        </div>
+
+        <!-- Support -->
+        <div class="contact-support">
+            <p>Cần hỗ trợ? Liên hệ Admin:</p>
+            <a href="https://www.facebook.com/profile.php?id=61585307701894" target="_blank" class="support-link">
+                📘 Facebook Support
+            </a>
+        </div>
+    </div>
+</div>
+
+<script>
+    // ⭐ BIẾN GLOBAL
+    let accountVisible = false;
+
+    // ⭐ HÀM ẨN/HIỆN SỐ TÀI KHOẢN
+    function toggleAccountNumber() {
+        const masked = document.getElementById('accountNumberMasked');
+        const real = document.getElementById('accountNumberReal');
+        const btn = document.getElementById('toggleAccountBtn');
+
+        accountVisible = !accountVisible;
+
+        if (accountVisible) {
+            // Hiện số tài khoản
+            masked.style.display = 'none';
+            real.style.display = 'inline';
+            btn.innerHTML = '🙈 Ẩn';
+            btn.classList.add('active');
+        } else {
+            // Ẩn số tài khoản
+            masked.style.display = 'inline';
+            real.style.display = 'none';
+            btn.innerHTML = '👁️ Hiện';
+            btn.classList.remove('active');
+        }
+    }
+
+    // ⭐ HÀM COPY SỐ TÀI KHOẢN
+    function copyAccountNumber() {
+        const real = document.getElementById('accountNumberReal');
+        const text = real.textContent;
+
+        const textarea = document.createElement('textarea');
+        textarea.value = text;
+        textarea.style.position = 'fixed';
+        textarea.style.opacity = '0';
+        document.body.appendChild(textarea);
+        textarea.select();
+
+        try {
+            document.execCommand('copy');
+            const button = event.target;
+            const originalText = button.textContent;
+            button.textContent = '✅ Đã Copy!';
+            button.style.background = 'linear-gradient(135deg, #51cf66, #37b24d)';
+
+            setTimeout(() => {
+                button.textContent = originalText;
+                button.style.background = 'linear-gradient(135deg, #667eea, #764ba2)';
+            }, 2000);
+        } catch (err) {
+            alert('Không thể copy. Vui lòng copy thủ công!');
+        }
+
+        document.body.removeChild(textarea);
+    }
+
+    // HÀM COPY TEXT KHÁC (amount, transferContent)
+    function copyText(elementId) {
+        const element = document.getElementById(elementId);
+        const text = element.textContent;
+        const textarea = document.createElement('textarea');
+        textarea.value = text;
+        textarea.style.position = 'fixed';
+        textarea.style.opacity = '0';
+        document.body.appendChild(textarea);
+        textarea.select();
+
+        try {
+            document.execCommand('copy');
+            const button = event.target;
+            const originalText = button.textContent;
+            button.textContent = '✅ Đã Copy!';
+            button.style.background = 'linear-gradient(135deg, #51cf66, #37b24d)';
+
+            setTimeout(() => {
+                button.textContent = originalText;
+                button.style.background = 'linear-gradient(135deg, #667eea, #764ba2)';
+            }, 2000);
+        } catch (err) {
+            alert('Không thể copy. Vui lòng copy thủ công!');
+        }
+
+        document.body.removeChild(textarea);
+    }
+
+    window.scrollTo(0, 0);
+</script>
+</body>
+</html>

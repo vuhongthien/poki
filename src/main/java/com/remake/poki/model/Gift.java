@@ -45,9 +45,12 @@ public class Gift {
     private Integer starBlue;
     private Integer starRed;
     private Integer wheel;
+    private Integer wheelDay;
+    private Integer ruby;
 
     // Foreign keys cho rewards phức tạp
     private Long petId;
+    private Long avtId;
     private Long cardId;
 
     // Multiple stones support

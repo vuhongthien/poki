@@ -28,7 +28,7 @@ public class MilestoneService {
     private final ObjectMapper objectMapper;
 
     /**
-     * Lấy tất cả mốc nạp với trạng thái của user
+     * Lấy tất cả mốc hỗ trợ với trạng thái của user
      */
     public List<RechargeMilestoneDTO> getAllMilestones(Long userId) {
         List<RechargeMilestone> milestones = milestoneRepository
@@ -49,7 +49,7 @@ public class MilestoneService {
     }
 
     /**
-     * Nhận quà mốc nạp
+     * Nhận quà mốc hỗ trợ
      */
     @Transactional
     public RechargeMilestoneDTO claimMilestone(Long milestoneId, Long userId) {
