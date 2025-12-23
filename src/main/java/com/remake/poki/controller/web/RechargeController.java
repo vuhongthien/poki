@@ -64,7 +64,7 @@ public class RechargeController {
             String accountName = "VU HONG THIEN";
 
             // Nội dung chuyển khoản: POKI {username} {packageId}
-            String transferContent = "SUPORTPOKI " + user.getUser() + " " + packageId;
+            String transferContent = "SUPPORTPOKI " + user.getUser() + " " + packageId;
 
             // Thêm data vào model
             model.addAttribute("package", packageInfo);
