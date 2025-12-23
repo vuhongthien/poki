@@ -343,7 +343,7 @@ public class RechargeService {
         long startTime = System.currentTimeMillis();
 
         // Query 1: Lấy tất cả pending transactions
-        List<UserRecharge> pending = userRechargeRepository.findByStatus("PENDING");
+        List<UserRecharge> pending = userRechargeRepository.findByStatusOrderByCreatedAtDesc("PENDING");
 
         if (pending.isEmpty()) {
             log.info("✅ No pending transactions found");
