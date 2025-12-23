@@ -563,4 +563,8 @@ public class RechargeService {
         if (number == null) return "0";
         return String.format("%,d", number);
     }
+
+    public long totalAmountByStatus(String status) {
+        return userRechargeRepository.totalAmountByStatus(status);
+    }
 }

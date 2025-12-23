@@ -1,9 +1,11 @@
 package com.remake.poki.controller.web;
 
 import com.remake.poki.model.User;
+import com.remake.poki.service.RechargeService;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -14,6 +16,9 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 @Slf4j
 @RequestMapping("/admin")
 public class AdminController {
+
+    @Autowired
+    RechargeService  rechargeService;
 
     /**
      * Trang đăng nhập admin
@@ -92,5 +97,12 @@ public class AdminController {
     private boolean isAdmin(HttpSession session) {
         Boolean isAdmin = (Boolean) session.getAttribute("isAdmin");
         return isAdmin != null && isAdmin;
+    }
+
+    @GetMapping("/amount")
+    public String showAmountRecharge(HttpSession session, RedirectAttributes redirectAttributes, Model model) {
+        long totalAmount = rechargeService.totalAmountByStatus("SUCCESS");
+        model.addAttribute("totalAmount", totalAmount);
+        return "admin-amount";
     }
 }
