@@ -14,4 +14,6 @@ public interface RechargePackageRepository extends JpaRepository<RechargePackage
     List<RechargePackage> findByStatusOrderBySortOrder(PackageStatus status);
     
     List<RechargePackage> findByPackageTypeAndStatusOrderBySortOrder(PackageType packageType, PackageStatus status);
+
+    List<RechargePackage> findAllByOrderByIdDesc();
 }

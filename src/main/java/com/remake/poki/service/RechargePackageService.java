@@ -70,7 +70,7 @@ public class RechargePackageService {
      * Lấy tất cả gói hỗ trợ
      */
     public List<RechargePackage> getAllPackages() {
-        return rechargePackageRepository.findAll();
+        return rechargePackageRepository.findAllByOrderByIdDesc();
     }
 
     /**
