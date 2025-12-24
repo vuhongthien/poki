@@ -25,7 +25,7 @@ public class HomeController {
     @GetMapping("/")
     public String home(Model model, HttpSession session) {
         // Game info
-        String launchDate = "2025-12-25 00:00:00";
+        String launchDate = "2025-12-25 19:00:00";
         String bannerImage = "banner.png";
         String leftPetGif = "pet-left.gif";
         String rightPetGif = "pet-right.gif";
