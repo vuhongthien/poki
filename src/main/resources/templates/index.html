@@ -1398,11 +1398,6 @@
         <p class="game-subtitle" th:text="${gameDescription}">Hành trình thu phục và tiến hóa các sinh vật huyền thoại!</p>
     </div>
 
-    <!-- ========== NAVIGATION TABS - NEW ========== -->
-    <div class="nav-tabs">
-        <button class="nav-tab active" onclick="switchTab('home')">🏠 Trang Chủ</button>
-        <button class="nav-tab" onclick="switchTab('recharge')">💎 Gói hỗ trợ</button>
-    </div>
 
     <!-- ========== HOME TAB (Original Content) ========== -->
     <div id="homeTab" class="tab-content-section active">
@@ -1444,7 +1439,10 @@
                 </div>
             </div>
         </div>
-
+        <div class="nav-tabs" bis_skin_checked="1">
+            <button class="nav-tab active" onclick="switchTab('home')">🏠 Trang Chủ</button>
+            <button class="nav-tab" onclick="switchTab('recharge')">💎 Gói hỗ trợ</button>
+        </div>
         <!-- Registration Section -->
         <div class="register-section">
             <div class="register-wrapper">
