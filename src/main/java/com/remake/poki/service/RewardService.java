@@ -159,7 +159,7 @@ public class RewardService {
             description.append("Chúc mừng bạn đã lên Level ").append(newLevel).append("!\n");
             description.append("Phần thưởng:\n");
             description.append("• 30 Năng lượng\n");
-            description.append("• 5 Đá Lv7 mỗi loại");
+            description.append("• 3 Đá Lv6 mỗi loại");
 
             // ✅ NĂNG LƯỢNG: 30
             giftRequest.setEnergy(30);
@@ -171,18 +171,18 @@ public class RewardService {
             // Giả sử: Fire(1-7), Water(8-14), Earth(15-21), Wind(22-28), Metal(29-35)
             // → Level 7: Fire=7, Water=14, Earth=21, Wind=28, Metal=35
 
-            stones.add(createStoneReward(7L, 5));    // Fire Lv7
-            stones.add(createStoneReward(14L, 5));   // Water Lv7
-            stones.add(createStoneReward(21L, 5));   // Earth Lv7
-            stones.add(createStoneReward(28L, 5));   // Wind Lv7
-            stones.add(createStoneReward(35L, 5));   // Metal Lv7
+            stones.add(createStoneReward(6L, 3));    // Fire Lv7
+            stones.add(createStoneReward(13L, 3));   // Water Lv7
+            stones.add(createStoneReward(20L, 3));   // Earth Lv7
+            stones.add(createStoneReward(27L, 3));   // Wind Lv7
+            stones.add(createStoneReward(34L, 3));   // Metal Lv7
 
             giftRequest.setStones(stones);
 
             // ✅ NẾU LEVEL CHIA HẾT CHO 10: THÊM 20,000 GOLD
             if (newLevel % 10 == 0) {
-                giftRequest.setGold(20000);
-                description.append("\n• 20,000 Gold (Cột mốc Level ").append(newLevel).append(")");
+                giftRequest.setGold(10000);
+                description.append("\n• 10,000 Gold (Cột mốc Level ").append(newLevel).append(")");
             }
 
             giftRequest.setDescription(description.toString());
