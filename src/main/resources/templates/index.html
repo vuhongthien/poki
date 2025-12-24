@@ -282,6 +282,215 @@
             color: #a8b2d1;
         }
 
+        /* RECHARGE LAYOUT WITH HISTORY */
+        .recharge-layout {
+            display: flex;
+            gap: 30px;
+            margin-top: 30px;
+        }
+
+        .recharge-packages {
+            flex: 2;
+        }
+
+        .recharge-history-sidebar {
+            flex: 1;
+            min-width: 320px;
+        }
+
+        @media (max-width: 1024px) {
+            .recharge-layout {
+                flex-direction: column;
+            }
+
+            .recharge-history-sidebar {
+                width: 100%;
+            }
+        }
+
+        /* RECHARGE HISTORY BOX */
+        .history-box {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(102, 126, 234, 0.3);
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            position: sticky;
+            top: 20px;
+        }
+
+        .history-box h3 {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #f093fb 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .history-list {
+            max-height: 600px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .history-list::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .history-list::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+        }
+
+        .history-list::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 10px;
+        }
+
+        .history-item {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(102, 126, 234, 0.2);
+            border-radius: 12px;
+            padding: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .history-item:hover {
+            background: rgba(102, 126, 234, 0.1);
+            border-color: rgba(102, 126, 234, 0.4);
+            transform: translateX(5px);
+        }
+
+        .history-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .history-item-date {
+            font-size: 0.85rem;
+            color: #a8b2d1;
+        }
+
+        .history-item-status {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .status-success {
+            background: rgba(46, 213, 115, 0.2);
+            color: #2ed573;
+            border: 1px solid rgba(46, 213, 115, 0.3);
+        }
+
+        .status-pending {
+            background: rgba(255, 184, 0, 0.2);
+            color: #ffb800;
+            border: 1px solid rgba(255, 184, 0, 0.3);
+        }
+
+        .status-failed {
+            background: rgba(255, 71, 87, 0.2);
+            color: #ff4757;
+            border: 1px solid rgba(255, 71, 87, 0.3);
+        }
+
+        .history-item-amount {
+            font-size: 1.3rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea 0%, #f093fb 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 5px;
+        }
+
+        .history-item-package {
+            font-size: 0.9rem;
+            color: #a8b2d1;
+        }
+
+        .history-empty {
+            text-align: center;
+            padding: 40px 20px;
+            color: #a8b2d1;
+        }
+
+        .history-empty-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+        }
+/* User Info Bar */
+        .user-info-bar {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(102, 126, 234, 0.3);
+            border-radius: 15px;
+            padding: 15px 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            animation: fadeInDown 0.5s ease-out;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #f093fb 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .user-details h3 {
+            font-size: 1.2rem;
+            margin-bottom: 3px;
+            color: #fff;
+        }
+
+        .user-details p {
+            font-size: 0.9rem;
+            color: #a8b2d1;
+        }
+
+        .logout-button {
+            padding: 10px 25px;
+            background: rgba(255, 71, 87, 0.2);
+            border: 2px solid #ff4757;
+            border-radius: 10px;
+            color: #ff4757;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .logout-button:hover {
+            background: #ff4757;
+            color: #fff;
+            transform: scale(1.05);
+        }
+
         .packages-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
@@ -1394,11 +1603,20 @@
 <div class="container">
     <!-- Header -->
     <div class="header">
-        <h1 class="game-logo" th:text="${gameName}">POKI ADVENTURE</h1>
+        <h1 class="game-logo" th:text="${gameName}">POKIGUARD</h1>
         <p class="game-subtitle" th:text="${gameDescription}">Hành trình thu phục và tiến hóa các sinh vật huyền thoại!</p>
     </div>
 
-
+    <!-- User Info Bar (Only show when logged in) -->
+    <div class="user-info-bar" th:if="${isLoggedIn}" style="display: none;" id="userInfoBar">
+        <div class="user-info">
+            <div class="user-avatar" id="userAvatar">U</div>
+            <div class="user-details">
+                <h3 id="userName">User</h3>
+            </div>
+        </div>
+        <button class="logout-button" onclick="logout()">ĐĂNG XUẤT</button>
+    </div>
     <!-- ========== HOME TAB (Original Content) ========== -->
     <div id="homeTab" class="tab-content-section active">
         <!-- Banner -->
@@ -1517,9 +1735,6 @@
                         </ul>
                     </div>
 
-                    <div class="login-link">
-                        Đã có tài khoản? <a href="/login">Đăng nhập ngay</a>
-                    </div>
                 </div>
 
                 <!-- Accounts List -->
@@ -1596,7 +1811,7 @@
         <div class="social-section">
             <h3 class="social-title">FOLLOW US</h3>
             <div class="social-links">
-                <a href="#" class="social-link" title="Facebook">📘</a>
+                <a href="https://www.facebook.com/profile.php?id=61585307701894" class="social-link" title="Facebook">📘</a>
                 <a href="#" class="social-link" title="Discord">💬</a>
                 <a href="#" class="social-link" title="YouTube">▶️</a>
                 <a href="#" class="social-link" title="Twitter">🐦</a>
@@ -1618,9 +1833,27 @@
                 <p class="recharge-main-subtitle">hỗ trợ ngay để nhận quà khủng!</p>
             </div>
 
-            <div class="packages-grid" id="packagesGrid">
-                <div style="grid-column: 1/-1; text-align: center; padding: 40px; color: #a8b2d1;">
-                    Đang tải gói hỗ trợ...
+            <div class="recharge-layout">
+                <!-- Packages Column -->
+                <div class="recharge-packages">
+                    <div class="packages-grid" id="packagesGrid">
+                        <div style="grid-column: 1/-1; text-align: center; padding: 40px; color: #a8b2d1;">
+                            Đang tải gói hỗ trợ...
+                        </div>
+                    </div>
+                </div>
+
+                <!-- History Sidebar -->
+                <div class="recharge-history-sidebar" th:if="${isLoggedIn}" style="display: none;" id="historySidebar">
+                    <div class="history-box">
+                        <h3>📜 Lịch Sử Hỗ Trợ</h3>
+                        <div class="history-list" id="historyList">
+                            <div class="history-empty">
+                                <div class="history-empty-icon">📭</div>
+                                <p>Chưa có lịch sử hỗ trợ</p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -1917,13 +2150,18 @@
         const data = await response.json();
 
         if (data.success && data.user) {
-            currentUser = data.user;
-            // Nếu đang ở tab recharge thì load packages
-            const rechargeTab = document.getElementById('rechargeTab');
-            if (rechargeTab && rechargeTab.classList.contains('active')) {
-                await loadPackages();
-            }
-        }
+    currentUser = data.user;
+
+    document.getElementById('userInfoBar').style.display = 'flex';
+    document.getElementById('userName').textContent = currentUser.name || currentUser.username || currentUser.user;
+    document.getElementById('userAvatar').textContent = (currentUser.name || currentUser.username || currentUser.user).charAt(0).toUpperCase();
+
+    const rechargeTab = document.getElementById('rechargeTab');
+    if (rechargeTab && rechargeTab.classList.contains('active')) {
+        await loadPackages();
+        await loadRechargeHistory();
+    }
+}
     } catch (error) {
         console.log('Not logged in or error checking login status');
     }
@@ -1932,6 +2170,7 @@
     // ========== NEW SCRIPTS FOR RECHARGE TAB ==========
 
     let currentUser = null;
+    let rechargeHistory = /*[[${listAmountUserByStatus}]]*/ [];
 
     // Switch Tab Function
     function switchTab(tabName) {
@@ -1949,6 +2188,7 @@
                 openLoginModal();
             } else {
                 loadPackages();
+                loadRechargeHistory();
             }
         }
     }
@@ -1987,17 +2227,11 @@
         const data = await response.json();
 
         if (response.ok && data.success) {
-            // Lưu thông tin user
-            currentUser = {
-                id: data.user.id,
-                username: data.user.username || data.user.user,
-                name: data.user.name
-            };
+            // Đăng nhập thành công - RELOAD TRANG để session được cập nhật
+            window.location.reload();
 
-            closeLoginModal();
-
-            // Load packages sau khi login
-            await loadPackages();
+            // HOẶC chuyển hướng đến tab recharge
+            // window.location.href = '/?tab=recharge';
 
         } else {
             errorMessage.textContent = '❌ ' + (data.message || 'Đăng nhập thất bại!');
@@ -2026,8 +2260,13 @@
                 </button>
             </div>
         `;
+        // Ẩn history sidebar
+        document.getElementById('historySidebar').style.display = 'none';
         return;
     }
+
+    // Hiển thị history sidebar
+    document.getElementById('historySidebar').style.display = 'block';
 
     // Hiển thị loading
     grid.innerHTML = `
@@ -2170,6 +2409,72 @@
         `;
     }
 }
+// Logout function
+    function logout() {
+        if (confirm('Bạn có chắc muốn đăng xuất?')) {
+            window.location.href = '/logout';
+        }
+    }
+
+    // Load Recharge History
+    async function loadRechargeHistory() {
+        const historyList = document.getElementById('historyList');
+
+        if (!historyList || !currentUser) return;
+
+        if (!rechargeHistory || rechargeHistory.length === 0) {
+            historyList.innerHTML = `
+                <div class="history-empty">
+                    <div class="history-empty-icon">📭</div>
+                    <p>Chưa có lịch sử hỗ trợ</p>
+                </div>
+            `;
+            return;
+        }
+
+        historyList.innerHTML = rechargeHistory.map(item => {
+
+            return `
+                <div class="history-item">
+                    <div class="history-item-header">
+                        <span class="history-item-date">${formatDate(item.createTime)}</span>
+                    </div>
+                    <div class="history-item-amount">${formatPrice(item.amount)}</div>
+                    <div class="history-item-package">${item.packageName || 'Gói hỗ trợ'}</div>
+                </div>
+            `;
+        }).join('');
+    }
+function calculateTotalRecharge() {
+    if (!rechargeHistory || rechargeHistory.length === 0) {
+        return 0;
+    }
+
+    return rechargeHistory
+        .filter(item => item.status === 1)
+        .reduce((total, item) => total + (item.amount || 0), 0);
+}
+    function formatDate(dateString) {
+        const date = new Date(dateString);
+        const now = new Date();
+        const diffMs = now - date;
+        const diffMins = Math.floor(diffMs / 60000);
+        const diffHours = Math.floor(diffMs / 3600000);
+        const diffDays = Math.floor(diffMs / 86400000);
+
+        if (diffMins < 1) return 'Vừa xong';
+        if (diffMins < 60) return diffMins + ' phút trước';
+        if (diffHours < 24) return diffHours + ' giờ trước';
+        if (diffDays < 7) return diffDays + ' ngày trước';
+
+        return date.toLocaleDateString('vi-VN', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+    }
 
     async function purchasePackage(packageId, packageName, price) {
         if (!currentUser) {

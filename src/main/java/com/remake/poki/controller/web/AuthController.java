@@ -151,4 +151,22 @@ public class AuthController {
     public String loginPage() {
         return "login"; // Nếu bạn có trang login riêng
     }
+
+    /**
+     * GET: Logout và redirect về trang chủ
+     */
+    @GetMapping("/logout")
+    public String logoutPage(HttpSession session) {
+        try {
+            User user = (User) session.getAttribute("user");
+            if (user != null) {
+                log.info("User logged out via GET: {}", user.getUser());
+            }
+            session.invalidate();
+        } catch (Exception e) {
+            log.error("Logout error", e);
+        }
+
+        return "redirect:/";
+    }
 }

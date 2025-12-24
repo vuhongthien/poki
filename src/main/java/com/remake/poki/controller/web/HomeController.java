@@ -1,5 +1,6 @@
 package com.remake.poki.controller.web;
 
+import com.remake.poki.dto.HistoryUserRechargeDTO;
 import com.remake.poki.dto.RechargePackageDTO;
 import com.remake.poki.dto.RechargeMilestoneDTO;
 import com.remake.poki.model.User;
@@ -55,7 +56,9 @@ public class HomeController {
             try {
                 // Load recharge packages
                 List<RechargePackageDTO> packages = rechargeService.getAllActivePackages(user.getId());
+                List<HistoryUserRechargeDTO> listAmountUserByStatus = rechargeService.listAmountUserByStatus(user.getUser());
                 model.addAttribute("packages", packages);
+                model.addAttribute("listAmountUserByStatus", listAmountUserByStatus);
 
                 // Load milestones
                 List<RechargeMilestoneDTO> milestones = milestoneService.getAllMilestones(user.getId());
