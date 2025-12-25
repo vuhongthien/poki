@@ -93,9 +93,14 @@ public class UserService {
     }
 
     public UserDTO login(LoginDTO request) {
+        // Kiểm tra version trước
+        if (!versionRepository.findByVersion(request.getVersion()).isPresent()) {
+            throw new RuntimeException("VERSION_EXPIRED:Phiên bản đã hết hạn. Vui lòng cập nhật!");
+        }
+
+        // Kiểm tra user
         User user = userRepository.findByUserAndPassword(request.getUser(), request.getPassword())
-                .orElseThrow(() -> new NoSuchElementException("fail info login: " + request.getUser()));
-        versionRepository.findByVersion(request.getVersion()).orElseThrow(() -> new NoSuchElementException("Phiên bản đã hết hạn" + request.getVersion()));
+                .orElseThrow(() -> new RuntimeException("INVALID_CREDENTIALS:Tài khoản hoặc mật khẩu không chính xác"));
 
         return getMoney(user.getId());
     }

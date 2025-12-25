@@ -177,7 +177,7 @@ public class PetService {
         UserPetDTO ePet;
         if(userPetDTO.getLevel() != 14){
             ePet = Calculator.calculateStats(petRepository.getInfoEPet( petEId)) ;
-            ePet.setHp(ePet.getHp());
+            ePet.setHp(ePet.getHp()+ePet.getHp());
         }else{
             ePet = petRepository.getInfoEPet( petEId);
             WorldBossSchedule worldBossSchedule = worldBossScheduleRepository.findByPetId(petEId);
