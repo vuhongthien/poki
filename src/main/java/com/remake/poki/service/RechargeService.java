@@ -2,6 +2,7 @@ package com.remake.poki.service;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.remake.poki.dto.HistoryUserRechargeDTO;
 import com.remake.poki.dto.RechargePackageDTO;
 import com.remake.poki.dto.StoneRewardDTO;
 import com.remake.poki.dto.UserRechargeDTO;
@@ -18,6 +19,7 @@ import com.remake.poki.repo.UserRepository;
 import com.remake.poki.request.CreateGiftRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,6 +37,8 @@ public class RechargeService {
     private final UserPackagePurchaseRepository userPackagePurchaseRepository;
     private final UserRepository userRepository;
     private final ObjectMapper objectMapper;
+    @Autowired
+    RechargePackageRepository rechargePackageRepository;
 
     // ⭐ THÊM GiftService
     private final GiftService giftService;
@@ -567,4 +571,23 @@ public class RechargeService {
     public long totalAmountByStatus(String status) {
         return userRechargeRepository.totalAmountByStatus(status);
     }
+
+    public List<HistoryUserRechargeDTO> listAmountUserByStatus(String userName) {
+        User user = userRepository.findByUser(userName)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        List<UserRecharge> userRechargeList =
+                userRechargeRepository.listAmountUserByStatus("SUCCESS", user.getId());
+        return userRechargeList.stream()
+                .map(recharge -> HistoryUserRechargeDTO.builder()
+                        .userId(recharge.getUserId())
+                        .packageId(recharge.getPackageId())
+                        .packageName(rechargePackageRepository.findById(recharge.getPackageId()).get().getName())
+                        .amount(recharge.getAmount())
+                        .createTime(recharge.getCreatedAt())
+                        .build()
+                )
+                .toList();
+    }
+
 }

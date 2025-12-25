@@ -1,5 +1,6 @@
 package com.remake.poki.controller.web;
 
+import com.remake.poki.dto.HistoryUserRechargeDTO;
 import com.remake.poki.dto.RechargePackageDTO;
 import com.remake.poki.dto.RechargeMilestoneDTO;
 import com.remake.poki.model.User;
@@ -25,7 +26,7 @@ public class HomeController {
     @GetMapping("/")
     public String home(Model model, HttpSession session) {
         // Game info
-        String launchDate = "2025-12-25 00:00:00";
+        String launchDate = "2025-12-25 19:00:00";
         String bannerImage = "banner.png";
         String leftPetGif = "pet-left.gif";
         String rightPetGif = "pet-right.gif";
@@ -55,7 +56,9 @@ public class HomeController {
             try {
                 // Load recharge packages
                 List<RechargePackageDTO> packages = rechargeService.getAllActivePackages(user.getId());
+                List<HistoryUserRechargeDTO> listAmountUserByStatus = rechargeService.listAmountUserByStatus(user.getUser());
                 model.addAttribute("packages", packages);
+                model.addAttribute("listAmountUserByStatus", listAmountUserByStatus);
 
                 // Load milestones
                 List<RechargeMilestoneDTO> milestones = milestoneService.getAllMilestones(user.getId());
