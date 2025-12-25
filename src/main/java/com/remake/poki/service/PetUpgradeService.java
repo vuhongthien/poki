@@ -56,9 +56,8 @@ public class PetUpgradeService {
             stoneUser.setCount(stoneUser.getCount() - 1);
             stoneUserRepository.save(stoneUser);
         }
-
+        User user = userRepository.findById(userPet.getUserId()).orElseThrow();
         if (request.isPreventDowngrade()) {
-            User user = userRepository.findById(userPet.getUserId()).orElseThrow();
             if(user.getGold() < 5000){
                 return new PetUpgradeResponse(
                         false,
@@ -82,7 +81,9 @@ public class PetUpgradeService {
 
                 userPet.setPetId((long) pet.getParentId());
                 userPet.setLevel(pet.getMaxLevel());
+                user.setPetId((long) pet.getParentId());
             }
+            userRepository.save(user);
 
             userPet = userPetRepository.save(userPet);
 
