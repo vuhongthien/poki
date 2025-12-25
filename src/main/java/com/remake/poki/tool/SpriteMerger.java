@@ -20,18 +20,60 @@ public class SpriteMerger {
     private static final int FRAMES_PER_ROW = 10;
 
     public static void main(String[] args) {
-        String inputDirPath  = "C:\\Users\\ASUS\\Downloads\\sprites\\sprites\\DefineSprite_146";
-        String outputDirPath = "C:\\Users\\ASUS\\Downloads\\sprites\\sprites\\DefineSprite_146\\New folder";
+        String spritesRootPath = "C:\\Users\\ASUS\\Downloads\\sprites";
+        String outputDirPath = "C:\\Users\\ASUS\\Desktop\\1";
 
-        try {
-            String outputFilePath = mergeSpritesAndExport(inputDirPath, outputDirPath);
-            System.out.println("✅ Đã xuất sprite sheet tới: " + outputFilePath);
-        } catch (IOException e) {
-            System.err.println("❌ Lỗi khi xử lý ảnh: " + e.getMessage());
+        File spritesRoot = new File(spritesRootPath);
+        if (!spritesRoot.exists() || !spritesRoot.isDirectory()) {
+            System.err.println("❌ Thư mục sprites không tồn tại: " + spritesRootPath);
+            return;
         }
+
+        // Lấy tất cả các thư mục bắt đầu với "DefineSprite_"
+        File[] defineSpritesFolders = spritesRoot.listFiles((dir, name) -> {
+            File f = new File(dir, name);
+            return f.isDirectory() && name.startsWith("DefineSprite_");
+        });
+
+        if (defineSpritesFolders == null || defineSpritesFolders.length == 0) {
+            System.err.println("❌ Không tìm thấy thư mục DefineSprite_ nào trong: " + spritesRootPath);
+            return;
+        }
+
+        // Sắp xếp theo số thứ tự trong tên thư mục
+        Arrays.sort(defineSpritesFolders, Comparator.comparingInt(SpriteMerger::extractNumber));
+
+        System.out.println("🔍 Tìm thấy " + defineSpritesFolders.length + " thư mục DefineSprite_");
+        System.out.println("📂 Bắt đầu xử lý...\n");
+
+        int successCount = 0;
+        int failCount = 0;
+
+        for (File folder : defineSpritesFolders) {
+            try {
+                System.out.println("⏳ Đang xử lý: " + folder.getName());
+
+                // Lấy số thứ tự từ tên thư mục (VD: 121 từ DefineSprite_121)
+                int spriteNumber = extractNumber(folder);
+
+                String outputFilePath = mergeSpritesAndExport(folder.getAbsolutePath(), outputDirPath, spriteNumber);
+                System.out.println("   ✅ Xuất thành công: " + outputFilePath + "\n");
+                successCount++;
+
+            } catch (Exception e) {
+                System.err.println("   ❌ Lỗi: " + e.getMessage() + "\n");
+                failCount++;
+            }
+        }
+
+        System.out.println("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+        System.out.println("🎉 Hoàn thành!");
+        System.out.println("✅ Thành công: " + successCount);
+        System.out.println("❌ Thất bại: " + failCount);
+        System.out.println("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
     }
 
-    public static String mergeSpritesAndExport(String inputDirPath, String outputDirPath) throws IOException {
+    public static String mergeSpritesAndExport(String inputDirPath, String outputDirPath, int spriteNumber) throws IOException {
         File inputDir = new File(inputDirPath);
         if (!inputDir.exists() || !inputDir.isDirectory()) {
             throw new IllegalArgumentException("Thư mục đầu vào không hợp lệ: " + inputDirPath);
@@ -80,7 +122,7 @@ public class SpriteMerger {
         }
         g.dispose();
 
-        String outputFileName = singleWidth + "x" + singleHeight + ".png";
+        String outputFileName = spriteNumber + "_" + singleWidth + "x" + singleHeight + ".png";
 
         File outputDir = new File(outputDirPath);
         if (!outputDir.exists()) {
@@ -93,7 +135,7 @@ public class SpriteMerger {
         return outputFile.getAbsolutePath();
     }
 
-    // Trích số từ tên file để sắp xếp (VD: 12 từ "sprite12.png")
+    // Trích số từ tên file/folder để sắp xếp (VD: 121 từ "DefineSprite_121")
     private static int extractNumber(File file) {
         String name = file.getName();
         Matcher matcher = Pattern.compile("(\\d+)").matcher(name);
