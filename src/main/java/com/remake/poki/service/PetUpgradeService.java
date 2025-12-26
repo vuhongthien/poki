@@ -113,6 +113,7 @@ public class PetUpgradeService {
                     // ✅ Thoái hóa về form trước
                     // VD: Form 2 đang level 7, giảm xuống 6 → Thoái hóa về Form 1 level 6
                     userPet.setPetId((long) previousPet.getId());
+                    user.setPetId((long) previousPet.getId());
                     userPet.setLevel(newLevel);
                 } else if (newLevel >= 1) {
                     // Giảm level bình thường (không cần thoái hóa)
@@ -121,7 +122,7 @@ public class PetUpgradeService {
                     // Không cho giảm xuống dưới level 1
                     userPet.setLevel(1);
                 }
-
+                userRepository.save(user);
                 userPetRepository.save(userPet);
 
                 return new PetUpgradeResponse(
