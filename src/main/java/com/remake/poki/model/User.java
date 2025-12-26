@@ -27,7 +27,7 @@ public class User {
     private String user;
     @Column(name = "last_energy_update")
     private LocalDateTime lastEnergyUpdate;
-    private int energy = 80;
+    private int energy = 150;
     private int energyFull;
     private int lever;
     private int exp = 500;

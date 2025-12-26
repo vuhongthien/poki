@@ -378,11 +378,7 @@ public class GiftService {
             StringBuilder description = new StringBuilder();
             description.append("Chúc mừng bạn đã lên Level ").append(newLevel).append("!\n");
             description.append("Phần thưởng:\n");
-            description.append("• 30 Năng lượng\n");
             description.append("• 5 Đá Lv7 mỗi loại");
-
-            // ✅ NĂNG LƯỢNG: 30
-            giftRequest.setEnergy(30);
 
             // ✅ ĐÁ LV7: 5 viên mỗi loại (Fire, Water, Earth, Wind, Metal)
             List<StoneReward> stones = new ArrayList<>();
