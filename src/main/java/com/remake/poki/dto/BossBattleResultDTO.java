@@ -9,6 +9,6 @@ public class BossBattleResultDTO {
     private Long userId;
     private Long bossScheduleId;
     private int damageDealt;
-    private boolean isVictory;
+    private boolean victory;
     private int turnCount;
 }

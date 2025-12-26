@@ -12,7 +12,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class RewardService {
@@ -46,46 +48,58 @@ public class RewardService {
      */
     @Transactional
     public void addPetToUser(Long userId, Long petId, int requestAttack, int expGain) {
-        User user = userRepository.findById(userId).orElse(null);
-        if (user == null) {
-            throw new RuntimeException("User not found");
-        }
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
 
-        // Cộng Request Attack
+        // Cộng Request Attack & EXP
         user.setRequestAttack(user.getRequestAttack() + requestAttack);
-
-        // ✅ Cộng EXP (Unity đã tính sẵn) + CHECK LEVEL UP
         addExpToUser(user, expGain);
-
         userRepository.save(user);
 
         System.out.println(String.format("[REWARD] User #%d - +%d CT, +%d EXP (Level %d: %d/%d)",
                 userId, requestAttack, expGain, user.getLever(), user.getExpCurrent(), user.getExp()));
 
+        // Kiểm tra đã có pet chưa
         if (auditRewardRepository.existsByUserIdAndPetId(userId, petId)) {
             throw new RuntimeException("User already has this pet");
         }
 
-        Pet pet = petRepository.findById(petId).orElse(null);
-        if (pet == null) {
-            throw new RuntimeException("Pet not found");
-        }
+        Pet pet = petRepository.findById(petId)
+                .orElseThrow(() -> new RuntimeException("Pet not found"));
 
+        // ✅ Tìm pet cuối cùng trong chuỗi child
+        Pet finalPet = findFinalPet(pet);
+
+        // Lưu audit
         AuditReward auditReward = new AuditReward();
         auditReward.setUserId(userId);
         auditReward.setPetId(petId);
         auditReward.setCreatedAt(LocalDateTime.now());
         auditRewardRepository.save(auditReward);
 
+        // Lưu UserPet
         UserPet userPet = new UserPet();
         userPet.setUserId(userId);
-        if(pet.getChildId() != null){
-            userPet.setPetId(pet.getChildId());
-        } else {
-            userPet.setPetId(petId);
-        }
+        userPet.setPetId(finalPet.getId());
         userPetRepository.save(userPet);
     }
+    private Pet findFinalPet(Pet pet) {
+        Set<Long> visited = new HashSet<>();
+        Pet current = pet;
+
+        while (current.getChildId() != null) {
+            if (visited.contains(current.getId())) {
+                throw new RuntimeException("Circular reference detected in pet chain!");
+            }
+            visited.add(current.getId());
+
+            current = petRepository.findById(current.getChildId())
+                    .orElseThrow(() -> new RuntimeException("Child pet not found"));
+        }
+
+        return current;
+    }
+
 
     /**
      * ✅ Chỉ cộng EXP (Unity đã tính) + CHECK LEVEL UP

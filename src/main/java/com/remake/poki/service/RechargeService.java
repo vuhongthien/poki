@@ -589,5 +589,165 @@ public class RechargeService {
                 )
                 .toList();
     }
+// THÊM VÀO RechargeService.java
 
+    /**
+     * Lấy danh sách giao dịch theo STATUS với phân trang và tìm kiếm theo username
+     * @param status SUCCESS hoặc PENDING
+     * @param page Số trang (bắt đầu từ 1)
+     * @param size Số items mỗi trang
+     * @param username Username để tìm kiếm (optional)
+     */
+    @Transactional(readOnly = true)
+    public Map<String, Object> getTransactionsByStatusWithPagination(String status, int page, int size, String username) {
+        long startTime = System.currentTimeMillis();
+
+        // Validate page và size
+        if (page < 1) page = 1;
+        if (size < 1 || size > 100) size = 20;
+
+        // Calculate offset
+        int offset = (page - 1) * size;
+
+        // Query transactions với hoặc không có username filter
+        List<UserRecharge> transactions;
+        long totalCount;
+
+        if (username != null && !username.trim().isEmpty()) {
+            // Tìm user trước
+            Optional<User> userOpt = userRepository.findByUser(username.trim());
+
+            if (userOpt.isEmpty()) {
+                // Username không tồn tại
+                return Map.of(
+                        "transactions", Collections.emptyList(),
+                        "pagination", Map.of(
+                                "currentPage", page,
+                                "pageSize", size,
+                                "totalItems", 0L,
+                                "totalPages", 0,
+                                "hasNext", false,
+                                "hasPrevious", false
+                        )
+                );
+            }
+
+            Long userId = userOpt.get().getId();
+            transactions = userRechargeRepository.findTransactionsByStatusAndUserIdWithPagination(
+                    status, userId, size, offset);
+            totalCount = userRechargeRepository.countTransactionsByStatusAndUserId(status, userId);
+
+            log.info("📊 Loaded {} {} transactions for user '{}' (page {}/{})",
+                    transactions.size(), status, username, page, size);
+        } else {
+            // Lấy tất cả transactions theo status
+            transactions = userRechargeRepository.findTransactionsByStatusWithPagination(status, size, offset);
+            totalCount = userRechargeRepository.countTransactionsByStatus(status);
+
+            log.info("📊 Loaded {} {} transactions (page {}/{})",
+                    transactions.size(), status, page, size);
+        }
+
+        // Collect unique IDs
+        Set<Long> userIds = transactions.stream()
+                .map(UserRecharge::getUserId)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
+
+        Set<Long> packageIds = transactions.stream()
+                .map(UserRecharge::getPackageId)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
+
+        // Batch load users và packages
+        Map<Long, User> usersMap = Collections.emptyMap();
+        if (!userIds.isEmpty()) {
+            usersMap = userRepository.findAllById(userIds).stream()
+                    .collect(Collectors.toMap(User::getId, user -> user));
+        }
+
+        Map<Long, RechargePackage> packagesMap = Collections.emptyMap();
+        if (!packageIds.isEmpty()) {
+            packagesMap = packageRepository.findAllById(packageIds).stream()
+                    .collect(Collectors.toMap(RechargePackage::getId, pkg -> pkg));
+        }
+
+        final Map<Long, User> finalUsersMap = usersMap;
+        final Map<Long, RechargePackage> finalPackagesMap = packagesMap;
+
+        // Build response
+        List<Map<String, Object>> transactionsList = transactions.stream()
+                .map(r -> {
+                    Map<String, Object> map = new HashMap<>();
+
+                    map.put("id", r.getId());
+                    map.put("transactionId", r.getTransactionId());
+                    map.put("userId", r.getUserId());
+                    map.put("packageId", r.getPackageId());
+                    map.put("amount", r.getAmount());
+                    map.put("goldReceived", r.getGoldReceived());
+                    map.put("createdAt", r.getCreatedAt());
+                    map.put("completedAt", r.getCompletedAt());
+                    map.put("status", r.getStatus());
+
+                    // User info
+                    User user = finalUsersMap.get(r.getUserId());
+                    if (user != null) {
+                        map.put("username", user.getUser());
+                        map.put("name", user.getName());
+                    } else {
+                        map.put("username", "Unknown");
+                        map.put("name", "Unknown");
+                    }
+
+                    // Package info
+                    RechargePackage pkg = finalPackagesMap.get(r.getPackageId());
+                    if (pkg != null) {
+                        map.put("packageName", pkg.getName());
+                    } else {
+                        map.put("packageName", "Unknown Package");
+                    }
+
+                    return map;
+                })
+                .collect(Collectors.toList());
+
+        // Calculate pagination info
+        int totalPages = (int) Math.ceil((double) totalCount / size);
+        boolean hasNext = page < totalPages;
+        boolean hasPrevious = page > 1;
+
+        Map<String, Object> pagination = Map.of(
+                "currentPage", page,
+                "pageSize", size,
+                "totalItems", totalCount,
+                "totalPages", totalPages,
+                "hasNext", hasNext,
+                "hasPrevious", hasPrevious
+        );
+
+        long endTime = System.currentTimeMillis();
+        log.info("✅ Query completed in {}ms", (endTime - startTime));
+
+        return Map.of(
+                "transactions", transactionsList,
+                "pagination", pagination
+        );
+    }
+
+    /**
+     * Đếm tổng số giao dịch theo status
+     */
+    public long countTransactionsByStatus(String status) {
+        return userRechargeRepository.countTransactionsByStatus(status);
+    }
+
+    /**
+     * Lấy danh sách giao dịch SUCCESS với phân trang (backward compatible)
+     * Wrapper method để giữ tương thích với code cũ
+     */
+    @Transactional(readOnly = true)
+    public Map<String, Object> getSuccessTransactionsWithPagination(int page, int size, String username) {
+        return getTransactionsByStatusWithPagination("SUCCESS", page, size, username);
+    }
 }

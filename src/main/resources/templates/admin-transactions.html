@@ -1,0 +1,1003 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản Lý Giao Dịch | Pokiguard Admin</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            margin-bottom: 30px;
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .header-left h1 {
+            color: #667eea;
+            font-size: 28px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .header-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .stat-box {
+            text-align: center;
+            padding: 15px;
+            background: #f8f9ff;
+            border-radius: 10px;
+            border: 2px solid #e2e8f0;
+            transition: all 0.3s;
+        }
+
+        .stat-box:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .stat-box.success {
+            border-color: #48bb78;
+            background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+        }
+
+        .stat-box.pending {
+            border-color: #f59e0b;
+            background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+        }
+
+        .stat-box .label {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 8px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .stat-box .value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .stat-box.success .value {
+            color: #48bb78;
+        }
+
+        .stat-box.pending .value {
+            color: #f59e0b;
+        }
+
+        .stat-box .sub-value {
+            font-size: 14px;
+            color: #718096;
+            margin-top: 5px;
+            font-weight: 500;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-success {
+            background: #48bb78;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #38a169;
+        }
+
+        .btn-warning {
+            background: #f59e0b;
+            color: white;
+        }
+
+        .btn-warning:hover {
+            background: #d97706;
+        }
+
+        .btn-danger {
+            background: #f56565;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #e53e3e;
+        }
+
+        .btn:disabled {
+            background: #cbd5e0;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .controls {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        .filter-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .tab {
+            padding: 12px 24px;
+            background: #f7fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tab.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .tab.success.active {
+            background: #48bb78;
+            border-color: #48bb78;
+        }
+
+        .tab.pending.active {
+            background: #f59e0b;
+            border-color: #f59e0b;
+        }
+
+        .tab:hover:not(.active) {
+            border-color: #667eea;
+            background: #f8f9ff;
+        }
+
+        .search-container {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .search-input {
+            flex: 1;
+            min-width: 250px;
+            padding: 12px 20px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .control-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .transactions-container {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .section-title {
+            font-size: 20px;
+            color: #2d3748;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .transaction-card {
+            background: #f7fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 15px;
+            transition: all 0.3s;
+        }
+
+        .transaction-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            border-color: #667eea;
+        }
+
+        .transaction-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .transaction-id {
+            font-weight: bold;
+            color: #2d3748;
+            font-size: 16px;
+        }
+
+        .transaction-status {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-success {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .status-pending {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .transaction-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .info-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .info-label {
+            font-size: 12px;
+            color: #718096;
+            margin-bottom: 4px;
+        }
+
+        .info-value {
+            font-size: 14px;
+            color: #2d3748;
+            font-weight: 600;
+        }
+
+        .info-value.highlight {
+            color: #667eea;
+            font-size: 18px;
+        }
+
+        .transaction-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            padding-top: 15px;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 2px solid #e2e8f0;
+            flex-wrap: wrap;
+        }
+
+        .pagination-btn {
+            padding: 8px 16px;
+            border: 2px solid #e2e8f0;
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            color: #2d3748;
+            transition: all 0.3s;
+        }
+
+        .pagination-btn:hover:not(:disabled) {
+            border-color: #667eea;
+            background: #f8f9ff;
+        }
+
+        .pagination-btn:disabled {
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+
+        .pagination-btn.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .pagination-info {
+            padding: 8px 16px;
+            font-size: 14px;
+            color: #718096;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #718096;
+        }
+
+        .empty-state-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #667eea;
+            font-size: 18px;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f4f6;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .alert {
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .alert-success {
+            background: #d1fae5;
+            color: #065f46;
+            border-left: 4px solid #10b981;
+        }
+
+        .alert-error {
+            background: #fee2e2;
+            color: #991b1b;
+            border-left: 4px solid #ef4444;
+        }
+
+        @media (max-width: 768px) {
+            .header-top {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .header-stats {
+                grid-template-columns: 1fr;
+            }
+
+            .search-container {
+                flex-direction: column;
+            }
+
+            .search-input {
+                width: 100%;
+            }
+
+            .transaction-info {
+                grid-template-columns: 1fr;
+            }
+
+            .transaction-actions {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .pagination {
+                flex-wrap: wrap;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <!-- Header -->
+    <div class="header">
+        <div class="header-top">
+            <div class="header-left">
+                <h1>
+                    <span>💳</span>
+                    Quản Lý Giao Dịch
+                </h1>
+            </div>
+            <div class="header-actions">
+                <button class="btn btn-danger" onclick="logout()">
+                    🚪 Đăng Xuất
+                </button>
+            </div>
+        </div>
+
+        <div class="header-stats">
+            <div class="stat-box success">
+                <div class="label">✅ Đã Hoàn Thành</div>
+                <div class="value" id="totalSuccessCount">0</div>
+                <div class="sub-value" id="totalSuccessAmount">0đ</div>
+            </div>
+            <div class="stat-box pending">
+                <div class="label">⏳ Đang Chờ</div>
+                <div class="value" id="totalPendingCount">0</div>
+                <div class="sub-value" id="totalPendingAmount">0đ</div>
+            </div>
+            <div class="stat-box">
+                <div class="label">📄 Trang Hiện Tại</div>
+                <div class="value" id="currentPageDisplay">0</div>
+                <div class="sub-value" id="totalPagesDisplay">/ 0 trang</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Controls -->
+    <div class="controls">
+        <!-- Status Tabs -->
+        <div class="filter-tabs">
+            <div class="tab success active" data-status="SUCCESS" onclick="changeStatus('SUCCESS')">
+                <span>✅</span>
+                <span>ĐÃ HOÀN THÀNH</span>
+            </div>
+            <div class="tab pending" data-status="PENDING" onclick="changeStatus('PENDING')">
+                <span>⏳</span>
+                <span>ĐANG CHỜ</span>
+            </div>
+        </div>
+
+        <!-- Search -->
+        <div class="search-container">
+            <input type="text"
+                   id="searchInput"
+                   class="search-input"
+                   placeholder="🔍 Tìm kiếm theo username...">
+            <div class="control-buttons">
+                <button class="btn btn-primary" onclick="searchTransactions()">
+                    <span>🔍</span>
+                    Tìm Kiếm
+                </button>
+                <button class="btn btn-success" onclick="resetSearch()">
+                    <span>🔄</span>
+                    Làm Mới
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Alert Container -->
+    <div id="alertContainer"></div>
+
+    <!-- Transactions -->
+    <div class="transactions-container">
+        <h2 class="section-title">
+            <span id="sectionIcon">✅</span>
+            <span id="sectionTitle">Danh Sách Giao Dịch Đã Hoàn Thành</span>
+        </h2>
+        <div id="transactionsContent">
+            <div class="loading">
+                <div class="spinner"></div>
+                <div>Đang tải dữ liệu...</div>
+            </div>
+        </div>
+
+        <!-- Pagination -->
+        <div id="paginationContainer"></div>
+    </div>
+</div>
+
+<script>
+    let currentPage = 1;
+    let pageSize = 20;
+    let currentUsername = null;
+    let currentStatus = 'SUCCESS';
+    let paginationData = null;
+    let statsData = {
+        successCount: 0,
+        successAmount: 0,
+        pendingCount: 0,
+        pendingAmount: 0
+    };
+
+    // Load transactions on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        loadStats();
+        loadTransactions();
+
+        // Enter key để search
+        document.getElementById('searchInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                searchTransactions();
+            }
+        });
+    });
+
+    // Load statistics
+    async function loadStats() {
+        try {
+            // Load SUCCESS stats
+            const successResponse = await fetch('/api/admin/recharge-packages/stats?status=SUCCESS');
+            const successData = await successResponse.json();
+            if (successData.success && successData.data) {
+                statsData.successCount = successData.data.totalCount || 0;
+                statsData.successAmount = successData.data.totalAmount || 0;
+            }
+
+            // Load PENDING stats
+            const pendingResponse = await fetch('/api/admin/recharge-packages/stats?status=PENDING');
+            const pendingData = await pendingResponse.json();
+            if (pendingData.success && pendingData.data) {
+                statsData.pendingCount = pendingData.data.totalCount || 0;
+                statsData.pendingAmount = pendingData.data.totalAmount || 0;
+            }
+
+            updateStatsDisplay();
+        } catch (error) {
+            console.error('Error loading stats:', error);
+        }
+    }
+
+    function updateStatsDisplay() {
+        document.getElementById('totalSuccessCount').textContent = formatNumber(statsData.successCount);
+        document.getElementById('totalSuccessAmount').textContent = formatMoney(statsData.successAmount);
+        document.getElementById('totalPendingCount').textContent = formatNumber(statsData.pendingCount);
+        document.getElementById('totalPendingAmount').textContent = formatMoney(statsData.pendingAmount);
+    }
+
+    // Change status tab
+    function changeStatus(status) {
+        currentStatus = status;
+        currentPage = 1;
+
+        // Update active tab
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.classList.remove('active');
+        });
+        document.querySelector(`.tab[data-status="${status}"]`).classList.add('active');
+
+        // Update section title
+        if (status === 'SUCCESS') {
+            document.getElementById('sectionIcon').textContent = '✅';
+            document.getElementById('sectionTitle').textContent = 'Danh Sách Giao Dịch Đã Hoàn Thành';
+        } else {
+            document.getElementById('sectionIcon').textContent = '⏳';
+            document.getElementById('sectionTitle').textContent = 'Danh Sách Giao Dịch Đang Chờ Xử Lý';
+        }
+
+        loadTransactions();
+    }
+
+    // Search transactions
+    function searchTransactions() {
+        const username = document.getElementById('searchInput').value.trim();
+        currentUsername = username || null;
+        currentPage = 1;
+        loadTransactions();
+    }
+
+    // Reset search
+    function resetSearch() {
+        document.getElementById('searchInput').value = '';
+        currentUsername = null;
+        currentPage = 1;
+        loadTransactions();
+    }
+
+    // Load transactions from API
+    async function loadTransactions() {
+        document.getElementById('transactionsContent').innerHTML = `
+            <div class="loading">
+                <div class="spinner"></div>
+                <div>Đang tải dữ liệu...</div>
+            </div>
+        `;
+
+        try {
+            console.log(`🔄 Fetching ${currentStatus} transactions from API...`);
+
+            let url = `/api/admin/recharge-packages/transactions?status=${currentStatus}&page=${currentPage}&size=${pageSize}`;
+            if (currentUsername) {
+                url += `&username=${encodeURIComponent(currentUsername)}`;
+            }
+
+            const response = await fetch(url);
+            console.log('📡 Response status:', response.status);
+
+            const result = await response.json();
+            console.log('📦 Response data:', result);
+
+            if (result.success) {
+                const data = result.data;
+                paginationData = data.pagination;
+
+                displayTransactions(data.transactions);
+                displayPagination(data.pagination);
+                updatePageStats(data.pagination);
+
+                console.log('✅ Loaded', data.transactions.length, 'transactions');
+            } else {
+                console.error('❌ API returned error:', result.message);
+                showAlert('error', result.message || 'Không thể tải dữ liệu');
+                document.getElementById('transactionsContent').innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">❌</div>
+                        <h3>Lỗi</h3>
+                        <p>${result.message || 'Không thể tải dữ liệu'}</p>
+                    </div>
+                `;
+            }
+        } catch (error) {
+            console.error('❌ Error loading transactions:', error);
+            showAlert('error', 'Lỗi kết nối đến server: ' + error.message);
+            document.getElementById('transactionsContent').innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-state-icon">🔌</div>
+                    <h3>Lỗi Kết Nối</h3>
+                    <p>${error.message}</p>
+                    <button class="btn btn-primary" onclick="loadTransactions()" style="margin-top: 20px;">
+                        🔄 Thử Lại
+                    </button>
+                </div>
+            `;
+        }
+    }
+
+    // Display transactions
+    function displayTransactions(transactions) {
+        const container = document.getElementById('transactionsContent');
+
+        if (!transactions || transactions.length === 0) {
+            container.innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-state-icon">📭</div>
+                    <h3>Không có giao dịch nào</h3>
+                    <p>${currentUsername ? 'Không tìm thấy giao dịch cho user: ' + currentUsername : 'Hiện tại không có giao dịch nào'}</p>
+                </div>
+            `;
+            return;
+        }
+
+        container.innerHTML = transactions.map(tx => {
+            const isPending = tx.status === 'PENDING';
+            const statusClass = isPending ? 'status-pending' : 'status-success';
+            const statusIcon = isPending ? '⏳' : '✅';
+
+            let actionsHTML = '';
+            if (isPending) {
+                actionsHTML = `
+                    <div class="transaction-actions">
+                        <button class="btn btn-success" onclick="confirmTransaction('${tx.transactionId}')">
+                            <span>✅</span>
+                            Xác Nhận Đã Hoàn Thành
+                        </button>
+                    </div>
+                `;
+            }
+
+            return `
+                <div class="transaction-card">
+                    <div class="transaction-header">
+                        <div class="transaction-id">
+                            🔖 ${tx.transactionId}
+                        </div>
+                        <div class="transaction-status ${statusClass}">
+                            ${statusIcon} ${tx.status}
+                        </div>
+                    </div>
+
+                    <div class="transaction-info">
+                        <div class="info-item">
+                            <div class="info-label">👤 Người Dùng</div>
+                            <div class="info-value">${tx.username}</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">👨‍💼 Tên</div>
+                            <div class="info-value">${tx.name || 'N/A'}</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">📦 Gói hỗ trợ</div>
+                            <div class="info-value">${tx.packageName}</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">💰 Số Tiền</div>
+                            <div class="info-value highlight">${formatMoney(tx.amount)}</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">💎 Gold Nhận</div>
+                            <div class="info-value">${formatNumber(tx.goldReceived)} Gold</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">⏰ Thời Gian Tạo</div>
+                            <div class="info-value">${formatDateTime(tx.createdAt)}</div>
+                        </div>
+                        ${!isPending ? `
+                        <div class="info-item">
+                            <div class="info-label">✅ Hoàn Thành</div>
+                            <div class="info-value">${formatDateTime(tx.completedAt)}</div>
+                        </div>
+                        ` : ''}
+                    </div>
+                    ${actionsHTML}
+                </div>
+            `;
+        }).join('');
+    }
+
+    // Confirm transaction
+    async function confirmTransaction(transactionId) {
+        if (!confirm(`Xác nhận giao dịch:\n${transactionId}?`)) {
+            return;
+        }
+
+        const button = event.target.closest('button');
+        button.disabled = true;
+        button.innerHTML = '<span>⏳</span> Đang xử lý...';
+
+        try {
+            const response = await fetch(`/api/admin/recharge-packages/confirm/${transactionId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                showAlert('success', '✅ Đã xác nhận giao dịch thành công!');
+
+                // Reload stats và transactions
+                await loadStats();
+                setTimeout(() => {
+                    loadTransactions();
+                }, 500);
+            } else {
+                showAlert('error', '❌ ' + (data.message || 'Không thể xác nhận'));
+                button.disabled = false;
+                button.innerHTML = '<span>✅</span> Xác Nhận Đã Hoàn Thành';
+            }
+        } catch (error) {
+            console.error('Error confirming transaction:', error);
+            showAlert('error', '❌ Lỗi kết nối: ' + error.message);
+            button.disabled = false;
+            button.innerHTML = '<span>✅</span> Xác Nhận Đã Hoàn Thành';
+        }
+    }
+
+    // Display pagination
+    function displayPagination(pagination) {
+        const container = document.getElementById('paginationContainer');
+
+        if (!pagination || pagination.totalPages <= 1) {
+            container.innerHTML = '';
+            return;
+        }
+
+        let paginationHTML = '<div class="pagination">';
+
+        // Previous button
+        paginationHTML += `
+            <button class="pagination-btn"
+                    onclick="goToPage(${pagination.currentPage - 1})"
+                    ${!pagination.hasPrevious ? 'disabled' : ''}>
+                ‹ Trước
+            </button>
+        `;
+
+        // Page numbers
+        const startPage = Math.max(1, pagination.currentPage - 2);
+        const endPage = Math.min(pagination.totalPages, pagination.currentPage + 2);
+
+        if (startPage > 1) {
+            paginationHTML += `<button class="pagination-btn" onclick="goToPage(1)">1</button>`;
+            if (startPage > 2) {
+                paginationHTML += `<span class="pagination-info">...</span>`;
+            }
+        }
+
+        for (let i = startPage; i <= endPage; i++) {
+            paginationHTML += `
+                <button class="pagination-btn ${i === pagination.currentPage ? 'active' : ''}"
+                        onclick="goToPage(${i})">
+                    ${i}
+                </button>
+            `;
+        }
+
+        if (endPage < pagination.totalPages) {
+            if (endPage < pagination.totalPages - 1) {
+                paginationHTML += `<span class="pagination-info">...</span>`;
+            }
+            paginationHTML += `<button class="pagination-btn" onclick="goToPage(${pagination.totalPages})">${pagination.totalPages}</button>`;
+        }
+
+        // Next button
+        paginationHTML += `
+            <button class="pagination-btn"
+                    onclick="goToPage(${pagination.currentPage + 1})"
+                    ${!pagination.hasNext ? 'disabled' : ''}>
+                Sau ›
+            </button>
+        `;
+
+        // Page info
+        paginationHTML += `
+            <span class="pagination-info">
+                Trang ${pagination.currentPage}/${pagination.totalPages}
+                (${pagination.totalItems} giao dịch)
+            </span>
+        `;
+
+        paginationHTML += '</div>';
+
+        container.innerHTML = paginationHTML;
+    }
+
+    // Go to page
+    function goToPage(page) {
+        if (page < 1 || (paginationData && page > paginationData.totalPages)) {
+            return;
+        }
+        currentPage = page;
+        loadTransactions();
+
+        // Scroll to top
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // Update page statistics
+    function updatePageStats(pagination) {
+        document.getElementById('currentPageDisplay').textContent = pagination ? pagination.currentPage : 0;
+        document.getElementById('totalPagesDisplay').textContent = pagination ? `/ ${pagination.totalPages} trang` : '/ 0 trang';
+    }
+
+    // Show alert
+    function showAlert(type, message) {
+        const alertContainer = document.getElementById('alertContainer');
+        const alertClass = type === 'success' ? 'alert-success' : 'alert-error';
+
+        const alert = document.createElement('div');
+        alert.className = `alert ${alertClass}`;
+        alert.innerHTML = message;
+
+        alertContainer.appendChild(alert);
+
+        // Auto remove after 5 seconds
+        setTimeout(() => {
+            alert.style.transition = 'all 0.3s';
+            alert.style.opacity = '0';
+            setTimeout(() => alert.remove(), 300);
+        }, 5000);
+    }
+
+    // Logout
+    function logout() {
+        if (confirm('Bạn có chắc muốn đăng xuất?')) {
+            window.location.href = '/admin/logout';
+        }
+    }
+
+    // Format money
+    function formatMoney(amount) {
+        return new Intl.NumberFormat('vi-VN', {
+            style: 'currency',
+            currency: 'VND'
+        }).format(amount);
+    }
+
+    // Format number
+    function formatNumber(number) {
+        return new Intl.NumberFormat('vi-VN').format(number);
+    }
+
+    // Format datetime
+    function formatDateTime(dateString) {
+        if (!dateString) return 'N/A';
+
+        const date = new Date(dateString);
+        const day = String(date.getDate()).padStart(2, '0');
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const year = date.getFullYear();
+        const hours = String(date.getHours()).padStart(2, '0');
+        const minutes = String(date.getMinutes()).padStart(2, '0');
+        const seconds = String(date.getSeconds()).padStart(2, '0');
+
+        return `${day}/${month}/${year} ${hours}:${minutes}:${seconds}`;
+    }
+</script>
+</body>
+</html>
