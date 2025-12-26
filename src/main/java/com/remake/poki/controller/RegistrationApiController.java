@@ -70,8 +70,8 @@ public class RegistrationApiController {
 
             // Set các giá trị mặc định
             user.setLever(1);
-            user.setEnergy(80);
-            user.setEnergyFull(80);
+            user.setEnergy(150);
+            user.setEnergyFull(150);
             user.setGold(100000);
             user.setRuby(0);
             user.setRequestAttack(1000);
@@ -91,7 +91,7 @@ public class RegistrationApiController {
             // 4. Tạo 3 Pet mặc định (Bunny Boy, Gila, Hamma)
             createDefaultPet(user.getId(), 1L); // Bunny Boy lv1
             createDefaultPet(user.getId(), 4L); // Gila lv1
-            createDefaultPet(user.getId(), 7L); // Latios lv1
+            createDefaultPet(user.getId(), 10L); // Latios lv1
 
             // 5. Tạo 3 Avatar mặc định
             createDefaultAvatar(user.getId(), 1L);
