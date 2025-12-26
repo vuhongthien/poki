@@ -72,10 +72,10 @@ public class RegistrationApiController {
             user.setLever(1);
             user.setEnergy(150);
             user.setEnergyFull(150);
-            user.setGold(100000);
+            user.setGold(50000);
             user.setRuby(0);
             user.setRequestAttack(1000);
-            user.setWheel(3);
+            user.setWheel(0);
             user.setWheelDay(3);
             user.setStarWhite(0);
             user.setStarBlue(0);
