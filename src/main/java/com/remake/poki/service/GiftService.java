@@ -263,7 +263,7 @@ public class GiftService {
                     if (userCard == null) {
                         userCard = new UserCard();
                         userCard.setUserId(user.getId());
-                        userCard.setCardId(gift.getCardId());
+                        userCard.setCardId(9L);
                         userCard.setCount(0);
                         userCard.setLevel(1);
                         userCardRepository.save(userCard);
