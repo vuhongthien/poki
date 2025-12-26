@@ -11,5 +11,6 @@ public class StoneUpgradeRequestDTO {
     private Long userId;
     private Long[] stoneIds; // 3 stone IDs cùng level
     private boolean success; // Client đã random
+    private boolean upgradeAll; // Client đã random
 }
 

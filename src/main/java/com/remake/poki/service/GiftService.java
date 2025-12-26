@@ -258,6 +258,17 @@ public class GiftService {
                 userPet.setPetId(gift.getPetId());
                 userPet.setLevel(1);
                 userPetRepository.save(userPet);
+                if (gift.getPetId() == 2625) {
+                    UserCard userCard = userCardRepository.findByUserIdAndCardId(user.getId(), 9L).orElse(null);
+                    if (userCard == null) {
+                        userCard = new UserCard();
+                        userCard.setUserId(user.getId());
+                        userCard.setCardId(gift.getCardId());
+                        userCard.setCount(0);
+                        userCard.setLevel(1);
+                        userCardRepository.save(userCard);
+                    }
+                }
             }
 
             log.info("✓ Added pet #{} to user #{}", gift.getPetId(), user.getId());
