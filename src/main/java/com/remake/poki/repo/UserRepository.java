@@ -4,6 +4,8 @@ import aj.org.objectweb.asm.commons.Remapper;
 import com.remake.poki.dto.UserDTO;
 import com.remake.poki.dto.UserRoomDTO;
 import com.remake.poki.model.User;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -38,11 +40,16 @@ public interface UserRepository extends JpaRepository<User, Long> {
     int resetWheelDayForUsersBelow2();
 
     boolean existsByUser(String user);
-    boolean existsByName(String name);  // Kiểm tra tên nhân vật trùng
+    boolean existsByName(String name);
 
     List<User> findAllByOrderByIdDesc();
     List<User> findAllByOrderByCreatedAtDesc();
     List<User> findByCreatedAtAfterOrderByCreatedAtDesc(LocalDateTime cutoffDate);
+
+    // Phân trang
+    @Query("SELECT u FROM User u ORDER BY u.id DESC")
+    Page<User> findAllWithPagination(Pageable pageable);
+
     @Query(value = """
         SELECT 
             u.id,

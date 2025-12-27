@@ -5,6 +5,9 @@ import com.remake.poki.repo.*;
 import com.remake.poki.request.RegisterRequest;
 import com.remake.poki.response.RegisterResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,6 +17,7 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api")
@@ -193,28 +197,49 @@ public class RegistrationApiController {
         }
     }
 
+    /**
+     * API lấy danh sách user với phân trang
+     * @param page Số trang (bắt đầu từ 0)
+     * @param size Số lượng user mỗi trang (mặc định 20)
+     * @return Danh sách user kèm thông tin phân trang
+     */
     @GetMapping("/registered-accounts")
-    public ResponseEntity<Map<String, Object>> getAllRegisteredAccounts() {
+    public ResponseEntity<Map<String, Object>> getAllRegisteredAccounts(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size) {
+
         Map<String, Object> response = new HashMap<>();
 
         try {
+            // Tạo Pageable object
+            Pageable pageable = PageRequest.of(page, size);
 
-            LocalDateTime cutoffDate = LocalDateTime.of(2025, 12, 17, 5, 0, 0);
-            List<User> allUsers = userRepository.findAllByOrderByIdDesc();
+            // Lấy data với phân trang
+            Page<User> userPage = userRepository.findAllWithPagination(pageable);
 
-            List<Map<String, Object>> accounts = allUsers.stream()
+            // Convert sang DTO
+            List<Map<String, Object>> accounts = userPage.getContent().stream()
                     .map(user -> {
                         Map<String, Object> acc = new HashMap<>();
                         acc.put("username", user.getUser());
                         acc.put("characterName", user.getName());
                         acc.put("level", user.getLever());
+                        acc.put("id", user.getId());
                         return acc;
                     })
-                    .collect(java.util.stream.Collectors.toList());
+                    .collect(Collectors.toList());
 
+            // Thông tin phân trang
             response.put("success", true);
             response.put("accounts", accounts);
-            response.put("total", accounts.size());
+            response.put("currentPage", userPage.getNumber());
+            response.put("totalPages", userPage.getTotalPages());
+            response.put("totalElements", userPage.getTotalElements());
+            response.put("pageSize", userPage.getSize());
+            response.put("hasNext", userPage.hasNext());
+            response.put("hasPrevious", userPage.hasPrevious());
+            response.put("isFirst", userPage.isFirst());
+            response.put("isLast", userPage.isLast());
 
             return ResponseEntity.ok(response);
 

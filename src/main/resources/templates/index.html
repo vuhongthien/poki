@@ -63,6 +63,84 @@
             animation: floatPet 3s ease-in-out infinite;
         }
 
+        /* CSS cho phân trang - Thêm vào phần <style> trong HTML */
+
+        /* Pagination Controls */
+        .pagination-controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            margin-top: 25px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 15px;
+            border: 1px solid rgba(102, 126, 234, 0.2);
+        }
+
+        .pagination-button {
+            padding: 10px 20px;
+            background: rgba(102, 126, 234, 0.2);
+            border: 2px solid rgba(102, 126, 234, 0.3);
+            border-radius: 10px;
+            color: #fff;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .pagination-button:hover:not(:disabled) {
+            background: rgba(102, 126, 234, 0.4);
+            border-color: rgba(102, 126, 234, 0.6);
+            transform: translateY(-2px);
+        }
+
+        .pagination-button:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .pagination-info {
+            color: #a8b2d1;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .page-size-selector {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .page-size-selector select {
+            padding: 8px 15px;
+            background: rgba(10, 14, 39, 0.8);
+            border: 2px solid rgba(102, 126, 234, 0.3);
+            border-radius: 8px;
+            color: #fff;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .page-size-selector select:hover {
+            border-color: rgba(102, 126, 234, 0.6);
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .pagination-controls {
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+
+            .pagination-button {
+                padding: 8px 15px;
+                font-size: 0.85rem;
+            }
+        }
+
         .corner-pet-left {
             bottom: 20px;
             left: 20px;
@@ -2014,7 +2092,7 @@
 
         if (distance < 0) {
             document.querySelector('.countdown-wrapper').innerHTML =
-                '<a href="https://drive.google.com/file/d/1Fs6CaAbrsaYWoXARFXsJjwXyR1SExxIu/view?usp=sharing"><h2 style="color: #667eea; font-size: 2.5rem; text-align: center;">🎮 GAME IS LIVE! 🎮</h2></a>';
+                '<a href="https://drive.google.com/file/d/1JfwEaHNMAD5BSW0QXj6QetSFMoua4n5w/view?usp=sharing"><h2 style="color: #667eea; font-size: 2.5rem; text-align: center;">🎮 GAME IS LIVE! 🎮</h2></a>';
             return;
         }
 
@@ -2500,6 +2578,320 @@ function calculateTotalRecharge() {
     function formatNumber(num) {
         return new Intl.NumberFormat('vi-VN').format(num);
     }
+
+    // JavaScript code cho phân trang - Thêm vào phần <script> trong HTML
+
+    // Biến lưu trạng thái phân trang
+    let currentPage = 0;
+    let pageSize = 20;
+    let totalPages = 0;
+    let totalElements = 0;
+
+    /**
+     * Render danh sách accounts với phân trang
+     */
+    async function renderAccountsList(page = 0, size = 20) {
+        const accountsList = document.getElementById('accountsList');
+        const accountCount = document.getElementById('accountCount');
+
+        try {
+            // Hiển thị loading
+            accountsList.innerHTML = '<li class="no-accounts">Đang tải...</li>';
+
+            // Gọi API với phân trang
+            const response = await fetch(`/api/registered-accounts?page=${page}&size=${size}`);
+            const data = await response.json();
+
+            if (data.success && data.accounts && data.accounts.length > 0) {
+                // Cập nhật biến phân trang
+                currentPage = data.currentPage;
+                totalPages = data.totalPages;
+                totalElements = data.totalElements;
+                pageSize = data.pageSize;
+
+                // Cập nhật tổng số tài khoản
+                accountCount.textContent = `(${data.totalElements})`;
+
+                // Render danh sách accounts
+                accountsList.innerHTML = data.accounts.map((acc, idx) => {
+                    return `
+                    <li class="account-item">
+                        <div class="account-username">🎮 ${acc.username}</div>
+                        <div class="account-character">👤 ${acc.characterName}</div>
+                        <div class="account-date">⭐ Level ${acc.level}</div>
+                    </li>
+                `;
+                }).join('');
+
+                // Render pagination controls
+                renderPaginationControls();
+
+            } else {
+                accountCount.textContent = '(0)';
+                accountsList.innerHTML = '<li class="no-accounts">Chưa có tài khoản nào được đăng ký</li>';
+                // Ẩn pagination controls nếu không có data
+                const paginationDiv = document.getElementById('paginationControls');
+                if (paginationDiv) {
+                    paginationDiv.style.display = 'none';
+                }
+            }
+        } catch (error) {
+            console.error('Error loading accounts:', error);
+            accountCount.textContent = '(0)';
+            accountsList.innerHTML = '<li class="no-accounts">Không thể tải danh sách tài khoản</li>';
+        }
+    }
+
+    /**
+     * Render các nút điều khiển phân trang
+     */
+    function renderPaginationControls() {
+        let paginationDiv = document.getElementById('paginationControls');
+
+        // Nếu chưa có div pagination, tạo mới
+        if (!paginationDiv) {
+            paginationDiv = document.createElement('div');
+            paginationDiv.id = 'paginationControls';
+            paginationDiv.className = 'pagination-controls';
+
+            const accountsContainer = document.querySelector('.accounts-list-container');
+            accountsContainer.appendChild(paginationDiv);
+        }
+
+        paginationDiv.style.display = 'flex';
+
+        const hasNext = currentPage < totalPages - 1;
+        const hasPrevious = currentPage > 0;
+
+        paginationDiv.innerHTML = `
+        <button class="pagination-button"
+                onclick="goToFirstPage()"
+                ${!hasPrevious ? 'disabled' : ''}>
+            ⏮️
+        </button>
+
+        <button class="pagination-button"
+                onclick="goToPreviousPage()"
+                ${!hasPrevious ? 'disabled' : ''}>
+            ◀️
+        </button>
+
+        <span class="pagination-info">
+             ${currentPage + 1} / ${totalPages}
+
+        </span>
+
+        <button class="pagination-button"
+                onclick="goToNextPage()"
+                ${!hasNext ? 'disabled' : ''}>
+            ▶️
+        </button>
+
+        <button class="pagination-button"
+                onclick="goToLastPage()"
+                ${!hasNext ? 'disabled' : ''}>
+            ⏭️
+        </button>
+
+        <div class="page-size-selector">
+            <label style="color: #a8b2d1; font-size: 0.85rem;">Hiển thị:</label>
+            <select onchange="changePageSize(this.value)" id="pageSizeSelect">
+                <option value="10" ${pageSize === 10 ? 'selected' : ''}>10</option>
+                <option value="20" ${pageSize === 20 ? 'selected' : ''}>20</option>
+                <option value="50" ${pageSize === 50 ? 'selected' : ''}>50</option>
+                <option value="100" ${pageSize === 100 ? 'selected' : ''}>100</option>
+            </select>
+        </div>
+    `;
+    }
+
+    /**
+     * Chuyển đến trang đầu tiên
+     */
+    function goToFirstPage() {
+        if (currentPage > 0) {
+            renderAccountsList(0, pageSize);
+        }
+    }
+
+    /**
+     * Chuyển đến trang trước
+     */
+    function goToPreviousPage() {
+        if (currentPage > 0) {
+            renderAccountsList(currentPage - 1, pageSize);
+        }
+    }
+
+    /**
+     * Chuyển đến trang tiếp theo
+     */
+    function goToNextPage() {
+        if (currentPage < totalPages - 1) {
+            renderAccountsList(currentPage + 1, pageSize);
+        }
+    }
+
+    /**
+     * Chuyển đến trang cuối cùng
+     */
+    function goToLastPage() {
+        if (currentPage < totalPages - 1) {
+            renderAccountsList(totalPages - 1, pageSize);
+        }
+    }
+
+    /**
+     * Thay đổi số lượng hiển thị mỗi trang
+     */
+    function changePageSize(newSize) {
+        pageSize = parseInt(newSize);
+        renderAccountsList(0, pageSize); // Reset về trang đầu khi thay đổi page size
+    }
+
+    /**
+     * Cập nhật hàm load ban đầu
+     */
+    window.addEventListener('load', async function() {
+        const deviceId = generateDeviceFingerprint();
+        const accountLimit = checkAccountLimit(deviceId);
+
+        // Render với phân trang
+        renderAccountsList(0, 20);
+
+        if (!accountLimit.canCreate) {
+            const submitBtn = document.getElementById('submitBtn');
+            const errorMessage = document.getElementById('errorMessage');
+
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'ĐÃ ĐẠT GIỚI HẠN';
+
+            errorMessage.textContent = '❌ Thiết bị này đã tạo đủ 3 tài khoản! Không thể tạo thêm.';
+            errorMessage.style.display = 'block';
+        }
+
+        // Kiểm tra login status
+        try {
+            const response = await fetch('/api/check-login');
+            const data = await response.json();
+
+            if (data.success && data.user) {
+                currentUser = data.user;
+
+                document.getElementById('userInfoBar').style.display = 'flex';
+                document.getElementById('userName').textContent = currentUser.name || currentUser.username || currentUser.user;
+                document.getElementById('userAvatar').textContent = (currentUser.name || currentUser.username || currentUser.user).charAt(0).toUpperCase();
+
+                const rechargeTab = document.getElementById('rechargeTab');
+                if (rechargeTab && rechargeTab.classList.contains('active')) {
+                    await loadPackages();
+                    await loadRechargeHistory();
+                }
+            }
+        } catch (error) {
+            console.log('Not logged in or error checking login status');
+        }
+    });
+
+    /**
+     * Cập nhật register form để refresh list sau khi đăng ký thành công
+     */
+    document.getElementById('registerForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+
+        const password = document.getElementById('password').value;
+        const confirmPassword = document.getElementById('confirmPassword').value;
+        const characterName = document.getElementById('name').value;
+        const errorMessage = document.getElementById('errorMessage');
+        const successMessage = document.getElementById('successMessage');
+        const warningMessage = document.getElementById('warningMessage');
+        const submitBtn = document.getElementById('submitBtn');
+
+        errorMessage.style.display = 'none';
+        successMessage.style.display = 'none';
+        warningMessage.style.display = 'none';
+
+        if (password !== confirmPassword) {
+            errorMessage.textContent = '❌ Mật khẩu xác nhận không khớp!';
+            errorMessage.style.display = 'block';
+            errorMessage.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            return;
+        }
+
+        const deviceId = generateDeviceFingerprint();
+        const accountLimit = checkAccountLimit(deviceId);
+
+        if (!accountLimit.canCreate) {
+            errorMessage.textContent = '❌ Thiết bị này đã tạo đủ 3 tài khoản! Không thể tạo thêm.';
+            errorMessage.style.display = 'block';
+            errorMessage.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            return;
+        }
+
+        const formData = {
+            user: document.getElementById('username').value,
+            name: characterName,
+            password: password,
+            deviceId: deviceId
+        };
+
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'ĐANG XỬ LÝ...';
+
+        try {
+            const response = await fetch('/api/register', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData)
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                addAccountToDevice(deviceId, formData.user, formData.name);
+
+                errorMessage.style.display = 'none';
+                warningMessage.style.display = 'none';
+                successMessage.textContent = '✅ Đăng ký thành công! Chào mừng đến với POKIGUARD!';
+                successMessage.style.display = 'block';
+                successMessage.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                document.getElementById('registerForm').reset();
+
+                // Refresh danh sách với phân trang
+                renderAccountsList(0, pageSize);
+
+                const newLimit = checkAccountLimit(deviceId);
+                if (newLimit.count >= 3) {
+                    submitBtn.textContent = 'ĐÃ ĐẠT GIỚI HẠN';
+                    submitBtn.disabled = true;
+                    setTimeout(() => {
+                        successMessage.style.display = 'none';
+                        errorMessage.textContent = '⚠️ Thiết bị này đã tạo đủ 3 tài khoản!';
+                        errorMessage.style.display = 'block';
+                    }, 3000);
+                } else {
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'ĐĂNG KÝ NGAY';
+                }
+            } else {
+                successMessage.style.display = 'none';
+                errorMessage.textContent = '❌ ' + (data.message || 'Đăng ký thất bại! Vui lòng thử lại.');
+                errorMessage.style.display = 'block';
+                errorMessage.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'ĐĂNG KÝ NGAY';
+            }
+        } catch (error) {
+            successMessage.style.display = 'none';
+            errorMessage.textContent = '❌ Lỗi kết nối! Vui lòng kiểm tra kết nối mạng và thử lại.';
+            errorMessage.style.display = 'block';
+            errorMessage.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'ĐĂNG KÝ NGAY';
+        }
+    });
 </script>
 </body>
 </html>

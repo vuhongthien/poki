@@ -216,9 +216,9 @@ public class GiftService {
         }
 
         if (gift.getEnergy() != null && gift.getEnergy() > 0) {
-            int newEnergy = Math.min(user.getEnergy() + gift.getEnergy(), user.getEnergyFull());
-            user.setEnergy(newEnergy);
+            user.setEnergy(user.getEnergy() + gift.getEnergy());
         }
+
 
         if (gift.getExp() != null && gift.getExp() > 0) {
             user.setExpCurrent(user.getExpCurrent() + gift.getExp());

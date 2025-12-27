@@ -15,4 +15,8 @@ public class Version {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String version;
+    private String linkDownload;
+    private String bank;
+    private String number;
+    private String name;
 }
