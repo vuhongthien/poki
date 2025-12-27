@@ -6,6 +6,7 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface WheelSpinHistoryRepository extends JpaRepository<WheelSpinHistory, Long> {
@@ -15,4 +16,6 @@ public interface WheelSpinHistoryRepository extends JpaRepository<WheelSpinHisto
     List<WheelSpinHistory> findByUserIdAndSpinTimeBetween(Long userId, LocalDateTime start, LocalDateTime end);
     
     long countByUserIdAndSpinTimeBetween(Long userId, LocalDateTime start, LocalDateTime end);
+
+    Optional<WheelSpinHistory> findByUserIdAndPrizeId(Long userId, Long prizeId);
 }

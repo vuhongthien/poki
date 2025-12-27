@@ -5,6 +5,7 @@ import com.remake.poki.repo.*;
 import com.remake.poki.request.RegisterRequest;
 import com.remake.poki.response.RegisterResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -38,11 +39,25 @@ public class RegistrationApiController {
     @Transactional
     public ResponseEntity<RegisterResponse> register(@RequestBody RegisterRequest request) {
         try {
-            // 0. Validate device ID
+            // 0. Validate input data
             if (request.getDeviceId() == null || request.getDeviceId().trim().isEmpty()) {
                 return ResponseEntity.badRequest()
                         .body(new RegisterResponse(false, "Device ID không hợp lệ!", null));
             }
+
+            if (request.getUser() == null || request.getUser().trim().isEmpty()) {
+                return ResponseEntity.badRequest()
+                        .body(new RegisterResponse(false, "Tên đăng nhập không hợp lệ!", null));
+            }
+
+            if (request.getName() == null || request.getName().trim().isEmpty()) {
+                return ResponseEntity.badRequest()
+                        .body(new RegisterResponse(false, "Tên nhân vật không hợp lệ!", null));
+            }
+
+            // Normalize username (trim và lowercase để tránh trùng lặp do chữ hoa/thường)
+            String normalizedUsername = request.getUser().trim().toLowerCase();
+            String characterName = request.getName().trim();
 
             // 1. Check device account limit
             long accountCount = deviceAccountRepository.countByDeviceId(request.getDeviceId());
@@ -54,84 +69,82 @@ public class RegistrationApiController {
                                 null));
             }
 
-            // 2. Kiểm tra username đã tồn tại chưa
-            if (userRepository.existsByUser(request.getUser())) {
-                return ResponseEntity.badRequest()
-                        .body(new RegisterResponse(false, "Tên đăng nhập đã tồn tại!", null));
+            // 2. Kiểm tra username đã tồn tại chưa (synchronized để tránh race condition)
+            synchronized (this) {
+                if (userRepository.existsByUser(normalizedUsername)) {
+                    return ResponseEntity.badRequest()
+                            .body(new RegisterResponse(false, "Tên đăng nhập đã tồn tại!", null));
+                }
+
+                // 2.5. Kiểm tra tên nhân vật đã tồn tại chưa
+                if (userRepository.existsByName(characterName)) {
+                    return ResponseEntity.badRequest()
+                            .body(new RegisterResponse(false, "Tên nhân vật đã tồn tại! Vui lòng chọn tên khác.", null));
+                }
+
+                // 3. Tạo User mới với các giá trị mặc định
+                User user = new User();
+                user.setUser(normalizedUsername);
+                user.setName(characterName);
+                user.setPassword(request.getPassword()); // Nên hash password trong thực tế
+
+                // Set các giá trị mặc định
+                user.setLever(1);
+                user.setEnergy(150);
+                user.setEnergyFull(150);
+                user.setGold(50000);
+                user.setRuby(0);
+                user.setRequestAttack(1000);
+                user.setWheel(0);
+                user.setWheelDay(3);
+                user.setStarWhite(0);
+                user.setStarBlue(0);
+                user.setStarRed(0);
+                user.setPetId(1L); // Bunny Boy
+                user.setAvtId(1L); // Avatar 1
+                user.setExp(500);
+                user.setExpCurrent(10);
+                user.setLastEnergyUpdate(LocalDateTime.now());
+
+                try {
+                    user = userRepository.save(user);
+                } catch (DataIntegrityViolationException e) {
+                    return ResponseEntity.badRequest()
+                            .body(new RegisterResponse(false, "Tên đăng nhập hoặc tên nhân vật đã tồn tại!", null));
+                }
+
+                // 4. Tạo 3 Pet mặc định (Bunny Boy, Gila, Latios)
+                createDefaultPet(user.getId(), 1L); // Bunny Boy lv1
+                createDefaultPet(user.getId(), 4L); // Gila lv1
+                createDefaultPet(user.getId(), 10L); // Latios lv1
+
+                // 5. Tạo 3 Avatar mặc định
+                createDefaultAvatar(user.getId(), 1L);
+                createDefaultAvatar(user.getId(), 2L);
+                createDefaultAvatar(user.getId(), 3L);
+
+                // 6. Tạo 5 viên đá cấp 7 mỗi loại (Water, Fire, Earth, Metal, Wood)
+                createDefaultStone(user.getId(), 7L, 5); // Water Stone Lv7
+                createDefaultStone(user.getId(), 14L, 5); // Fire Stone Lv7
+                createDefaultStone(user.getId(), 21L, 5); // Earth Stone Lv7
+                createDefaultStone(user.getId(), 28L, 5); // Metal Stone Lv7
+                createDefaultStone(user.getId(), 35L, 5); // Wood Stone Lv7
+
+                // 7. Tạo 3 Card mặc định (Card 1, 2, 3) mỗi card 99 lá
+                createDefaultCard(user.getId(), 1L, 99);
+                createDefaultCard(user.getId(), 2L, 99);
+                createDefaultCard(user.getId(), 3L, 99);
+
+                // 8. Save device account tracking
+                DeviceAccount deviceAccount = new DeviceAccount();
+                deviceAccount.setDeviceId(request.getDeviceId());
+                deviceAccount.setUsername(normalizedUsername);
+                deviceAccountRepository.save(deviceAccount);
+
+                return ResponseEntity.ok(
+                        new RegisterResponse(true, "Đăng ký thành công! Chào mừng đến với POKIGUARD!", user.getId())
+                );
             }
-
-            // 2.5. Kiểm tra tên nhân vật đã tồn tại chưa
-            if (userRepository.existsByName(request.getName())) {
-                return ResponseEntity.badRequest()
-                        .body(new RegisterResponse(false, "Tên nhân vật đã tồn tại! Vui lòng chọn tên khác.", null));
-            }
-
-            // 3. Tạo User mới với các giá trị mặc định
-            User user = new User();
-            user.setUser(request.getUser());
-            user.setName(request.getName());
-            user.setPassword(request.getPassword()); // Nên hash password trong thực tế
-
-            // Set các giá trị mặc định
-            user.setLever(1);
-            user.setEnergy(150);
-            user.setEnergyFull(150);
-            user.setGold(50000);
-            user.setRuby(0);
-            user.setRequestAttack(1000);
-            user.setWheel(0);
-            user.setWheelDay(3);
-            user.setStarWhite(0);
-            user.setStarBlue(0);
-            user.setStarRed(0);
-            user.setPetId(1L); // Bunny Boy
-            user.setAvtId(1L); // Avatar 1
-            user.setExp(500);
-            user.setExpCurrent(10);
-            user.setLastEnergyUpdate(LocalDateTime.now());
-
-            user = userRepository.save(user);
-
-            // 4. Tạo 3 Pet mặc định (Bunny Boy, Gila, Hamma)
-            createDefaultPet(user.getId(), 1L); // Bunny Boy lv1
-            createDefaultPet(user.getId(), 4L); // Gila lv1
-            createDefaultPet(user.getId(), 10L); // Latios lv1
-
-            // 5. Tạo 3 Avatar mặc định
-            createDefaultAvatar(user.getId(), 1L);
-            createDefaultAvatar(user.getId(), 2L);
-            createDefaultAvatar(user.getId(), 3L);
-
-            // 6. Tạo 5 viên đá cấp 7 mỗi loại (Water, Fire, Earth, Metal, Wood)
-            // Water Stones (ID: 1-7) -> Level 7 = ID 7
-            createDefaultStone(user.getId(), 7L, 5); // Water Stone Lv7
-
-            // Fire Stones (ID: 8-14) -> Level 7 = ID 14
-            createDefaultStone(user.getId(), 14L, 5); // Fire Stone Lv7
-
-            // Earth Stones (ID: 15-21) -> Level 7 = ID 21
-            createDefaultStone(user.getId(), 21L, 5); // Earth Stone Lv7
-
-            // Metal Stones (ID: 22-28) -> Level 7 = ID 28
-            createDefaultStone(user.getId(), 28L, 5); // Metal Stone Lv7
-
-            // Wood Stones (ID: 29-35) -> Level 7 = ID 35
-            createDefaultStone(user.getId(), 35L, 5); // Wood Stone Lv7
-
-            // 7. Tạo 3 Card mặc định (Card 1, 2, 3) mỗi card 99 lá
-            createDefaultCard(user.getId(), 1L, 99);
-            createDefaultCard(user.getId(), 2L, 99);
-            createDefaultCard(user.getId(), 3L, 99);
-
-            // 8. Save device account tracking
-            DeviceAccount deviceAccount = new DeviceAccount();
-            deviceAccount.setDeviceId(request.getDeviceId());
-            deviceAccount.setUsername(request.getUser());
-            deviceAccountRepository.save(deviceAccount);
-
-            return ResponseEntity.ok(
-                    new RegisterResponse(true, "Đăng ký thành công! Chào mừng đến với POKIGUARD!", user.getId())
-            );
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -197,12 +210,6 @@ public class RegistrationApiController {
         }
     }
 
-    /**
-     * API lấy danh sách user với phân trang
-     * @param page Số trang (bắt đầu từ 0)
-     * @param size Số lượng user mỗi trang (mặc định 20)
-     * @return Danh sách user kèm thông tin phân trang
-     */
     @GetMapping("/registered-accounts")
     public ResponseEntity<Map<String, Object>> getAllRegisteredAccounts(
             @RequestParam(defaultValue = "0") int page,
@@ -211,13 +218,9 @@ public class RegistrationApiController {
         Map<String, Object> response = new HashMap<>();
 
         try {
-            // Tạo Pageable object
             Pageable pageable = PageRequest.of(page, size);
-
-            // Lấy data với phân trang
             Page<User> userPage = userRepository.findAllWithPagination(pageable);
 
-            // Convert sang DTO
             List<Map<String, Object>> accounts = userPage.getContent().stream()
                     .map(user -> {
                         Map<String, Object> acc = new HashMap<>();
@@ -229,7 +232,6 @@ public class RegistrationApiController {
                     })
                     .collect(Collectors.toList());
 
-            // Thông tin phân trang
             response.put("success", true);
             response.put("accounts", accounts);
             response.put("currentPage", userPage.getNumber());

@@ -27,6 +27,7 @@ public class WheelService {
 
     private static final int SPIN_COST = 10000;
     private static final int DUPLICATE_COMPENSATION = 100000;
+    private final WheelSpinHistoryRepository wheelSpinHistoryRepository;
 
     private List<WheelPrizeConfig> cachedPrizes;
 
@@ -289,10 +290,9 @@ public class WheelService {
     }
 
     private boolean grantPet(User user, WheelPrizeConfig prize) {
-        Optional<UserPet> existingPet = userPetRepository.findByUserIdAndPetId(
-                user.getId(), prize.getPrizeId());
+        Optional<WheelSpinHistory> wheelSpinHistory = wheelSpinHistoryRepository.findByUserIdAndPrizeId(user.getId(), prize.getPrizeId());
 
-        if (existingPet.isEmpty()) {
+        if (wheelSpinHistory.isEmpty()) {
             UserPet userPet = new UserPet();
             userPet.setUserId(user.getId());
             userPet.setPetId(prize.getPrizeId());
