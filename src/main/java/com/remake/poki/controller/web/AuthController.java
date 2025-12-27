@@ -169,4 +169,79 @@ public class AuthController {
 
         return "redirect:/";
     }
+
+    /**
+     * API: Change Password
+     */
+    @PostMapping("/api/change-password")
+    @ResponseBody
+    public ResponseEntity<?> changePassword(@RequestBody Map<String, String> request, HttpSession session) {
+        Map<String, Object> response = new HashMap<>();
+
+        try {
+            User user = (User) session.getAttribute("user");
+
+            if (user == null) {
+                response.put("success", false);
+                response.put("message", "Vui lòng đăng nhập để đổi mật khẩu");
+                return ResponseEntity.ok(response);
+            }
+
+            String currentPassword = request.get("currentPassword");
+            String newPassword = request.get("newPassword");
+
+            // Validate input
+            if (currentPassword == null || currentPassword.trim().isEmpty()) {
+                response.put("success", false);
+                response.put("message", "Mật khẩu hiện tại không được để trống");
+                return ResponseEntity.ok(response);
+            }
+
+            if (newPassword == null || newPassword.trim().isEmpty()) {
+                response.put("success", false);
+                response.put("message", "Mật khẩu mới không được để trống");
+                return ResponseEntity.ok(response);
+            }
+
+            if (newPassword.length() < 6) {
+                response.put("success", false);
+                response.put("message", "Mật khẩu mới phải có tối thiểu 6 ký tự");
+                return ResponseEntity.ok(response);
+            }
+
+            // Verify current password
+            if (!user.getPassword().equals(currentPassword)) {
+                response.put("success", false);
+                response.put("message", "Mật khẩu hiện tại không đúng");
+                return ResponseEntity.ok(response);
+            }
+
+            // Check if new password is same as current
+            if (currentPassword.equals(newPassword)) {
+                response.put("success", false);
+                response.put("message", "Mật khẩu mới phải khác mật khẩu hiện tại");
+                return ResponseEntity.ok(response);
+            }
+
+            // Update password
+            user.setPassword(newPassword);
+            userService.save(user);
+
+            // Update session
+            session.setAttribute("user", user);
+
+            response.put("success", true);
+            response.put("message", "Đổi mật khẩu thành công!");
+
+            log.info("User changed password: {}", user.getUser());
+
+            return ResponseEntity.ok(response);
+
+        } catch (Exception e) {
+            log.error("Change password error", e);
+            response.put("success", false);
+            response.put("message", "Lỗi hệ thống: " + e.getMessage());
+            return ResponseEntity.ok(response);
+        }
+    }
 }

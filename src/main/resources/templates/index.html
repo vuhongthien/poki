@@ -1649,6 +1649,66 @@
                 padding: 30px 25px;
             }
         }
+        .change-password-button {
+            padding: 10px 25px;
+            background: rgba(102, 126, 234, 0.2);
+            border: 2px solid #667eea;
+            border-radius: 10px;
+            color: #667eea;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .change-password-button:hover {
+            background: #667eea;
+            color: #fff;
+            transform: scale(1.05);
+        }
+
+        /* Change Password Modal */
+        .password-strength {
+            margin-top: 10px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .password-strength-bar {
+            height: 100%;
+            width: 0%;
+            transition: all 0.3s ease;
+        }
+
+        .strength-weak { background: #ff4757; width: 33%; }
+        .strength-medium { background: #ffa502; width: 66%; }
+        .strength-strong { background: #2ed573; width: 100%; }
+
+        .password-requirements {
+            margin-top: 15px;
+            padding: 15px;
+            background: rgba(102, 126, 234, 0.1);
+            border-radius: 10px;
+            font-size: 0.85rem;
+        }
+
+        .requirement-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: 8px 0;
+            color: #a8b2d1;
+        }
+
+        .requirement-item.met {
+            color: #2ed573;
+        }
+
+        .requirement-item .icon {
+            width: 16px;
+            text-align: center;
+        }
     </style>
 </head>
 <body>
@@ -1686,6 +1746,7 @@
     </div>
 
     <!-- User Info Bar (Only show when logged in) -->
+    <!-- User Info Bar (Only show when logged in) -->
     <div class="user-info-bar" th:if="${isLoggedIn}" style="display: none;" id="userInfoBar">
         <div class="user-info">
             <div class="user-avatar" id="userAvatar">U</div>
@@ -1693,7 +1754,10 @@
                 <h3 id="userName">User</h3>
             </div>
         </div>
-        <button class="logout-button" onclick="logout()">ĐĂNG XUẤT</button>
+        <div style="display: flex; gap: 15px;">
+            <button class="change-password-button" onclick="openChangePasswordModal()">🔐 ĐỔI MẬT KHẨU</button>
+            <button class="logout-button" onclick="logout()">ĐĂNG XUẤT</button>
+        </div>
     </div>
     <!-- ========== HOME TAB (Original Content) ========== -->
     <div id="homeTab" class="tab-content-section active">
@@ -1964,6 +2028,71 @@
         <div class="login-link">
             Chưa có tài khoản? <a href="javascript:void(0)" onclick="closeLoginModal(); switchTab('home')">Đăng ký ngay</a>
         </div>
+    </div>
+</div>
+<!-- Change Password Modal -->
+<div id="changePasswordModal" class="modal">
+    <div class="modal-content">
+        <button class="modal-close" onclick="closeChangePasswordModal()">×</button>
+        <div class="modal-header">
+            <h2 class="modal-title">🔐 ĐỔI MẬT KHẨU</h2>
+            <p class="modal-subtitle">Bảo mật tài khoản của bạn</p>
+        </div>
+
+        <div class="error-message" id="changePasswordErrorMessage"></div>
+        <div class="success-message" id="changePasswordSuccessMessage"></div>
+
+        <form id="changePasswordForm">
+            <div class="form-group">
+                <label class="form-label">Mật khẩu hiện tại</label>
+                <input type="password"
+                       class="form-input"
+                       id="currentPassword"
+                       placeholder="Nhập mật khẩu hiện tại"
+                       required>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Mật khẩu mới</label>
+                <input type="password"
+                       class="form-input"
+                       id="newPassword"
+                       placeholder="Nhập mật khẩu mới (tối thiểu 6 ký tự)"
+                       minlength="6"
+                       oninput="checkPasswordStrength()"
+                       required>
+                <div class="password-strength" id="passwordStrength">
+                    <div class="password-strength-bar" id="passwordStrengthBar"></div>
+                </div>
+                <div class="password-requirements" id="passwordRequirements">
+                    <div class="requirement-item" id="req-length">
+                        <span class="icon">○</span>
+                        <span>Tối thiểu 6 ký tự</span>
+                    </div>
+                    <div class="requirement-item" id="req-number">
+                        <span class="icon">○</span>
+                        <span>Chứa ít nhất 1 số</span>
+                    </div>
+                    <div class="requirement-item" id="req-special">
+                        <span class="icon">○</span>
+                        <span>Chứa ký tự đặc biệt (khuyến nghị)</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Xác nhận mật khẩu mới</label>
+                <input type="password"
+                       class="form-input"
+                       id="confirmNewPassword"
+                       placeholder="Nhập lại mật khẩu mới"
+                       required>
+            </div>
+
+            <button type="submit" class="submit-btn" id="changePasswordButton">
+                ĐỔI MẬT KHẨU
+            </button>
+        </form>
     </div>
 </div>
 
@@ -2890,6 +3019,155 @@ function calculateTotalRecharge() {
             errorMessage.scrollIntoView({ behavior: 'smooth', block: 'center' });
             submitBtn.disabled = false;
             submitBtn.textContent = 'ĐĂNG KÝ NGAY';
+        }
+    });
+
+    // Change Password Modal Functions
+    function openChangePasswordModal() {
+        if (!currentUser) {
+            alert('Vui lòng đăng nhập trước!');
+            return;
+        }
+        document.getElementById('changePasswordModal').classList.add('active');
+    }
+
+    function closeChangePasswordModal() {
+        document.getElementById('changePasswordModal').classList.remove('active');
+        document.getElementById('changePasswordErrorMessage').style.display = 'none';
+        document.getElementById('changePasswordSuccessMessage').style.display = 'none';
+        document.getElementById('changePasswordForm').reset();
+        resetPasswordStrength();
+    }
+
+    // Password Strength Checker
+    function checkPasswordStrength() {
+        const password = document.getElementById('newPassword').value;
+        const strengthBar = document.getElementById('passwordStrengthBar');
+        const reqLength = document.getElementById('req-length');
+        const reqNumber = document.getElementById('req-number');
+        const reqSpecial = document.getElementById('req-special');
+
+        // Reset classes
+        strengthBar.className = 'password-strength-bar';
+
+        // Check requirements
+        const hasLength = password.length >= 6;
+        const hasNumber = /\d/.test(password);
+        const hasSpecial = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+
+        // Update requirement indicators
+        updateRequirement(reqLength, hasLength);
+        updateRequirement(reqNumber, hasNumber);
+        updateRequirement(reqSpecial, hasSpecial);
+
+        // Calculate strength
+        let strength = 0;
+        if (hasLength) strength++;
+        if (hasNumber) strength++;
+        if (hasSpecial) strength++;
+
+        // Update strength bar
+        if (strength === 1) {
+            strengthBar.classList.add('strength-weak');
+        } else if (strength === 2) {
+            strengthBar.classList.add('strength-medium');
+        } else if (strength === 3) {
+            strengthBar.classList.add('strength-strong');
+        }
+    }
+
+    function updateRequirement(element, met) {
+        const icon = element.querySelector('.icon');
+        if (met) {
+            element.classList.add('met');
+            icon.textContent = '✓';
+        } else {
+            element.classList.remove('met');
+            icon.textContent = '○';
+        }
+    }
+
+    function resetPasswordStrength() {
+        const strengthBar = document.getElementById('passwordStrengthBar');
+        strengthBar.className = 'password-strength-bar';
+
+        ['req-length', 'req-number', 'req-special'].forEach(id => {
+            const element = document.getElementById(id);
+            element.classList.remove('met');
+            element.querySelector('.icon').textContent = '○';
+        });
+    }
+
+    // Change Password Form Handler
+    document.getElementById('changePasswordForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+
+        const currentPassword = document.getElementById('currentPassword').value;
+        const newPassword = document.getElementById('newPassword').value;
+        const confirmNewPassword = document.getElementById('confirmNewPassword').value;
+        const errorMessage = document.getElementById('changePasswordErrorMessage');
+        const successMessage = document.getElementById('changePasswordSuccessMessage');
+        const changePasswordButton = document.getElementById('changePasswordButton');
+
+        // Reset messages
+        errorMessage.style.display = 'none';
+        successMessage.style.display = 'none';
+
+        // Validation
+        if (newPassword !== confirmNewPassword) {
+            errorMessage.textContent = '❌ Mật khẩu mới không khớp!';
+            errorMessage.style.display = 'block';
+            return;
+        }
+
+        if (newPassword.length < 6) {
+            errorMessage.textContent = '❌ Mật khẩu mới phải có tối thiểu 6 ký tự!';
+            errorMessage.style.display = 'block';
+            return;
+        }
+
+        if (currentPassword === newPassword) {
+            errorMessage.textContent = '❌ Mật khẩu mới phải khác mật khẩu hiện tại!';
+            errorMessage.style.display = 'block';
+            return;
+        }
+
+        changePasswordButton.disabled = true;
+        changePasswordButton.textContent = 'ĐANG XỬ LÝ...';
+
+        try {
+            const response = await fetch('/api/change-password', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    currentPassword: currentPassword,
+                    newPassword: newPassword
+                })
+            });
+
+            const data = await response.json();
+
+            if (response.ok && data.success) {
+                successMessage.textContent = '✅ ' + data.message;
+                successMessage.style.display = 'block';
+
+                // Reset form sau 2 giây và đóng modal
+                setTimeout(() => {
+                    closeChangePasswordModal();
+                    alert('Đổi mật khẩu thành công! Vui lòng đăng nhập lại.');
+                    logout();
+                }, 2000);
+            } else {
+                errorMessage.textContent = '❌ ' + (data.message || 'Đổi mật khẩu thất bại!');
+                errorMessage.style.display = 'block';
+            }
+        } catch (error) {
+            console.error('Change password error:', error);
+            errorMessage.textContent = '❌ Lỗi kết nối! Vui lòng thử lại.';
+            errorMessage.style.display = 'block';
+        } finally {
+            changePasswordButton.disabled = false;
+            changePasswordButton.textContent = 'ĐỔI MẬT KHẨU';
         }
     });
 </script>
